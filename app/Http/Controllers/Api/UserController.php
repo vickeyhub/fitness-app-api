@@ -4,30 +4,64 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 use App\Models\User;
+use App\Models\UserProfile;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Str;
-use App\Mail\ResetPasswordMail;
-use Illuminate\Support\Facades\Mail;
+
 
 class UserController extends Controller
 {
+
     /**
-     * Login API for users and gym owners
+     * Fetch user profile.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\JsonResponse
+     * GET /api/user/profile
      */
-    public function login(Request $request)
+    // public function getProfile()
+    // {
+    //     $user = Auth::user();
+
+    //     // Fetch user's profile along with the base user details
+    //     $profile = UserProfile::where('user_id', $user->id)->first();
+
+    //     return response()->json([
+    //         'message' => 'User profile fetched successfully!',
+    //         'user' => $user,
+    //         'profile' => $profile
+    //     ], 200);
+    // }
+
+    public function show()
     {
-        // Validate the request data
+        $user = User::with('profile')->find(Auth::user()->id);
+        return response()->json([
+            'user' => $user
+        ]);
+    }
+
+    /**
+     * Update user profile.
+     *
+     * PUT /api/user/profile
+     */
+    public function updateProfile(Request $request)
+    {
+        $user = Auth::user();
+        // Check if the user has a profile, or create one if it doesn't exist
+        $profile = $user->profile;
+
+        // Validation rules
         $validator = Validator::make($request->all(), [
-            'email' => 'required|email',
-            'password' => 'required|string|min:6',
+            'age' => 'nullable|numeric|min:1|max:150',
+            'weight' => 'nullable|numeric',
+            'weight_parameter' => 'nullable|in:kg,lb',
+            'height' => 'nullable|numeric',
+            'height_parameter' => 'nullable|in:cm,inch'
         ]);
 
+        // If validation fails, return errors
         if ($validator->fails()) {
             return response()->json([
                 'message' => 'Validation failed',
@@ -35,137 +69,27 @@ class UserController extends Controller
             ], 422);
         }
 
-        // Find the user by email
-        $user = User::where('email', $request->email)->first();
 
-        // Check if the user exists and the password is correct
-        if (!$user || !Hash::check($request->password, $user->password)) {
-            return response()->json([
-                'message' => 'Invalid credentials'
-            ], 401);
+        if (!$profile) {
+            // If no profile exists, create a new one
+            $profile = UserProfile::create([
+                'user_id' => $user->id,
+                // 'profile_picture' => $request->profile_picture,
+                'age' => $request->age,
+                'weight' => $request->weight,
+                'weight_parameter' => $request->weight_parameter,
+                'height' => $request->height,
+                'height_parameter' => $request->height_parameter,
+            ]);
+        } else {
+            // Update existing profile
+            $profile->update($request->only(['age', 'weight', 'weight_parameter', 'height', 'height_parameter']));
         }
 
-        // Generate a new API token for the user
-        $token = $user->createToken('auth_token')->plainTextToken;
-
-        // Return success response with the user data and token
         return response()->json([
-            'message' => 'User logged in successfully!',
+            'message' => 'User profile updated successfully!',
             'user' => $user,
-            'token' => $token
-        ], 200);
-    }
-    public function register(Request $request)
-    {
-        // return $payload = $request->all();
-        $validator = Validator::make($request->all(), [
-            'email' => 'required|email|unique:users,email|max:255',
-            'password' => 'required|string|min:6|confirmed', // password_confirmation required
-            'user_type' => 'required|in:admin,trainer,user',
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json([
-                'message' => 'Validation failed',
-                'errors' => $validator->errors()
-            ], 422);
-        }
-
-        // Create the user record in the database
-        $user = User::create([
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
-            'user_type' => $request->user_type,
-        ]);
-
-        // Generate API token
-        $token = $user->createToken('auth_token')->plainTextToken;
-
-        return response()->json([
-            'message' => 'User registered successfully!',
-            'user' => $user,
-            'token' => $token
-        ], 201);
-    }
-
-    /**
-     * Handle a forgot password request
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\JsonResponse
-     */
-    public function forgotPassword(Request $request)
-    {
-        // Validate the incoming request
-        $validator = Validator::make($request->all(), [
-            'email' => 'required|email|exists:users,email',
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json([
-                'message' => 'Validation failed',
-                'errors' => $validator->errors(),
-            ], 422);
-        }
-        $rawToken = Str::random(6);
-
-        DB::table('password_reset_tokens')->updateOrInsert(
-            ['email' => $request->email],
-            [
-                'email' => $request->email,
-                'token' => Hash::make($rawToken), // Store a hashed version of the token for security
-                'created_at' => now(),
-            ]
-        );
-
-        Mail::to($request->email)->send(new ResetPasswordMail($request->email, $rawToken));
-
-        return response()->json([
-            'message' => 'A reset code has been sent to your email. Please use it to reset your password.',
-        ], 200);
-
-    }
-
-    public function resetPassword(Request $request)
-    {
-        // Validate the incoming request
-        $validator = Validator::make($request->all(), [
-            'email' => 'required|email|exists:users,email',
-            'token' => 'required|string',
-            'password' => 'required|string|min:6|confirmed',
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json([
-                'message' => 'Validation failed',
-                'errors' => $validator->errors(),
-            ], 422);
-        }
-
-        // Retrieve the reset token record for the given email
-        $record = DB::table('password_resets')
-            ->where('email', $request->email)
-            ->first();
-
-        if (!$record) {
-            return response()->json(['message' => 'Invalid or expired reset token.'], 400);
-        }
-
-        // Verify the provided token against the hashed token stored in the database
-        if (!Hash::check($request->token, $record->token)) {
-            return response()->json(['message' => 'Invalid reset token.'], 400);
-        }
-
-        // Update the user's password
-        $user = User::where('email', $request->email)->first();
-        $user->password = Hash::make($request->password);
-        $user->save();
-
-        // Delete the password reset record
-        DB::table('password_resets')->where('email', $request->email)->delete();
-
-        return response()->json([
-            'message' => 'Password updated successfully!',
+            'profile' => $profile
         ], 200);
     }
 }
