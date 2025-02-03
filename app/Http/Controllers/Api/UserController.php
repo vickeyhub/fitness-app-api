@@ -54,11 +54,17 @@ class UserController extends Controller
 
         // Validation rules
         $validator = Validator::make($request->all(), [
+            'first_name' => 'required|string|min:1|max:150',
+            'last_name' => 'required|string|min:1|max:150',
             'age' => 'nullable|numeric|min:1|max:150',
             'weight' => 'nullable|numeric',
             'weight_parameter' => 'nullable|in:kg,lb',
             'height' => 'nullable|numeric',
-            'height_parameter' => 'nullable|in:cm,inch'
+            'height_parameter' => 'nullable|in:cm,inch',
+            'dob' => 'nullable|date',
+            'location' => 'nullable|string|max:255',
+            'rating' => 'nullable|numeric|min:0|max:5',
+            'specialty' => 'nullable|string|max:255',
         ]);
 
         // If validation fails, return errors
@@ -68,6 +74,11 @@ class UserController extends Controller
                 'errors' => $validator->errors()
             ], 422);
         }
+
+        $user->update([
+            'name' => $request->first_name,
+            'last_name' => $request->last_name,
+        ]);
 
 
         if (!$profile) {
@@ -80,16 +91,23 @@ class UserController extends Controller
                 'weight_parameter' => $request->weight_parameter,
                 'height' => $request->height,
                 'height_parameter' => $request->height_parameter,
+                'dob' => $request->dob,
+                'location' => $request->location,
+                'rating' => $request->rating,
+                'specialty' => $request->specialty,
             ]);
         } else {
             // Update existing profile
-            $profile->update($request->only(['age', 'weight', 'weight_parameter', 'height', 'height_parameter']));
+            $profile->update($request->only([
+                'age', 'weight', 'weight_parameter', 'height', 'height_parameter',
+                'dob', 'location', 'rating', 'specialty'
+            ]));
         }
 
         return response()->json([
             'message' => 'User profile updated successfully!',
             'user' => $user,
-            'profile' => $profile
+            // 'profile' => $profile
         ], 200);
     }
 }
