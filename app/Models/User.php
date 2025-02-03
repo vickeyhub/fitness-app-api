@@ -26,6 +26,8 @@ class User extends Authenticatable
         'mobile_number',
         'password',
         'user_type',
+        'otp',
+        'status'
     ];
 
     /**

@@ -14,6 +14,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
 });
 
 Route::post('signup',[Api\AuthController::class, 'register']);
+Route::post('verify-otp', [Api\AuthController::class, 'verifyOtp']);
 Route::post('login',[Api\AuthController::class, 'login']);
 Route::post('forgot-password', [Api\PasswordResetController::class, 'forgotPassword']);
 Route::post('reset-password', [Api\PasswordResetController::class, 'resetPassword']);

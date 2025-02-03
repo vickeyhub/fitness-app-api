@@ -21,6 +21,9 @@ return new class extends Migration
             $table->string('mobile_number')->nullable();
             $table->string('password');
             $table->enum('user_type',['admin','trainer','user'])->nullable();
+            $table->string('otp', 4)->nullable();
+            $table->enum('status',['0','1','2'])->default('0');
+            $table->enum('paid_status',['0','1','2'])->default('0');
             $table->rememberToken();
             $table->timestamps();
             $table->softDeletes();
