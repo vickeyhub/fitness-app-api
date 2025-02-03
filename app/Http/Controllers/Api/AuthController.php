@@ -82,9 +82,6 @@ class AuthController extends Controller
             Mail::to($request->email)->send(new SendOtpMail($otp, $request->email));
         }
 
-        // Generate API token
-        $token = $user->createToken('auth_token')->plainTextToken;
-
         return response()->json([
             'message' => 'User registered successfully! Please verify your email with OTP.',
             'user' => $user,
@@ -112,7 +109,13 @@ class AuthController extends Controller
         // Mark user as verified
         $user->update(['status' => '1', 'otp' => null]);
 
-        return response()->json(['message' => 'Email verified successfully!'], 200);
+        // Generate API token
+        $token = $user->createToken('auth_token')->plainTextToken;
+
+        return response()->json([
+            'message' => 'Email verified successfully!',
+            'token' => $token
+        ], 200);
     }
 
 }
