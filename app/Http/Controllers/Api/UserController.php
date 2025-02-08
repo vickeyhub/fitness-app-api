@@ -99,8 +99,15 @@ class UserController extends Controller
         } else {
             // Update existing profile
             $profile->update($request->only([
-                'age', 'weight', 'weight_parameter', 'height', 'height_parameter',
-                'dob', 'location', 'rating', 'specialty'
+                'age',
+                'weight',
+                'weight_parameter',
+                'height',
+                'height_parameter',
+                'dob',
+                'location',
+                'rating',
+                'specialty'
             ]));
         }
 
@@ -109,5 +116,58 @@ class UserController extends Controller
             'user' => $user,
             // 'profile' => $profile
         ], 200);
+    }
+
+    public function getTrainers(Request $request)
+    {
+        try {
+            // Validation Rules
+            $validator = Validator::make($request->all(), [
+                'location' => 'nullable|string|max:255',
+                'rating' => 'nullable|numeric|min:0|max:5',
+                'specialty' => 'nullable|string|max:255',
+            ]);
+
+            // If validation fails, return errors
+            if ($validator->fails()) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Invalid credentials',
+                    'errors' => $validator->errors()
+                ], 422);
+            }
+            $name = $request->name;
+            $location = $request->location;
+            $rating = $request->rating;
+            $specialty = $request->specialty;
+
+            $trainers = User::select('id','name')
+            ->where(['user_type' => 'trainer','status' => '1'])
+                ->when($name, function ($query, $name) {
+                    $query->where('name', 'LIKE', "%$name%")
+                        ->orWhere('last_name', 'LIKE', "%$name%");
+                })
+                ->whereHas('profile', function ($query) use ($location, $rating, $specialty) {
+                    $query->when($location, fn($q) => $q->where('location', 'LIKE', "%$location%"))
+                        ->when($rating, fn($q) => $q->where('rating', 'LIKE', "%$rating%"))
+                        ->when($specialty, fn($q) => $q->where('specialty', 'LIKE', "%$specialty%"));
+                })
+                ->with('profile:id,user_id,specialty,rating,location')
+                ->get();
+            if($trainers->isEmpty()) {
+                return response()->json([
+                    'status' => 'success',
+                    'message' => 'No trainers are available'
+                ], 200);
+            }
+
+            return response()->json($trainers, 200);
+        } catch (ValidationException $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Validation Failed',
+                'errors' => $e->errors()
+            ], 422);
+        }
     }
 }

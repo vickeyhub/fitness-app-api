@@ -18,3 +18,6 @@ Route::post('verify-otp', [Api\AuthController::class, 'verifyOtp']);
 Route::post('login',[Api\AuthController::class, 'login']);
 Route::post('forgot-password', [Api\PasswordResetController::class, 'forgotPassword']);
 Route::post('reset-password', [Api\PasswordResetController::class, 'resetPassword']);
+
+// trainers api routes
+Route::get('trainers', [Api\UserController::class, 'getTrainers']);
