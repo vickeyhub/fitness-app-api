@@ -141,7 +141,7 @@ class UserController extends Controller
             $rating = $request->rating;
             $specialty = $request->specialty;
 
-            $trainers = User::select('id','name')
+            $trainers = User::select('id','name as first_name', 'last_name')
             ->where(['user_type' => 'trainer','status' => '1'])
                 ->when($name, function ($query, $name) {
                     $query->where('name', 'LIKE', "%$name%")

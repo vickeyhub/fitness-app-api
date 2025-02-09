@@ -24,7 +24,7 @@ class AuthController extends Controller
         $validator = Validator::make($request->all(), [
             'email' => 'required|email',
             'password' => 'required|string|min:6',
-            'user_type' => 'required|string'
+            // 'user_type' => 'required|string'
         ]);
 
         if ($validator->fails()) {
@@ -38,7 +38,7 @@ class AuthController extends Controller
         // Find the user by email
         $user = User::where([
             'email' => $request->email,
-            'user_type' => $request->user_type
+            // 'user_type' => $request->user_type
         ])->first();
 
         // Check if the user exists and the password is correct
