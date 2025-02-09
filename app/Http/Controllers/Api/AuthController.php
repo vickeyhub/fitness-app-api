@@ -24,17 +24,22 @@ class AuthController extends Controller
         $validator = Validator::make($request->all(), [
             'email' => 'required|email',
             'password' => 'required|string|min:6',
+            'user_type' => 'required|string'
         ]);
 
         if ($validator->fails()) {
             return response()->json([
                 'message' => 'Validation failed',
-                'errors' => $validator->errors()
+                // 'errors' => $validator->errors()
+                'errors' => array_values($validator->errors()->all())
             ], 422);
         }
 
         // Find the user by email
-        $user = User::where('email', $request->email)->first();
+        $user = User::where([
+            'email' => $request->email,
+            'user_type' => $request->user_type
+        ])->first();
 
         // Check if the user exists and the password is correct
         if (!$user || !Hash::check($request->password, $user->password)) {
@@ -55,8 +60,11 @@ class AuthController extends Controller
     }
     public function register(Request $request)
     {
+
         // return $payload = $request->all();
         $validator = Validator::make($request->all(), [
+            'first_name' => 'required|string|min:1|max:150',
+            'last_name' => 'required|string|min:1|max:150',
             'email' => 'required|email|unique:users,email|max:255',
             'password' => 'required|string|min:6|confirmed', // password_confirmation required
             'user_type' => 'required|in:admin,trainer,user',
@@ -65,12 +73,14 @@ class AuthController extends Controller
         if ($validator->fails()) {
             return response()->json([
                 'message' => 'Invalid credentials',
-                'errors' => $validator->errors()
+                'errors' => array_values($validator->errors()->all())
             ], 422);
         }
         $otp = rand(1000, 9999);
         // Create the user record in the database
         $user = User::create([
+            'name' => $request->first_name,
+            'last_name' => $request->last_name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
             'user_type' => $request->user_type,
@@ -97,7 +107,10 @@ class AuthController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return response()->json(['message' => 'Validation failed', 'errors' => $validator->errors()], 422);
+            return response()->json([
+                'message' => 'Validation failed',
+                'errors' => array_values($validator->errors()->all())
+            ], 422);
         }
 
         $user = User::where('email', $request->email)->where('otp', $request->otp)->first();
