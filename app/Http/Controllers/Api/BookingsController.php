@@ -58,14 +58,17 @@ class BookingsController extends Controller
         if ($request->trainer) {
             $trainer = User::where('id', $request->trainer)->where('user_type', 'trainer')->first();
             if (!$trainer) {
-                return response()->json(['message' => 'Invalid trainer ID'], 400);
+                return response()->json([
+                    'status' => "failed",
+                    'message' => 'Invalid trainer ID'
+                ], 400);
             }
         }
 
         if ($request->gym) {
             $gym = User::where('id', $request->gym)->where('user_type', 'gym')->first();
             if (!$gym) {
-                return response()->json(['message' => 'Invalid gym ID'], 400);
+                return response()->json(['status' => "failed",'message' => 'Invalid gym ID'], 400);
             }
         }
 

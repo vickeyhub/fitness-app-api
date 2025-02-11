@@ -26,3 +26,6 @@ Route::post('reset-password', [Api\PasswordResetController::class, 'resetPasswor
 Route::get('trainers', [Api\UserController::class, 'getTrainers']);
 Route::get('gyms', [Api\GymsController::class, 'getGyms']);
 
+// sessions/classes management
+Route::apiResource('sessions', Api\SessionsController::class);
+
