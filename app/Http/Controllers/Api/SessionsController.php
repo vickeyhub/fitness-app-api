@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Classes;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Auth;
 
 class SessionsController extends Controller
 {
@@ -39,19 +40,21 @@ class SessionsController extends Controller
             'steps' => 'required|array',
             'muscles_involved' => 'required|array',
             'schedule' => 'required|array',
-            'user_id' => 'required|string',
+            // 'user_id' => 'required|string',
             'price' => 'required|numeric',
             'session_thumbnail' => 'required|string',
             'session_avrage_rating' => 'required|numeric|min:0|max:5',
             'session_timing' => 'required|string',
         ]);
-        $payload = $validator->validated();
+
         if ($validator->fails()) {
             return response()->json([
                 'message' => 'Validation failed',
                 'errors' => array_values($validator->errors()->all())
             ], 422);
         }
+        $payload = $validator->validated();
+        $payload['user_id'] = Auth::user()->id;
 
         $session = Classes::create($payload);
 
