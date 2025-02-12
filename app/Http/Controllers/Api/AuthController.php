@@ -23,14 +23,12 @@ class AuthController extends Controller
         // Validate the request data
         $validator = Validator::make($request->all(), [
             'email' => 'required|email',
-            'password' => 'required|string|min:6',
-            // 'user_type' => 'required|string'
+            'password' => 'required|string|min:6'
         ]);
 
         if ($validator->fails()) {
             return response()->json([
                 'message' => 'Validation failed',
-                // 'errors' => $validator->errors()
                 'errors' => array_values($validator->errors()->all())
             ], 422);
         }
@@ -38,16 +36,20 @@ class AuthController extends Controller
         // Find the user by email
         $user = User::where([
             'email' => $request->email,
-            // 'user_type' => $request->user_type
-        ])->first();
+            'status' => '1'
+        ])
+            ->with('profile')
+            ->first();
 
         // Check if the user exists and the password is correct
         if (!$user || !Hash::check($request->password, $user->password)) {
             return response()->json([
+                'status' => 'failed',
                 'message' => 'Invalid credentials'
             ], 401);
         }
-
+        $user->first_name = $user->name;
+        $user->makeHidden(['name']);
         // Generate a new API token for the user
         $token = $user->createToken('auth_token')->plainTextToken;
 
@@ -88,13 +90,43 @@ class AuthController extends Controller
             'status' => '0', // Set status as pending
         ]);
 
-        if ($user) {
-            Mail::to($request->email)->send(new SendOtpMail($otp, $request->email));
+
+        if (!$user->profile) {
+            // Create a new profile if it doesn't exist
+            $user->profile()->create([
+                'age' => null,
+                'mobile_number' => null,
+                'profile_picture' => null,
+                'dob' => null,
+                'weight' => null,
+                'weight_parameter' => null,
+                'height' => null,
+                'height_parameter' => null,
+                'location' => null
+            ]);
+        } else {
+            // Update existing profile
+            $user->profile->update([
+                'age' => null,
+                'mobile_number' => null,
+                'profile_picture' => null,
+                'dob' => null,
+                'weight' => null,
+                'weight_parameter' => null,
+                'height' => null,
+                'height_parameter' => null,
+                'location' => null
+            ]);
         }
 
+        if ($user) {
+            // Mail::to($request->email)->send(new SendOtpMail($otp, $request->email));
+        }
+        $user->first_name = $user->name;
+        $user->makeHidden(['name']);
         return response()->json([
             'message' => 'User registered successfully! Please verify your email with OTP.',
-            'user' => $user,
+            'user' => $user->load('profile'),
             // 'token' => $token
         ], 201);
     }

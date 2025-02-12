@@ -36,6 +36,8 @@ class UserController extends Controller
     public function show()
     {
         $user = User::with('profile')->find(Auth::user()->id);
+        $user->first_name = $user->name;
+        $user->makeHidden(['name']);
         return response()->json([
             'user' => $user
         ]);
@@ -110,7 +112,8 @@ class UserController extends Controller
                 'specialty'
             ]));
         }
-
+        $user->first_name = $user->name;
+        $user->makeHidden(['name']);
         return response()->json([
             'message' => 'User profile updated successfully!',
             'user' => $user,
