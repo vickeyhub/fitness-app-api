@@ -14,7 +14,7 @@ class SessionsController extends Controller
      */
     public function index()
     {
-        //
+        return Classes::all();
     }
 
     /**

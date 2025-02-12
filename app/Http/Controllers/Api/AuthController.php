@@ -120,7 +120,7 @@ class AuthController extends Controller
         }
 
         if ($user) {
-            // Mail::to($request->email)->send(new SendOtpMail($otp, $request->email));
+            Mail::to($request->email)->send(new SendOtpMail($otp, $request->email));
         }
         $user->first_name = $user->name;
         $user->makeHidden(['name']);
