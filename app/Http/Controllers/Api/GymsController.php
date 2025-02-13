@@ -31,7 +31,7 @@ class GymsController extends Controller
             $rating = $request->rating;
             $specialty = $request->specialty;
 
-            $trainers = User::select('id','name as first_name','last_name','email')
+            $trainers = User::select('id','first_name','last_name','email')
             ->where(['user_type' => 'gym','status' => '1'])
                 ->when($name, function ($query, $name) {
                     $query->where('name', 'LIKE', "%$name%")

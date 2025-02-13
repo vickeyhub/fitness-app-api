@@ -22,6 +22,7 @@ class PasswordResetController extends Controller
      */
     public function forgotPassword(Request $request)
     {
+        try {
         // Validate the incoming request
         $validator = Validator::make($request->all(), [
             'email' => 'required|email|exists:users,email',
@@ -49,6 +50,9 @@ class PasswordResetController extends Controller
         return response()->json([
             'message' => 'A reset code has been sent to your email. Please use it to reset your password.',
         ], 200);
+    }  catch (\InvalidArgumentException $e) {
+        return response()->json([$e->getMessage(), 500]);
+    }
 
     }
 

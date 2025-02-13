@@ -36,8 +36,7 @@ class UserController extends Controller
     public function show()
     {
         $user = User::with('profile')->find(Auth::user()->id);
-        $user->first_name = $user->name;
-        $user->makeHidden(['name']);
+
         return response()->json([
             'user' => $user
         ]);
@@ -112,8 +111,7 @@ class UserController extends Controller
                 'specialty'
             ]));
         }
-        $user->first_name = $user->name;
-        $user->makeHidden(['name']);
+
         return response()->json([
             'message' => 'User profile updated successfully!',
             'user' => $user,
@@ -144,10 +142,10 @@ class UserController extends Controller
             $rating = $request->rating;
             $specialty = $request->specialty;
 
-            $trainers = User::select('id','name as first_name', 'last_name')
+            $trainers = User::select('id','first_name as first_name', 'last_name')
             ->where(['user_type' => 'trainer','status' => '1'])
                 ->when($name, function ($query, $name) {
-                    $query->where('name', 'LIKE', "%$name%")
+                    $query->where('first_name', 'LIKE', "%$name%")
                         ->orWhere('last_name', 'LIKE', "%$name%");
                 })
                 ->whereHas('profile', function ($query) use ($location, $rating, $specialty) {

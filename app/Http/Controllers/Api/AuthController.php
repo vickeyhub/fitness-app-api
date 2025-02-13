@@ -48,8 +48,7 @@ class AuthController extends Controller
                 'message' => 'Invalid credentials'
             ], 401);
         }
-        $user->first_name = $user->name;
-        $user->makeHidden(['name']);
+
         // Generate a new API token for the user
         $token = $user->createToken('auth_token')->plainTextToken;
 
@@ -60,8 +59,24 @@ class AuthController extends Controller
             'token' => $token
         ], 200);
     }
+
     public function register(Request $request)
     {
+        $otp = rand(1000, 9999);
+        $check_if_active = User::where([
+            'email' => $request->email,
+            'status' => '0'
+        ])->first();
+        if($check_if_active){
+            $check_if_active->otp = $otp;
+            $check_if_active->save();
+            Mail::to($request->email)->send(new SendOtpMail($otp, $request->email));
+            return response()->json([
+                'message' => 'your email already registered with us, Please verify your email with OTP.',
+                'user' => $check_if_active->load('profile'),
+                // 'token' => $token
+            ], 200);
+        }
 
         // return $payload = $request->all();
         $validator = Validator::make($request->all(), [
@@ -78,10 +93,9 @@ class AuthController extends Controller
                 'errors' => array_values($validator->errors()->all())
             ], 422);
         }
-        $otp = rand(1000, 9999);
         // Create the user record in the database
         $user = User::create([
-            'name' => $request->first_name,
+            'first_name' => $request->first_name,
             'last_name' => $request->last_name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
@@ -122,8 +136,7 @@ class AuthController extends Controller
         if ($user) {
             Mail::to($request->email)->send(new SendOtpMail($otp, $request->email));
         }
-        $user->first_name = $user->name;
-        $user->makeHidden(['name']);
+
         return response()->json([
             'message' => 'User registered successfully! Please verify your email with OTP.',
             'user' => $user->load('profile'),
