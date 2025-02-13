@@ -1,7 +1,6 @@
 <?php
 
 use Illuminate\Http\Request;
-use App\Http\Middleware\EnsureValidToken;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api;
 
@@ -30,4 +29,13 @@ Route::get('gyms', [Api\GymsController::class, 'getGyms']);
 // sessions/classes management
 // Route::apiResource('sessions', Api\SessionsController::class);
 Route::get('sessions', [Api\SessionsController::class, 'index']);
+
+
+Route::get('login', function (){
+    $output = [
+        'status' => 'faild',
+        'message' => 'Not Authorised',
+    ];
+    return response()->json($output, 401);
+})->name('login');
 

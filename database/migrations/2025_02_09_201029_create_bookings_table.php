@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('bookings', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained();
+            $table->foreignId('user_id');
             $table->foreignId('trainer_id')->nullable();
             $table->foreignId('gym_id')->nullable();
             $table->foreignId('class_id');
