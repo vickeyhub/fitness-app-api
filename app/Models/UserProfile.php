@@ -18,6 +18,7 @@ class UserProfile extends Model
         'weight_parameter',
         'height',
         'height_parameter',
+        'gender',
         "dob","location","rating","specialty"
     ];
 

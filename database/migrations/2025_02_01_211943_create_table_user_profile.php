@@ -20,6 +20,7 @@ return new class extends Migration
             $table->string('weight_parameter')->nullable();
             $table->string('height')->nullable();
             $table->string('height_parameter')->nullable();
+            $table->string('gender', 7)->nullable();
             $table->timestamps();
             $table->softDeletes();
         });

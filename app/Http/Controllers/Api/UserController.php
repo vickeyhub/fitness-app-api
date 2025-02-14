@@ -77,7 +77,7 @@ class UserController extends Controller
         }
 
         $user->update([
-            'name' => $request->first_name,
+            'first_name' => $request->first_name,
             'last_name' => $request->last_name,
         ]);
 
@@ -91,6 +91,7 @@ class UserController extends Controller
                 'weight' => $request->weight,
                 'weight_parameter' => $request->weight_parameter,
                 'height' => $request->height,
+                'gender' => $request->gender,
                 'height_parameter' => $request->height_parameter,
                 'dob' => $request->dob,
                 'location' => $request->location,
@@ -105,6 +106,7 @@ class UserController extends Controller
                 'weight_parameter',
                 'height',
                 'height_parameter',
+                'gender',
                 'dob',
                 'location',
                 'rating',
@@ -137,7 +139,7 @@ class UserController extends Controller
                     'errors' => $validator->errors()
                 ], 422);
             }
-            $name = $request->name;
+            $name = $request->first_name;
             $location = $request->location;
             $rating = $request->rating;
             $specialty = $request->specialty;
