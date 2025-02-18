@@ -26,6 +26,14 @@ class SessionsController extends Controller
         // ->paginate(1);
 
         $query = Classes::query();
+        $query->select(
+            'classes.*',
+            'users.first_name',
+            'users.last_name',
+            'users.email',
+            'users.mobile_number',
+            'users.user_type'
+        );
 
         if ($request->filled('category')) {
             $query->where('session_type', 'LIKE', '%' . $request->category . '%');
@@ -49,6 +57,7 @@ class SessionsController extends Controller
                 $query->whereIn('fitness_goal', $fitnessGoals);
             }
         }
+        $query->leftJoin('users', 'users.id','=', 'classes.user_id');
 
         return $query->paginate(5);
     }
