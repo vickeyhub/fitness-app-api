@@ -13,9 +13,44 @@ class SessionsController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        return Classes::all();
+        // $session_type = $request->get('category');
+        // $duration = $request->get('duration');
+        // $intensity = $request->get('intensity');
+        // $fitness_goal = $request->get('fitness_goal');
+        // return Classes::whereLike('session_type', "%$session_type%")
+        // ->orWhereLike('duration', "%$duration%")
+        // ->orWhereLike('intensity', "%$intensity%")
+        // ->orWhereLike('fitness_goal', "%$fitness_goal%")
+        // ->paginate(1);
+
+        $query = Classes::query();
+
+        if ($request->filled('category')) {
+            $query->where('session_type', 'LIKE', '%' . $request->category . '%');
+        }
+
+        if ($request->filled('duration')) {
+            $query->where('duration', 'LIKE', '%' . $request->duration . '%');
+        }
+
+        if ($request->filled('intensity')) {
+            $query->where('intensity', 'LIKE', '%' . $request->intensity . '%');
+        }
+
+        // if ($request->filled('fitness_goal')) {
+        //     $query->where('fitness_goal', 'LIKE', '%' . $request->fitness_goal . '%');
+        // }
+
+        if ($request->filled('fitness_goal')) {
+            $fitnessGoals = json_decode($request->fitness_goal, true);
+            if (is_array($fitnessGoals)) {
+                $query->whereIn('fitness_goal', $fitnessGoals);
+            }
+        }
+
+        return $query->paginate(5);
     }
 
     /**
@@ -45,6 +80,11 @@ class SessionsController extends Controller
             'session_thumbnail' => 'required|string',
             'session_avrage_rating' => 'required|numeric|min:0|max:5',
             'session_timing' => 'required|string',
+            // new addition in request 19-02-2025
+            "session_type" => "required|array",
+            "session_keywords" => "required|array",
+            "intensity" => "required|string",
+            "fitness_goal" => "required|array"
         ]);
 
         if ($validator->fails()) {

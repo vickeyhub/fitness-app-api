@@ -14,6 +14,9 @@ class Classes extends Model
         'steps' => 'array',
         'muscles_involved' => 'array',
         'schedule' => 'array',
+        "session_type" => "array",
+        "session_keywords" => "array",
+        "fitness_goal" => "array"
     ];
 
 }

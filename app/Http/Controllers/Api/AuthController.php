@@ -84,7 +84,7 @@ class AuthController extends Controller
             'last_name' => 'required|string|min:1|max:150',
             'email' => 'required|email|unique:users,email|max:255',
             'password' => 'required|string|min:6|confirmed', // password_confirmation required
-            'user_type' => 'required|in:admin,trainer,user',
+            'user_type' => 'required|in:admin,trainer,user,gym',
         ]);
 
         if ($validator->fails()) {
