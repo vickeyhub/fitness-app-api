@@ -15,15 +15,6 @@ class SessionsController extends Controller
      */
     public function index(Request $request)
     {
-        // $session_type = $request->get('category');
-        // $duration = $request->get('duration');
-        // $intensity = $request->get('intensity');
-        // $fitness_goal = $request->get('fitness_goal');
-        // return Classes::whereLike('session_type', "%$session_type%")
-        // ->orWhereLike('duration', "%$duration%")
-        // ->orWhereLike('intensity', "%$intensity%")
-        // ->orWhereLike('fitness_goal', "%$fitness_goal%")
-        // ->paginate(1);
 
         $query = Classes::query();
         $query->select(
@@ -47,17 +38,19 @@ class SessionsController extends Controller
             $query->where('intensity', 'LIKE', '%' . $request->intensity . '%');
         }
 
-        // if ($request->filled('fitness_goal')) {
-        //     $query->where('fitness_goal', 'LIKE', '%' . $request->fitness_goal . '%');
-        // }
-
         if ($request->filled('fitness_goal')) {
+            // $fitnessGoals = json_decode($request->fitness_goal, true);
+            // if (is_array($fitnessGoals)) {
+            //     $query->whereIn('fitness_goal', $fitnessGoals);
+            // }
             $fitnessGoals = json_decode($request->fitness_goal, true);
             if (is_array($fitnessGoals)) {
-                $query->whereIn('fitness_goal', $fitnessGoals);
+                foreach ($fitnessGoals as $goal) {
+                    $query->whereJsonContains('fitness_goal', $goal);
+                }
             }
         }
-        $query->leftJoin('users', 'users.id','=', 'classes.user_id');
+        $query->leftJoin('users', 'users.id', '=', 'classes.user_id');
 
         return $query->paginate(5);
     }
