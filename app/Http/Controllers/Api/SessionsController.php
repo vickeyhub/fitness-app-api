@@ -5,17 +5,16 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Classes;
+use App\Models\Bookmark;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
 
 class SessionsController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
+
     public function index(Request $request)
     {
-
+        // return $request->all();
         $query = Classes::query();
         $query->select(
             'classes.*',
@@ -26,6 +25,9 @@ class SessionsController extends Controller
             'users.user_type'
         );
 
+        if ($request->filled('session_title')) {
+            $query->where('session_title', 'LIKE', '%' . $request->session_title . '%');
+        }
         if ($request->filled('category')) {
             $query->where('session_type', 'LIKE', '%' . $request->category . '%');
         }
@@ -39,15 +41,14 @@ class SessionsController extends Controller
         }
 
         if ($request->filled('fitness_goal')) {
-            // $fitnessGoals = json_decode($request->fitness_goal, true);
-            // if (is_array($fitnessGoals)) {
-            //     $query->whereIn('fitness_goal', $fitnessGoals);
-            // }
-            $fitnessGoals = json_decode($request->fitness_goal, true);
+            $fitnessGoals = is_array($request->fitness_goal) ? $request->fitness_goal : json_decode($request->fitness_goal, true);
+
             if (is_array($fitnessGoals)) {
-                foreach ($fitnessGoals as $goal) {
-                    $query->whereJsonContains('fitness_goal', $goal);
-                }
+                $query->where(function ($q) use ($fitnessGoals) {
+                    foreach ($fitnessGoals as $goal) {
+                        $q->orWhereJsonContains('fitness_goal', $goal);
+                    }
+                });
             }
         }
         $query->leftJoin('users', 'users.id', '=', 'classes.user_id');
@@ -55,12 +56,58 @@ class SessionsController extends Controller
         return $query->paginate(5);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        return 'create';
+    public function save_bookmark(Request $request){
+        $validator = Validator::make($request->all(), [
+            'session_id' => 'required|exists:classes,id'
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'message' => 'Validation failed',
+                'errors' => array_values($validator->errors()->all())
+            ], 422);
+        }
+        // $bookmark = Bookmark::firstorCreate([
+        //     'user_id' => Auth::id(),
+        //     'session_id' => $request->session_id
+        // ]);
+
+        // if($bookmark){
+        //     return response()->json([
+        //         'message' => 'Session bookmarked successfully',
+        //         'bookmark' => $bookmark
+        //     ], 201);
+        // }
+
+        $user_id = Auth::id();
+        $session_id = $request->session_id;
+        // check if bookmark already exist or not
+        $bookmark = Bookmark::where([
+            'user_id' => $user_id,
+            'session_id' => $session_id
+        ])->first();
+        if($bookmark){
+            $bookmark->delete();
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Bookmark removed successfully',
+                'bookmarked' => false
+            ]);
+        } else {
+            Bookmark::create([
+                'user_id' => $user_id,
+                'session_id' => $session_id
+            ]);
+            return response()->json(['status' => 'success','message' => 'Session bookmarked successfully','bookmarked' => true]);
+        }
+    }
+
+    public function get_bookmarked_sessions(){
+        $bookmarks = Bookmark::where('user_id', Auth::id())
+        ->with('session')
+        ->get();
+
+        return response()->json($bookmarks);
     }
 
     /**

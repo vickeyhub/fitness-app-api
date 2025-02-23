@@ -14,6 +14,8 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('bookings', [Api\BookingsController::class, 'createBookings']);
     Route::get('bookings', [Api\BookingsController::class, 'index']);
     Route::post('sessions', [Api\SessionsController::class, 'store']);
+    Route::post('bookmark', [Api\SessionsController::class, 'save_bookmark']);
+    Route::get('bookmark', [Api\SessionsController::class, 'get_bookmarked_sessions']);
 });
 
 Route::post('signup',[Api\AuthController::class, 'register']);
@@ -28,7 +30,7 @@ Route::get('gyms', [Api\GymsController::class, 'getGyms']);
 
 // sessions/classes management
 // Route::apiResource('sessions', Api\SessionsController::class);
-Route::get('sessions', [Api\SessionsController::class, 'index']);
+Route::post('search-sessions', [Api\SessionsController::class, 'index']);
 
 
 Route::get('login', function (){
