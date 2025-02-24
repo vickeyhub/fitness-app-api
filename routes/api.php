@@ -16,6 +16,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('sessions', [Api\SessionsController::class, 'store']);
     Route::post('bookmark', [Api\SessionsController::class, 'save_bookmark']);
     Route::get('bookmark', [Api\SessionsController::class, 'get_bookmarked_sessions']);
+    Route::get('session/session-filter-api', [Api\SessionFilterController::class, 'session_filter_data']);
 });
 
 Route::post('signup',[Api\AuthController::class, 'register']);
