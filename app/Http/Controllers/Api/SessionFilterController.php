@@ -12,11 +12,30 @@ class SessionFilterController extends Controller
     {
         $data = Classes::select('session_type', 'fitness_goal', 'duration', 'intensity')->get();
 
+        $response = [
+            'categories' => [
+                'name' => 'Categories',
+                'data' => $data->pluck('session_type')->flatten()->unique()->values()
+            ],
+            'fitness_goals' => [
+                'name' => 'Fitness Goal',
+                'data' => $data->pluck('fitness_goal')->flatten()->unique()->values()
+            ],
+            'duration' => [
+                'name' => 'Duration',
+                'data' => $data->pluck('duration')->unique()->values()
+            ],
+            'intensities' => [
+                'name' => 'Intensities',
+                'data' => $data->pluck('intensity')->unique()->values()
+            ]
+        ];
+
+
+
         return response()->json([
-            'categories' => $data->pluck('session_type')->flatten()->unique()->values(),
-            'fitness_goals' => $data->pluck('fitness_goal')->flatten()->unique()->values(),
-            'duration' => $data->pluck('duration')->unique()->values(),
-            'intensities' => $data->pluck('intensity')->unique()->values(),
-        ]);
+                'status' => 'success',
+                'data' => $response
+            ],200);
     }
 }

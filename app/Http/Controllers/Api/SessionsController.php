@@ -107,7 +107,11 @@ class SessionsController extends Controller
         ->with('session')
         ->get();
 
-        return response()->json($bookmarks);
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Bookmarked sessions',
+            'data' => $bookmarks
+        ]);
     }
 
     /**
@@ -118,7 +122,7 @@ class SessionsController extends Controller
         $validator = Validator::make($request->all(), [
             'session_title' => 'required|string|max:255',
             'description' => 'required|string',
-            'duration' => 'required|integer',
+            'duration' => 'required|string',
             'total_duration' => 'required|integer',
             'calories' => 'required|integer',
             'steps' => 'required|array',
