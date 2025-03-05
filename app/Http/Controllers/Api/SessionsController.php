@@ -8,6 +8,7 @@ use App\Models\Classes;
 use App\Models\Bookmark;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class SessionsController extends Controller
 {
@@ -24,16 +25,30 @@ class SessionsController extends Controller
 
     public function search_sessions(Request $request)
     {
-        // return $request->all();
         $query = Classes::query();
+
         $query->select(
             'classes.*',
             'users.first_name',
             'users.last_name',
             'users.email',
             'users.mobile_number',
-            'users.user_type'
+            'users.user_type',
+            // DB::raw('IF(bookmarks.id IS NOT NULL, true, false) as is_bookmarked')
+            // 'bookmarks.user_id as bookmark_user_id',
+            // 'bookmarks.session_id as bookmark_session_id',
         );
+        if(Auth::guard('sanctum')->check()){
+            $authId = Auth::guard('sanctum')->id();
+            $query->leftJoin('bookmarks', function($join) use ($authId) {
+                $join->on('bookmarks.session_id', '=', 'classes.id')
+                     ->where('bookmarks.user_id', '=', $authId);
+            });
+            $query->addSelect(
+            DB::raw('IF(bookmarks.id IS NOT NULL, true, false) as is_bookmarked')
+            );
+        }
+
 
         if ($request->filled('session_title')) {
             $query->where('session_title', 'LIKE', '%' . $request->session_title . '%');
