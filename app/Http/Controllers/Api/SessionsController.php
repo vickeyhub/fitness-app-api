@@ -11,8 +11,18 @@ use Illuminate\Support\Facades\Auth;
 
 class SessionsController extends Controller
 {
+    public function index(){
+        $user_id = Auth::id();
+        $sessions = Classes::where('user_id', $user_id)->paginate();
 
-    public function index(Request $request)
+        return response()->json([
+            'status' => 'success',
+            'message' => "Session fetched successfully",
+            'data' => $sessions
+        ],200);
+    }
+
+    public function search_sessions(Request $request)
     {
         // return $request->all();
         $query = Classes::query();
