@@ -12,7 +12,8 @@ use Illuminate\Support\Facades\DB;
 
 class SessionsController extends Controller
 {
-    public function index(){
+    public function index()
+    {
         $user_id = Auth::id();
         $sessions = Classes::where('user_id', $user_id)->paginate();
 
@@ -20,7 +21,7 @@ class SessionsController extends Controller
             'status' => 'success',
             'message' => "Session fetched successfully",
             'data' => $sessions
-        ],200);
+        ], 200);
     }
 
     public function search_sessions(Request $request)
@@ -34,18 +35,15 @@ class SessionsController extends Controller
             'users.email',
             'users.mobile_number',
             'users.user_type',
-            // DB::raw('IF(bookmarks.id IS NOT NULL, true, false) as is_bookmarked')
-            // 'bookmarks.user_id as bookmark_user_id',
-            // 'bookmarks.session_id as bookmark_session_id',
         );
-        if(Auth::guard('sanctum')->check()){
+        if (Auth::guard('sanctum')->check()) {
             $authId = Auth::guard('sanctum')->id();
-            $query->leftJoin('bookmarks', function($join) use ($authId) {
+            $query->leftJoin('bookmarks', function ($join) use ($authId) {
                 $join->on('bookmarks.session_id', '=', 'classes.id')
-                     ->where('bookmarks.user_id', '=', $authId);
+                    ->where('bookmarks.user_id', '=', $authId);
             });
             $query->addSelect(
-            DB::raw('IF(bookmarks.id IS NOT NULL, true, false) as is_bookmarked')
+                DB::raw('IF(bookmarks.id IS NOT NULL, true, false) as is_bookmarked')
             );
         }
 
@@ -79,9 +77,48 @@ class SessionsController extends Controller
         $query->leftJoin('users', 'users.id', '=', 'classes.user_id');
 
         return $query->paginate(5);
+        // return $query->orderBy('classes.id', 'DESC')->cursorPaginate(5);
+    }
+    public function session_detail($id)
+    {
+        try {
+            $query = Classes::query();
+
+            $query->select(
+                'classes.*',
+                'users.first_name',
+                'users.last_name',
+                'users.email',
+                'users.mobile_number',
+                'users.user_type',
+            );
+
+            $query->leftJoin('users', 'users.id', '=', 'classes.user_id');
+            if($data = $query->where('classes.id', $id)->first()){
+
+                return response()->json([
+                    'status' => 'success',
+                    'message' => 'session detail fetched successfully',
+                    'data' => $data
+                ], 200);
+            } else {
+                return response()->json([
+                    'status' => 'failed',
+                    'message' => 'No record found',
+                    'data' => $data
+                ], 404);
+            }
+        } catch (Exception $e) {
+            return response()->json([
+                'status' => 'failed',
+                'message' => 'Message ' . $e->getMessage(),
+                'data' => $data
+            ], 401);
+        }
     }
 
-    public function save_bookmark(Request $request){
+    public function save_bookmark(Request $request)
+    {
         $validator = Validator::make($request->all(), [
             'session_id' => 'required|exists:classes,id'
         ]);
@@ -111,7 +148,7 @@ class SessionsController extends Controller
             'user_id' => $user_id,
             'session_id' => $session_id
         ])->first();
-        if($bookmark){
+        if ($bookmark) {
             $bookmark->delete();
             return response()->json([
                 'status' => 'success',
@@ -123,14 +160,15 @@ class SessionsController extends Controller
                 'user_id' => $user_id,
                 'session_id' => $session_id
             ]);
-            return response()->json(['status' => 'success','message' => 'Session bookmarked successfully','bookmarked' => true]);
+            return response()->json(['status' => 'success', 'message' => 'Session bookmarked successfully', 'bookmarked' => true]);
         }
     }
 
-    public function get_bookmarked_sessions(){
+    public function get_bookmarked_sessions()
+    {
         $bookmarks = Bookmark::where('user_id', Auth::id())
-        ->with('session')
-        ->get();
+            ->with('session')
+            ->get();
 
         return response()->json([
             'status' => 'success',

@@ -33,6 +33,7 @@ Route::get('gyms', [Api\GymsController::class, 'getGyms']);
 // sessions/classes management
 // Route::apiResource('sessions', Api\SessionsController::class);
 Route::post('search-sessions', [Api\SessionsController::class, 'search_sessions']);
+Route::get('session-detail/{id}', [Api\SessionsController::class, 'session_detail']);
 
 
 Route::get('login', function (){
