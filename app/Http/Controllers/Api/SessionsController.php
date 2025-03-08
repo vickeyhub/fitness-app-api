@@ -92,6 +92,16 @@ class SessionsController extends Controller
                 'users.mobile_number',
                 'users.user_type',
             );
+            if (Auth::guard('sanctum')->check()) {
+                $authId = Auth::guard('sanctum')->id();
+                $query->leftJoin('bookmarks', function ($join) use ($authId) {
+                    $join->on('bookmarks.session_id', '=', 'classes.id')
+                        ->where('bookmarks.user_id', '=', $authId);
+                });
+                $query->addSelect(
+                    DB::raw('IF(bookmarks.id IS NOT NULL, true, false) as is_bookmarked')
+                );
+            }
 
             $query->leftJoin('users', 'users.id', '=', 'classes.user_id');
             if($data = $query->where('classes.id', $id)->first()){
