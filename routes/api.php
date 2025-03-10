@@ -14,6 +14,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('bookings', [Api\BookingsController::class, 'createBookings']);
     Route::get('bookings', [Api\BookingsController::class, 'index']);
     Route::get('sessions', [Api\SessionsController::class, 'index']);
+    Route::delete('sessions/{id}', [Api\SessionsController::class, 'destroy']);
     Route::post('sessions', [Api\SessionsController::class, 'store']);
     Route::post('bookmark', [Api\SessionsController::class, 'save_bookmark']);
     Route::get('bookmark', [Api\SessionsController::class, 'get_bookmarked_sessions']);

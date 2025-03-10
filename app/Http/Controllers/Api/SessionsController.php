@@ -16,9 +16,9 @@ class SessionsController extends Controller
     public function index()
     {
         $user_id = Auth::id();
-        $sessions = Classes::select('id','session_title','duration','session_thumbnail','calories','price','session_avrage_rating')
-        ->where('user_id', $user_id)
-        ->paginate(20);
+        $sessions = Classes::select('id', 'session_title', 'duration', 'session_thumbnail', 'calories', 'price', 'session_avrage_rating')
+            ->where('user_id', $user_id)
+            ->paginate(20);
 
         return response()->json([
             'status' => 'success',
@@ -31,7 +31,7 @@ class SessionsController extends Controller
     {
         $query = Classes::query();
 
-        $query->select('id','session_title','duration','session_thumbnail','calories','price','session_avrage_rating');
+        $query->select('id', 'session_title', 'duration', 'session_thumbnail', 'calories', 'price', 'session_avrage_rating');
 
 
         if ($request->filled('session_title')) {
@@ -42,7 +42,7 @@ class SessionsController extends Controller
         }
 
         if ($request->filled('duration')) {
-            $duration_range = str_replace(' min','', $request->duration);
+            $duration_range = str_replace(' min', '', $request->duration);
             $duration_array = explode('-', $duration_range);
             if (count($duration_array) == 2) {
                 $min_duration = $duration_array[0];
@@ -100,7 +100,7 @@ class SessionsController extends Controller
             }
 
             $query->leftJoin('users', 'users.id', '=', 'classes.user_id');
-            if($data = $query->where('classes.id', $id)->first()){
+            if ($data = $query->where('classes.id', $id)->first()) {
 
                 return response()->json([
                     'status' => 'success',
@@ -188,46 +188,54 @@ class SessionsController extends Controller
      */
     public function store(Request $request)
     {
-        $validator = Validator::make($request->all(), [
-            'session_title' => 'required|string|max:255',
-            'description' => 'required|string',
-            // 'duration' => 'required|string',
-            'total_duration' => 'required|integer',
-            'calories' => 'required|integer',
-            'steps' => 'required|array',
-            'muscles_involved' => 'required|array',
-            'schedule' => 'required|array',
-            // 'user_id' => 'required|string',
-            'price' => 'required|numeric',
-            'session_thumbnail' => 'required|string',
-            'session_avrage_rating' => 'nullable|numeric|min:0|max:5',
-            'session_timing' => 'required|string',
-            // new addition in request 19-02-2025
-            "session_type" => "required|array",
-            "session_keywords" => "required|array",
-            "intensity" => "required|string",
-            "fitness_goal" => "required|array"
-        ]);
+        try {
+            $validator = Validator::make($request->all(), [
+                'session_title' => 'required|string|max:255',
+                'description' => 'required|string',
+                // 'duration' => 'required|string',
+                'total_duration' => 'required|integer',
+                'calories' => 'required|integer',
+                'steps' => 'required|array',
+                'muscles_involved' => 'required|array',
+                'schedule' => 'required|array',
+                // 'user_id' => 'required|string',
+                'price' => 'required|numeric',
+                'session_thumbnail' => 'required|string',
+                'session_avrage_rating' => 'nullable|numeric|min:0|max:5',
+                'session_timing' => 'required|string',
+                // new addition in request 19-02-2025
+                "session_type" => "required|array",
+                "session_keywords" => "required|array",
+                "intensity" => "required|string",
+                "fitness_goal" => "required|array"
+            ]);
 
-        if ($validator->fails()) {
+            if ($validator->fails()) {
+                return response()->json([
+                    'message' => 'Validation failed',
+                    'errors' => array_values($validator->errors()->all())
+                ], 422);
+            }
+            $payload = $validator->validated();
+            $session_timing = $payload['session_timing'];
+            $timing_array = explode(' - ', $session_timing);
+
+            // Convert times to Carbon instances
+            $start = Carbon::createFromFormat('h:i a', trim($timing_array[0]));
+            $end = Carbon::createFromFormat('h:i a', trim($timing_array[1]));
+            $payload['duration'] = $start->diffInMinutes($end);
+            $payload['user_id'] = Auth::user()->id;
+
+            $session = Classes::create($payload);
+
+            return response()->json(['message' => 'Session created successfully', 'session' => $session], 201);
+        } catch (\Exception $e) {
             return response()->json([
-                'message' => 'Validation failed',
-                'errors' => array_values($validator->errors()->all())
-            ], 422);
+                'status' => 'failed',
+                'message' => 'Message ' . $e->getMessage(),
+
+            ], 500);
         }
-        $payload = $validator->validated();
-        $session_timing = $payload['session_timing'];
-        $timing_array = explode(' - ', $session_timing);
-
-        // Convert times to Carbon instances
-        $start = Carbon::createFromFormat('h:i a', trim($timing_array[0]));
-        $end = Carbon::createFromFormat('h:i a', trim($timing_array[1]));
-        $payload['duration'] = $start->diffInMinutes($end);
-        $payload['user_id'] = Auth::user()->id;
-
-        $session = Classes::create($payload);
-
-        return response()->json(['message' => 'Session created successfully', 'session' => $session], 201);
     }
 
     /**
@@ -259,6 +267,35 @@ class SessionsController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        try {
+            $user_id = Auth::id();
+            $class = Classes::where('user_id', $user_id)->where('id', $id)->first();
+
+            if (!$class) {
+                return response()->json([
+                    'status' => 'failed',
+                    'message' => "Session not found or you don't have permission to delete it."
+                ], 404);
+            }
+
+            if ($class->delete()) {
+                return response()->json([
+                    'status' => 'success',
+                    'message' => "Session has been deleted successfully."
+                ], 200);
+            }
+            return response()->json([
+                'status' => 'error',
+                'message' => "Something went wrong."
+            ], 500);
+
+        } catch (\Exception $e) {
+            \Log::error('Delete Class Error: ' . $e->getMessage()); // Error Log
+            return response()->json([
+                'status' => 'error',
+                'message' => "Internal Server Error."
+            ], 500);
+        }
+
     }
 }
