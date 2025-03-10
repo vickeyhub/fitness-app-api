@@ -9,13 +9,16 @@ use App\Models\Bookmark;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
 
 class SessionsController extends Controller
 {
     public function index()
     {
         $user_id = Auth::id();
-        $sessions = Classes::where('user_id', $user_id)->paginate();
+        $sessions = Classes::select('id','session_title','duration','session_thumbnail','calories','price','session_avrage_rating')
+        ->where('user_id', $user_id)
+        ->paginate(20);
 
         return response()->json([
             'status' => 'success',
@@ -28,24 +31,7 @@ class SessionsController extends Controller
     {
         $query = Classes::query();
 
-        $query->select(
-            'classes.*',
-            'users.first_name',
-            'users.last_name',
-            'users.email',
-            'users.mobile_number',
-            'users.user_type',
-        );
-        if (Auth::guard('sanctum')->check()) {
-            $authId = Auth::guard('sanctum')->id();
-            $query->leftJoin('bookmarks', function ($join) use ($authId) {
-                $join->on('bookmarks.session_id', '=', 'classes.id')
-                    ->where('bookmarks.user_id', '=', $authId);
-            });
-            $query->addSelect(
-                DB::raw('IF(bookmarks.id IS NOT NULL, true, false) as is_bookmarked')
-            );
-        }
+        $query->select('id','session_title','duration','session_thumbnail','calories','price','session_avrage_rating');
 
 
         if ($request->filled('session_title')) {
@@ -56,7 +42,16 @@ class SessionsController extends Controller
         }
 
         if ($request->filled('duration')) {
-            $query->where('duration', 'LIKE', '%' . $request->duration . '%');
+            $duration_range = str_replace(' min','', $request->duration);
+            $duration_array = explode('-', $duration_range);
+            if (count($duration_array) == 2) {
+                $min_duration = $duration_array[0];
+                $max_duration = $duration_array[1];
+
+                $query->whereBetween('duration', [$min_duration, $max_duration]);
+            }
+            // $query->where('duration', 'LIKE', '%' . $request->duration . '%');
+
         }
 
         if ($request->filled('intensity')) {
@@ -74,10 +69,11 @@ class SessionsController extends Controller
                 });
             }
         }
-        $query->leftJoin('users', 'users.id', '=', 'classes.user_id');
-
-        return $query->paginate(5);
-        // return $query->orderBy('classes.id', 'DESC')->cursorPaginate(5);
+        return response()->json([
+            'status' => 'success',
+            'message' => "Session fetched successfully",
+            'data' => $query->paginate(20)
+        ], 200);
     }
     public function session_detail($id)
     {
@@ -195,7 +191,7 @@ class SessionsController extends Controller
         $validator = Validator::make($request->all(), [
             'session_title' => 'required|string|max:255',
             'description' => 'required|string',
-            'duration' => 'required|string',
+            // 'duration' => 'required|string',
             'total_duration' => 'required|integer',
             'calories' => 'required|integer',
             'steps' => 'required|array',
@@ -204,7 +200,7 @@ class SessionsController extends Controller
             // 'user_id' => 'required|string',
             'price' => 'required|numeric',
             'session_thumbnail' => 'required|string',
-            'session_avrage_rating' => 'required|numeric|min:0|max:5',
+            'session_avrage_rating' => 'nullable|numeric|min:0|max:5',
             'session_timing' => 'required|string',
             // new addition in request 19-02-2025
             "session_type" => "required|array",
@@ -220,6 +216,13 @@ class SessionsController extends Controller
             ], 422);
         }
         $payload = $validator->validated();
+        $session_timing = $payload['session_timing'];
+        $timing_array = explode(' - ', $session_timing);
+
+        // Convert times to Carbon instances
+        $start = Carbon::createFromFormat('h:i a', trim($timing_array[0]));
+        $end = Carbon::createFromFormat('h:i a', trim($timing_array[1]));
+        $payload['duration'] = $start->diffInMinutes($end);
         $payload['user_id'] = Auth::user()->id;
 
         $session = Classes::create($payload);

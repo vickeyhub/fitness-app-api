@@ -16,7 +16,8 @@ class Classes extends Model
         'schedule' => 'array',
         "session_type" => "array",
         "session_keywords" => "array",
-        "fitness_goal" => "array"
+        "fitness_goal" => "array",
+        'price' => 'float',
     ];
 
 }
