@@ -23,7 +23,13 @@ class SessionsController extends Controller
         return response()->json([
             'status' => 'success',
             'message' => "Session fetched successfully",
-            'data' => $sessions
+            'data' => $sessions->items(),
+            'pagination' => [
+                'current_page' => $sessions->currentPage(),
+                'total' => $sessions->total(),
+                'per_page' => $sessions->perPage(),
+                'last_page' => $sessions->lastPage(),
+            ]
         ], 200);
     }
 
@@ -69,10 +75,17 @@ class SessionsController extends Controller
                 });
             }
         }
+        $sessions = $query->paginate(20);
         return response()->json([
             'status' => 'success',
             'message' => "Session fetched successfully",
-            'data' => $query->paginate(20)
+            'data' => $sessions->items(),
+            'pagination' => [
+                'current_page' => $sessions->currentPage(),
+                'total' => $sessions->total(),
+                'per_page' => $sessions->perPage(),
+                'last_page' => $sessions->lastPage(),
+            ]
         ], 200);
     }
     public function session_detail($id)
