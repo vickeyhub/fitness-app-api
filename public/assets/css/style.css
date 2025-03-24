@@ -10408,3 +10408,11 @@ body.md-skin {
   margin-left: 30px;
   margin-top: -7px;
 }
+
+.text-left{
+    text-align: left !important;
+}
+
+.text-right{
+    text-align: right !important;
+}

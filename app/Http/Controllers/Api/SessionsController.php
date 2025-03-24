@@ -16,7 +16,7 @@ class SessionsController extends Controller
     public function index()
     {
         $user_id = Auth::id();
-        $sessions = Classes::select('id', 'session_title', 'duration', 'session_thumbnail', 'calories', 'price', 'session_avrage_rating')
+        $sessions = Classes::select('id', 'session_title', 'duration', 'session_thumbnail', 'calories', 'price', 'session_avrage_rating','is_publish')
             ->where('user_id', $user_id)
             ->paginate(20);
 
@@ -37,7 +37,7 @@ class SessionsController extends Controller
     {
         $query = Classes::query();
 
-        $query->select('id', 'session_title', 'duration', 'session_thumbnail', 'calories', 'price', 'session_avrage_rating');
+        $query->select('id', 'session_title', 'duration', 'session_thumbnail', 'calories', 'price', 'session_avrage_rating','is_publish');
 
 
         if ($request->filled('session_title')) {
@@ -220,7 +220,8 @@ class SessionsController extends Controller
                 "session_type" => "required|array",
                 "session_keywords" => "required|array",
                 "intensity" => "required|string",
-                "fitness_goal" => "required|array"
+                "fitness_goal" => "required|array",
+                "is_publish" => "required|boolean",
             ]);
 
             if ($validator->fails()) {

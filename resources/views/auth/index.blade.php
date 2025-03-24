@@ -139,14 +139,21 @@
 
             </p>
             <!-- <p>Login in. </p> -->
-            <form class="m-t" role="form" action="index.html">
-                <div class="form-group">
-                    <input type="email" class="form-control" placeholder="Username" required="">
+            <form class="m-t" role="form" method="post" action="{{ route('post-login')}}">
+                @csrf
+                <div class="form-group @error('email') has-error @enderror">
+                    <input type="email" class="form-control" placeholder="Username" required="" name="email">
+                    @error('email')
+                    <div class="text-danger text-left"><b>{{ $message }}</b></div>
+                    @enderror
                 </div>
-                <div class="form-group">
-                    <input type="password" class="form-control" placeholder="Password" required="">
+                <div class="form-group @error('password') has-error @enderror">
+                    <input type="password" class="form-control" placeholder="Password" required="" name="password">
+                    @error('password')
+                    <div class="text-danger text-left"><b>{{ $message }}</b></div>
+                    @enderror
                 </div>
-                <a href="index.html" type="submit" class="btn btn-primary block full-width m-b">Login</a>
+                <button type="submit" class="btn btn-primary block full-width m-b">Login</button>
 
                 <!-- <a href="forgot_password.html"><small>Forgot password?</small></a>
                 <p class="text-muted text-center"><small>Do not have an account?</small></p>
