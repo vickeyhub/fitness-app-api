@@ -35,9 +35,11 @@ class SessionsController extends Controller
 
     public function search_sessions(Request $request)
     {
-        $query = Classes::query();
+        try{
+            $query = Classes::query();
 
-        $query->select('id', 'session_title', 'duration', 'session_thumbnail', 'calories', 'price', 'session_avrage_rating','is_publish');
+        $query->select('classes.id', 'classes.session_title', 'classes.duration', 'classes.session_thumbnail', 'classes.calories', 'classes.price', 'classes.session_avrage_rating','classes.is_publish');
+        // $query->select('*');
 
 
         if ($request->filled('session_title')) {
@@ -75,7 +77,8 @@ class SessionsController extends Controller
                 });
             }
         }
-        $sessions = $query->paginate(20);
+        $sessions = $query->with('user_profile:id,user_id,specialty,rating,location')
+        ->paginate(20);
         return response()->json([
             'status' => 'success',
             'message' => "Session fetched successfully",
@@ -87,6 +90,12 @@ class SessionsController extends Controller
                 'last_page' => $sessions->lastPage(),
             ]
         ], 200);
+        } catch(\Exception $e) {
+            return response()->json([
+               'status' => 'failed',
+               'message' => $e->getMessage()
+            ], 500);
+        }
     }
     public function session_detail($id)
     {
@@ -127,7 +136,7 @@ class SessionsController extends Controller
                     'data' => $data
                 ], 404);
             }
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             return response()->json([
                 'status' => 'failed',
                 'message' => 'Message ' . $e->getMessage(),
