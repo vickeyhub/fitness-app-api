@@ -16,7 +16,7 @@ class SessionsController extends Controller
     public function index()
     {
         $user_id = Auth::id();
-        $sessions = Classes::select('id', 'session_title', 'duration', 'session_thumbnail', 'calories', 'price', 'session_avrage_rating','is_publish')
+        $sessions = Classes::select('id', 'session_title', 'duration', 'session_thumbnail', 'calories', 'price', 'session_avrage_rating','is_publish','latitude','longitude','radius')
             ->where('user_id', $user_id)
             ->paginate(20);
 
@@ -38,9 +38,11 @@ class SessionsController extends Controller
         try{
             $query = Classes::query();
 
-        $query->select('classes.id', 'classes.session_title', 'classes.duration', 'classes.session_thumbnail', 'classes.calories', 'classes.price', 'classes.session_avrage_rating','classes.is_publish');
+        $query->select('classes.id', 'classes.session_title', 'classes.duration', 'classes.session_thumbnail', 'classes.calories', 'classes.price', 'classes.session_avrage_rating','classes.is_publish','latitude','longitude','radius',
+        DB::raw("(6371 * acos(cos(radians(?)) * cos(radians(latitude)) * cos(radians(longitude) - radians(?)) + sin(radians(?)) * sin(radians(latitude)))) AS distance")
+    );
         // $query->select('*');
-
+        $query->addBinding([$request->latitude, $request->longitude, $request->latitude], 'select');
 
         if ($request->filled('session_title')) {
             $query->where('session_title', 'LIKE', '%' . $request->session_title . '%');
@@ -77,8 +79,7 @@ class SessionsController extends Controller
                 });
             }
         }
-        $sessions = $query->with('user_profile:id,user_id,specialty,rating,location')
-        ->paginate(20);
+        $sessions = $query->orderBy('id' ,'desc')->paginate(20);
         return response()->json([
             'status' => 'success',
             'message' => "Session fetched successfully",
@@ -231,6 +232,9 @@ class SessionsController extends Controller
                 "intensity" => "required|string",
                 "fitness_goal" => "required|array",
                 "is_publish" => "required|boolean",
+                'latitude' => 'required|numeric',
+                'longitude' => 'required|numeric',
+                'radius' => 'required|numeric', // Radius in KM
             ]);
 
             if ($validator->fails()) {

@@ -12,6 +12,9 @@ return new class extends Migration {
     {
         Schema::table('classes', function (Blueprint $table) {
             $table->enum('is_publish', ['1','0']);
+            $table->decimal('latitude', 10, 7)->nullable();
+            $table->decimal('longitude', 10, 7)->nullable()->after('latitude');
+            $table->integer('radius')->nullable()->after('longitude'); // Optional, for storing search radius
         });
     }
 
@@ -22,7 +25,7 @@ return new class extends Migration {
     {
         Schema::table('classes', function (Blueprint $table) {
             $table->dropColumn([
-                'is_publish'
+                'is_publish','latitude','longitude','radius'
             ]);
         });
     }
