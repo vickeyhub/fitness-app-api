@@ -19,6 +19,8 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('bookmark', [Api\SessionsController::class, 'save_bookmark']);
     Route::get('bookmark', [Api\SessionsController::class, 'get_bookmarked_sessions']);
     Route::get('session/session-filter-api', [Api\SessionFilterController::class, 'session_filter_data']);
+    Route::post('/create-payment-intent', [Api\PaymentController::class, 'createPaymentIntent']);
+    Route::post('/confirm-payment', [Api\PaymentController::class, 'confirmPayment']);
 });
 
 Route::post('signup',[Api\AuthController::class, 'register']);
@@ -32,7 +34,6 @@ Route::get('trainers', [Api\UserController::class, 'getTrainers']);
 Route::get('gyms', [Api\GymsController::class, 'getGyms']);
 
 // sessions/classes management
-// Route::apiResource('sessions', Api\SessionsController::class);
 Route::post('search-sessions', [Api\SessionsController::class, 'search_sessions']);
 Route::get('session-detail/{id}', [Api\SessionsController::class, 'session_detail']);
 
