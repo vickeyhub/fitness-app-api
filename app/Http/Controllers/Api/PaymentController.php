@@ -56,11 +56,16 @@ class PaymentController extends Controller
             'currency' => $request->currency,
             'response_data' => $paymentIntent
         ]);
-
-        return response()->json([
+        $output = [
             'paymentIntentId' => $paymentIntent->id,
             'clientSecret' => $paymentIntent->client_secret,
-            'status' => $paymentIntent->status
+            'payment_status' => $paymentIntent->status
+        ];
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'payment',
+            'data' => $output
         ]);
     }
 
