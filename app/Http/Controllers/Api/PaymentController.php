@@ -6,6 +6,9 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Stripe\Stripe;
 use Stripe\PaymentIntent;
+use Stripe\Customer;
+use Illuminate\Support\Facades\Auth;
+use App\Models\Payment;
 
 class PaymentController extends Controller
 {
@@ -18,12 +21,40 @@ class PaymentController extends Controller
             'currency' => 'required|string'
         ]);
 
+        $user = $request->user();
+
+        if (!$user->stripe_customer_id) {
+            $customer = Customer::create([
+                'email' => $user->email,
+                'name' => $user->first_name.' ' .$user->last_name
+            ]);
+
+            // Store Customer ID in DB
+            $user->stripe_customer_id = $customer->id;
+            $user->save();
+        } else {
+            $customer = Customer::retrieve($user->stripe_customer_id);
+        }
+
         $paymentIntent = PaymentIntent::create([
             'amount' => $request->amount, // Amount in cents
             'currency' => $request->currency,
             'payment_method_types' => ['card'],
             'payment_method' => 'pm_card_visa', // ✅ Attach test payment method
             'confirm' => true // ✅ Auto-confirm the payment
+        ]);
+
+        // 4️⃣ Store Payment in DB
+        Payment::create([
+            'user_id' => $user->id,
+            'customer_id' => $customer->id,
+            'email' => $user->email,
+            'name' => $user->first_name.' '.$user->last_name,
+            'payment_intent_id' => $paymentIntent->id,
+            'status' => $paymentIntent->status,
+            'amount' => $request->amount,
+            'currency' => $request->currency,
+            'response_data' => $paymentIntent
         ]);
 
         return response()->json([

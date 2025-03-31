@@ -27,7 +27,8 @@ class User extends Authenticatable
         'password',
         'user_type',
         'otp',
-        'status'
+        'status',
+        'stripe_customer_id'
     ];
 
     /**
