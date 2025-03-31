@@ -7,10 +7,10 @@ use Illuminate\Support\Facades\Auth;
 
 class AuthController extends Controller
 {
-    public function __construct(){
-
-    }
     public function index(){
+        if (Auth::check()) {
+            return redirect('/admin/dashboard'); // Redirect if logged in
+        }
         return view('auth.index');
     }
 
@@ -31,8 +31,8 @@ class AuthController extends Controller
     public function logout(Request $request){
         Auth::logout();
         $request->session()->invalidate();
-        $request->session()->regenerateToekn();
+        $request->session()->regenerateToken();
 
-        return redirect()->route('login');
+        return redirect()->route('web-login');
     }
 }

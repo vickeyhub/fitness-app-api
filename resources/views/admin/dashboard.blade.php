@@ -23,7 +23,7 @@
                                             </h2>
                                         </a>
                                     </div>
-                                    <div class="counter" data-target="254322"></div>
+                                    <div class="counter" data-target="{{ $users->total_users }}"></div>
                                     <!-- <h1 class="no-margins ">2,346</h1> -->
                                     <!-- <div style="margin-bottom:40px"> -->
                                 </div>
@@ -42,7 +42,7 @@
                                             </h2>
                                         </a>
                                     </div>
-                                    <div class="counter" data-target="12000"></div>
+                                    <div class="counter" data-target="{{ $users->total_gym_count }}"></div>
                                     <!-- <h1 class="no-margins ">2,346</h1> -->
 
                                 </div>
@@ -57,10 +57,10 @@
                                     style="border-bottom: 10px solid transparent; border-image: linear-gradient(to right, #47c1cf, #3e558b); border-image-slice: 1;">
                                     <div>
                                         <a href="" class="text-info">
-                                            <h2><span><i class="fa fa-file"></i></span> Total No of Booking</h2>
+                                            <h2><span><i class="fa fa-file"></i></span> Total No of Trainers</h2>
                                         </a>
                                     </div>
-                                    <div class="counter" data-target="1000"></div>
+                                    <div class="counter" data-target="{{ $users->total_trainer_count }}"></div>
                                     <!-- <h1 class="no-margins ">2,346</h1> -->
                                     <!-- <div style="margin-bottom:40px"></div> -->
                                 </div>
@@ -150,7 +150,7 @@
                     showMethod: 'slideDown',
                     timeOut: 4000
                 };
-                toastr.success(' Hello ', 'Welcome to Admin');
+                toastr.success( 'Welcome to Panel', 'Hello There');
 
             }, 1300);
 
@@ -310,10 +310,10 @@
         new Chart(ctx, {
             type: 'bar',
             data: {
-                labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
+                labels:  {!! json_encode($labels) !!},
                 datasets: [{
                     label: 'Total Users',
-                    data: [12, 19, 3, 5, 2, 3],
+                    data: {!! json_encode($user_count) !!},
                     borderWidth: 1,
                     backgroundColor: "#3e558b"
                 }]
@@ -327,7 +327,7 @@
             }
         });
     </script>
-    <script>
+    {{-- <script>
         const xValues = [100, 200, 300, 400, 500, 600, 700, 800, 900, 1000];
 
         new Chart("myChartone", {
@@ -356,6 +356,55 @@
                     display: false
                 }
             }
+        });
+    </script> --}}
+    <script>
+        $(document).ready(function () {
+            $.ajax({
+                url: "{{ url('/chart-data-line') }}",
+                method: "GET",
+                success: function(response) {
+                    const ctx = document.getElementById("myChartone").getContext("2d");
+
+                    new Chart(ctx, {
+                        type: "line",
+                        data: {
+                            labels: response.xValues, // Dates from backend
+                            datasets: [{
+                                label: "Total Users",
+                                data: response.usersData, // Users per date
+                                borderColor: "green",
+                                fill: false
+                            }, {
+                                label: "Total Gyms",
+                                data: response.gymsData, // Gyms per date
+                                borderColor: "#47c1cf",
+                                fill: false
+                            }, {
+                                label: "Total Bookings",
+                                data: response.bookingsData, // Bookings per date
+                                borderColor: "#32385a",
+                                fill: false
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            plugins: {
+                                legend: { display: true }
+                            },
+                            scales: {
+                                x: {
+                                    title: { display: true, text: "Date" }
+                                },
+                                y: {
+                                    title: { display: true, text: "Count" },
+                                    beginAtZero: true
+                                }
+                            }
+                        }
+                    });
+                }
+            });
         });
     </script>
 @endsection

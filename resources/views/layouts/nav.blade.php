@@ -48,7 +48,10 @@
                     </span></a>
             </li>
             <li>
-                <a href="logout.html"><i class="fa fa-sign-out"></i> <span class="nav-label">Log Out</span></a>
+                <a onclick="event.preventDefault(); document.getElementById('logout-form').submit();"><i class="fa fa-sign-out"></i> <span class="nav-label">Log Out</span></a>
+                <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
+                    @csrf
+                </form>
             </li>
 
 
