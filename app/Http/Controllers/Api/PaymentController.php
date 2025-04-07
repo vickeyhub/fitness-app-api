@@ -39,9 +39,13 @@ class PaymentController extends Controller
         $paymentIntent = PaymentIntent::create([
             'amount' => $request->amount, // Amount in cents
             'currency' => $request->currency,
+            'customer' => $customer->id,
             'payment_method_types' => ['card'],
-            'payment_method' => 'pm_card_visa', // ✅ Attach test payment method
-            'confirm' => true // ✅ Auto-confirm the payment
+            'metadata' => [
+                'user_id' => $user->id
+            ]
+            // 'payment_method' => 'pm_card_visa', // ✅ Attach test payment method
+            // 'confirm' => true // ✅ Auto-confirm the payment
         ]);
 
         // 4️⃣ Store Payment in DB
@@ -97,7 +101,10 @@ class PaymentController extends Controller
 
             return response()->json(['status' => $paymentIntent->status]);
         } catch (\Exception $e) {
-            return response()->json(['error' => $e->getMessage()], 500);
+            return response()->json([
+                'status' => 'failed',
+                'message' => $e->getMessage()
+             ], 500);
         }
     }
 }

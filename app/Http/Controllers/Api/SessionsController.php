@@ -13,12 +13,18 @@ use Carbon\Carbon;
 
 class SessionsController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         $user_id = Auth::id();
-        $sessions = Classes::select('id', 'session_title', 'duration', 'session_thumbnail', 'calories', 'price', 'session_avrage_rating','is_publish','latitude','longitude','radius')
-            ->where('user_id', $user_id)
-            ->paginate(20);
+
+        $query = Classes::select('id', 'session_title', 'duration', 'session_thumbnail', 'calories', 'price', 'session_avrage_rating','is_publish','latitude','longitude','radius')
+        ->where('user_id', $user_id);
+
+        if ($request->filled('is_publish')) {
+            $query->where('is_publish', $request->is_publish);
+        }
+
+        $sessions = $query->paginate(20);
 
         return response()->json([
             'status' => 'success',
