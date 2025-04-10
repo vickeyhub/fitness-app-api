@@ -36,6 +36,7 @@ Route::get('gyms', [Api\GymsController::class, 'getGyms']);
 // sessions/classes management
 Route::post('search-sessions', [Api\SessionsController::class, 'search_sessions']);
 Route::get('session-detail/{id}', [Api\SessionsController::class, 'session_detail']);
+Route::post('/stripe/webhook', [Api\StripeWebhookController::class, 'handle']);
 
 
 Route::get('login', function (){
