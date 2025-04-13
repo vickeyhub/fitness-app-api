@@ -140,14 +140,14 @@ class SessionsController extends Controller
                 return response()->json([
                     'status' => 'failed',
                     'message' => 'No record found',
-                    'data' => $data
+                    // 'data' => $data
                 ], 404);
             }
         } catch (\Exception $e) {
             return response()->json([
                 'status' => 'failed',
                 'message' => 'Message ' . $e->getMessage(),
-                'data' => $data
+                // 'data' => $data
             ], 401);
         }
     }

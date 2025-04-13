@@ -42,7 +42,12 @@ class PaymentController extends Controller
             'customer' => $customer->id,
             'payment_method_types' => ['card'],
             'metadata' => [
-                'user_id' => $user->id
+                'user_id' => $user->id,
+                'session_id' => $request->session_id,
+                'trainer_id' => $request->trainer_id,
+                'gym_id' => $request->gym_id,
+                'booking_date' => $request->booking_date,
+                'time_slot' => $request->time_slot
             ]
             // 'payment_method' => 'pm_card_visa', // ✅ Attach test payment method
             // 'confirm' => true // ✅ Auto-confirm the payment
