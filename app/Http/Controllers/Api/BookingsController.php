@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\User;
 use App\Models\Booking;
+use App\Models\Payment;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
 
@@ -18,7 +19,6 @@ class BookingsController extends Controller
 
         // Fetch bookings based on user type
         $query = Booking::query();
-
         if ($user->user_type === 'user') {
             $query->where('user_id', $user->id);
         } elseif ($user->user_type === 'trainer') {
@@ -28,7 +28,15 @@ class BookingsController extends Controller
         }
         // return $query->get();
 
-        $bookings = $query->with(['trainer', 'gym'])->get();
+        $bookings = $query->with([
+            'trainer',
+            'gym',
+            'session:id,session_title,duration,total_duration,calories,schedule,price,session_thumbnail,session_timing,session_type,is_publish',
+            // 'payment:customer_id,email'
+            'payment:id,payment_intent_id,amount,currency,status,email,name'
+            ])
+        // ->toSql();
+        ->get();
 
         return response()->json([
             'status' => 'success',

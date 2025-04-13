@@ -27,4 +27,8 @@ class Payment extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    public function booking() {
+        return $this->belongsTo(Booking::class, 'payment_intent_id', 'payment_id');
+    }
 }

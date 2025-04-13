@@ -26,4 +26,12 @@ class Booking extends Model
     {
         return $this->belongsTo(User::class, 'gym_id')->where('user_type', 'gym');
     }
+
+    public function payment() {
+        return $this->hasOne(Payment::class, 'payment_intent_id', 'payment_id');
+    }
+
+    public function session(){
+        return $this->hasOne(Classes::class,'id','session_id');
+    }
 }
