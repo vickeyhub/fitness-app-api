@@ -17,13 +17,20 @@ class SessionsController extends Controller
     {
         $user_id = Auth::id();
 
-        $query = Classes::select('id', 'session_title', 'duration', 'session_thumbnail', 'calories', 'price', 'session_avrage_rating','is_publish','latitude','longitude','radius')
+        $query = Classes::select('classes.id', 'session_title', 'duration', 'session_thumbnail', 'calories', 'price', 'session_avrage_rating','is_publish','latitude','longitude','radius',
+        'users.id as created_by',
+        'users.first_name',
+        'users.last_name',
+        'users.email',
+        'users.mobile_number',
+        'users.user_type'
+        )
         ->where('user_id', $user_id);
 
         if ($request->filled('is_publish')) {
             $query->where('is_publish', $request->is_publish);
         }
-
+        $query->leftJoin('users', 'users.id','=', 'classes.user_id');
         $sessions = $query->paginate(20);
 
         return response()->json([
@@ -85,6 +92,7 @@ class SessionsController extends Controller
                 });
             }
         }
+        $query->with('trainer');
         $sessions = $query->orderBy('id' ,'desc')->paginate(20);
         return response()->json([
             'status' => 'success',

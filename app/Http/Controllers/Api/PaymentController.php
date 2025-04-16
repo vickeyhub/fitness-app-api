@@ -47,7 +47,9 @@ class PaymentController extends Controller
                 'trainer_id' => $request->trainer_id,
                 'gym_id' => $request->gym_id,
                 'booking_date' => $request->booking_date,
-                'time_slot' => $request->time_slot
+                'time_slot' => $request->time_slot,
+                'days' => $request->days,
+                'contact_no' => $request->contact_no
             ]
             // 'payment_method' => 'pm_card_visa', // ✅ Attach test payment method
             // 'confirm' => true // ✅ Auto-confirm the payment
