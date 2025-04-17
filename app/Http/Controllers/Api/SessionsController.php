@@ -92,7 +92,7 @@ class SessionsController extends Controller
                 });
             }
         }
-        $query->with('trainer');
+        // $query->with('trainer');
         $sessions = $query->orderBy('id' ,'desc')->paginate(20);
         return response()->json([
             'status' => 'success',
