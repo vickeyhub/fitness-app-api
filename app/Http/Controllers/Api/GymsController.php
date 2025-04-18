@@ -80,13 +80,9 @@ class GymsController extends Controller
         $bookings = $query->with([
             'user:id,first_name,last_name,email,mobile_number',
             'user.profile:id,user_id,profile_picture,age,dob,weight,weight_parameter,gender,location,specialty',
-            // 'trainer',
-            // 'gym',
             'session:id,session_title,duration,total_duration,calories,schedule,price,session_thumbnail,session_timing,session_type,is_publish',
-            // 'payment:customer_id,email'
-            // 'payment:id,payment_intent_id,amount,currency,status,email,name'
+
             ])
-        // ->toSql();
         ->get();
 
         return response()->json([
