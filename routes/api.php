@@ -21,6 +21,9 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('session/session-filter-api', [Api\SessionFilterController::class, 'session_filter_data']);
     Route::post('/create-payment-intent', [Api\PaymentController::class, 'createPaymentIntent']);
     Route::post('/confirm-payment', [Api\PaymentController::class, 'confirmPayment']);
+    Route::get('fetch-active-plans', [Api\SessionsController::class, 'fetchActivePlans']);
+
+    Route::get('owner-bookings', [Api\GymsController::class, 'getBookingsFromUsers']);
 });
 
 Route::post('signup',[Api\AuthController::class, 'register']);

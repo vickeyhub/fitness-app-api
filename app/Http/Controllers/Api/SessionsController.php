@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Classes;
 use App\Models\Bookmark;
+use App\Models\Booking;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -279,33 +280,6 @@ class SessionsController extends Controller
         }
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(string $id)
     {
         try {
@@ -338,5 +312,28 @@ class SessionsController extends Controller
             ], 500);
         }
 
+    }
+
+    public function fetchActivePlans(){
+       $user = Auth::user();
+
+       // Fetch bookings based on user type
+       $query = Booking::query();
+       if ($user->user_type === 'user') {
+           $query->where('user_id', $user->id);
+       } elseif ($user->user_type === 'trainer') {
+           $query->where('trainer_id', $user->id);
+       } elseif ($user->user_type === 'gym') {
+           $query->where('gym_id', $user->id);
+       }
+       $bookings = $query->with([
+        'trainer',
+        'gym',
+        'session:id,session_title,duration,total_duration,calories,schedule,price,session_thumbnail,session_timing,session_type,is_publish',
+        // 'payment:customer_id,email'
+        'payment:id,payment_intent_id,amount,currency,status,email,name'
+        ])
+        // ->toSql();
+        ->get();
     }
 }
