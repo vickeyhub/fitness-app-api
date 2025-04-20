@@ -35,6 +35,7 @@ class BookingsController extends Controller
             // 'payment:customer_id,email'
             'payment:id,payment_intent_id,amount,currency,status,email,name'
             ])
+            ->orderBy('bookings.id', 'desc')
         // ->toSql();
         ->get();
 

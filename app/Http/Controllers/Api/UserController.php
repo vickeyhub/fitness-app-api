@@ -9,6 +9,7 @@ use App\Models\User;
 use App\Models\UserProfile;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
 
 
 class UserController extends Controller
@@ -49,9 +50,6 @@ class UserController extends Controller
      */
     public function updateProfile(Request $request)
     {
-        $user = Auth::user();
-        // Check if the user has a profile, or create one if it doesn't exist
-        $profile = $user->profile;
 
         // Validation rules
         $validator = Validator::make($request->all(), [
@@ -66,7 +64,12 @@ class UserController extends Controller
             'location' => 'nullable|string|max:255',
             'rating' => 'nullable|numeric|min:0|max:5',
             'specialty' => 'nullable|string|max:255',
+            'file' => 'nullable|file|mimes:jpeg,png,jpg,mp4,mov,pdf|max:5120' // 5MB max
         ]);
+
+        $user = Auth::user();
+        // Check if the user has a profile, or create one if it doesn't exist
+        $profile = $user->profile;
 
         // If validation fails, return errors
         if ($validator->fails()) {
@@ -81,12 +84,25 @@ class UserController extends Controller
             'last_name' => $request->last_name,
         ]);
 
+        // $file = $request->file('file');
+        // $filename = Str::uuid() . '.' . $file->getClientOriginalExtension();
+        // $path = $file->storeAs('uploads', $filename, 'public');
+
+        $filePath = null;
+
+        if ($request->hasFile('file')) {
+            $file = $request->file('file');
+            $filename = Str::uuid() . '.' . $file->getClientOriginalExtension();
+            $filePath = $file->storeAs('uploads/profile', $filename, 'public');
+        }
+
 
         if (!$profile) {
+
             // If no profile exists, create a new one
             $profile = UserProfile::create([
                 'user_id' => $user->id,
-                // 'profile_picture' => $request->profile_picture,
+                'profile_picture' => $filePath,
                 'age' => $request->age,
                 'weight' => $request->weight,
                 'weight_parameter' => $request->weight_parameter,
@@ -100,7 +116,20 @@ class UserController extends Controller
             ]);
         } else {
             // Update existing profile
-            $profile->update($request->only([
+            // $profile->update($request->only([
+            //     'age',
+            //     'weight',
+            //     'weight_parameter',
+            //     'height',
+            //     'height_parameter',
+            //     'gender',
+            //     'dob',
+            //     'location',
+            //     'rating',
+            //     'specialty'
+            // ]));
+
+            $updateData = $request->only([
                 'age',
                 'weight',
                 'weight_parameter',
@@ -111,12 +140,18 @@ class UserController extends Controller
                 'location',
                 'rating',
                 'specialty'
-            ]));
+            ]);
+            if ($filePath) {
+                $updateData['profile_picture'] = $filePath;
+            }
+            $profile->update($updateData);
         }
 
         return response()->json([
-            'message' => 'User profile updated successfully!',
+            // 'message' => 'User profile updated successfully!',
+            'message' => $filePath ? 'Profile updated with media' : 'Profile updated',
             'user' => $user,
+            'file_url' => $filePath ? asset('storage/' . $filePath) : null,
             // 'profile' => $profile
         ], 200);
     }
@@ -144,8 +179,8 @@ class UserController extends Controller
             $rating = $request->rating;
             $specialty = $request->specialty;
 
-            $trainers = User::select('id','first_name as first_name', 'last_name')
-            ->where(['user_type' => 'trainer','status' => '1'])
+            $trainers = User::select('id', 'first_name as first_name', 'last_name')
+                ->where(['user_type' => 'trainer', 'status' => '1'])
                 ->when($name, function ($query, $name) {
                     $query->where('first_name', 'LIKE', "%$name%")
                         ->orWhere('last_name', 'LIKE', "%$name%");
@@ -157,7 +192,7 @@ class UserController extends Controller
                 })
                 ->with('profile:id,user_id,specialty,rating,location')
                 ->get();
-            if($trainers->isEmpty()) {
+            if ($trainers->isEmpty()) {
                 return response()->json([
                     'status' => 'success',
                     'message' => 'No trainers are available'

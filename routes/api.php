@@ -10,7 +10,7 @@ use App\Http\Controllers\Api;
 
 Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('/user/profile', [Api\UserController::class, 'show']);
-    Route::put('/user/profile', [Api\UserController::class, 'updateProfile']);
+    Route::post('/user/profile', [Api\UserController::class, 'updateProfile']);
     Route::post('bookings', [Api\BookingsController::class, 'createBookings']);
     Route::get('bookings', [Api\BookingsController::class, 'index']);
     Route::get('sessions', [Api\SessionsController::class, 'index']);
@@ -24,6 +24,24 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('fetch-active-plans', [Api\SessionsController::class, 'fetchActivePlans']);
 
     Route::get('owner-bookings', [Api\GymsController::class, 'getBookingsFromUsers']);
+
+    // newsfeed controllers
+    // Posts
+    Route::apiResource('posts', Api\PostController::class);
+    // Route::get('posts', [Api\PostController::class,'index']);
+    // Route::post('posts', [Api\PostController::class,'store']);
+
+    // Likes
+    Route::post('/posts/{post}/like', [Api\LikeController::class, 'like']);
+    Route::post('/posts/{post}/dislike', [Api\LikeController::class, 'dislike']);
+
+    // Comments
+    Route::post('/posts/{post}/comment', [Api\CommentController::class, 'store']);
+    Route::delete('/comments/{comment}', [Api\CommentController::class, 'destroy']);
+
+    // Tags
+    Route::get('/tags', [Api\TagController::class, 'index']);
+    Route::post('/tags', [Api\TagController::class, 'store']);
 });
 
 Route::post('signup',[Api\AuthController::class, 'register']);
