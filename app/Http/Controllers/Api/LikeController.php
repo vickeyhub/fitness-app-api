@@ -32,7 +32,11 @@ class LikeController extends Controller
             'user_id' => $user->id,
             'type' => $type,
         ]);
-
-        return response()->json($like, 201);
+        return response()->json([
+            'status' => 'success',
+            'message' => "reacted $type",
+            'data' => $like,
+            // $post->load('tags')
+        ], 200);
     }
 }

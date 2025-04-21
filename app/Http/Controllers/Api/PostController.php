@@ -19,13 +19,20 @@ class PostController extends Controller
             'tags',
             'likes',
             'comments'
-            ])->latest()->get();
+            ])->latest()->paginate(20);
 
             return response()->json([
                 'status' => 'success',
                 'message' => 'All post fetched',
-                'data' => $post,
+                'data' => $post->items(),
+                'pagination' => [
+                    'current_page' => $post->currentPage(),
+                    'total' => $post->total(),
+                    'per_page' => $post->perPage(),
+                    'last_page' => $post->lastPage(),
+                ]
             ], 200);
+
     }
 
     public function show($id)
