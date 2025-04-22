@@ -38,17 +38,17 @@ class StripeWebhookController extends Controller
                 $payment->status = 'succeeded';
                 $payment->save();
 
-                 // Create booking only if metadata has session_id
+                // Create booking only if metadata has session_id
                 if (isset($paymentIntent->metadata->session_id)) {
                     Booking::create([
-                        'user_id'        => $paymentIntent->metadata->user_id,
-                        'trainer_id'     => $paymentIntent->metadata->trainer_id ?? null,
-                        'gym_id'         => $paymentIntent->metadata->gym_id ?? null,
-                        'session_id'       => $paymentIntent->metadata->session_id,
-                        'payment_id'     => $paymentIntent->id,
-                        'booking_date'   => $paymentIntent->metadata->booking_date,
-                        'time_slot'      => $paymentIntent->metadata->time_slot,
-                        'status'         => '1', // confirmed
+                        'user_id' => $paymentIntent->metadata->user_id,
+                        'trainer_id' => $paymentIntent->metadata->trainer_id ?? null,
+                        'gym_id' => $paymentIntent->metadata->gym_id ?? null,
+                        'session_id' => $paymentIntent->metadata->session_id,
+                        'payment_id' => $paymentIntent->id,
+                        'booking_date' => $paymentIntent->metadata->booking_date,
+                        'time_slot' => $paymentIntent->metadata->time_slot,
+                        'status' => '1', // confirmed
                         'payment_status' => 'paid',
                     ]);
                 }

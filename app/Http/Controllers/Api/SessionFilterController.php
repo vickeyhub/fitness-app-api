@@ -34,8 +34,8 @@ class SessionFilterController extends Controller
 
 
         return response()->json([
-                'status' => 'success',
-                'data' => $response
-            ],200);
+            'status' => 'success',
+            'data' => $response
+        ], 200);
     }
 }

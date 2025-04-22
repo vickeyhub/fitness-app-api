@@ -18,20 +18,31 @@ class SessionsController extends Controller
     {
         $user_id = Auth::id();
 
-        $query = Classes::select('classes.id', 'session_title', 'duration', 'session_thumbnail', 'calories', 'price', 'session_avrage_rating','is_publish','latitude','longitude','radius',
-        'users.id as created_by',
-        'users.first_name',
-        'users.last_name',
-        'users.email',
-        'users.mobile_number',
-        'users.user_type'
+        $query = Classes::select(
+            'classes.id',
+            'session_title',
+            'duration',
+            'session_thumbnail',
+            'calories',
+            'price',
+            'session_avrage_rating',
+            'is_publish',
+            'latitude',
+            'longitude',
+            'radius',
+            'users.id as created_by',
+            'users.first_name',
+            'users.last_name',
+            'users.email',
+            'users.mobile_number',
+            'users.user_type'
         )
-        ->where('user_id', $user_id);
+            ->where('user_id', $user_id);
 
         if ($request->filled('is_publish')) {
             $query->where('is_publish', $request->is_publish);
         }
-        $query->leftJoin('users', 'users.id','=', 'classes.user_id');
+        $query->leftJoin('users', 'users.id', '=', 'classes.user_id');
         $sessions = $query->paginate(20);
 
         return response()->json([
@@ -49,67 +60,78 @@ class SessionsController extends Controller
 
     public function search_sessions(Request $request)
     {
-        try{
+        try {
             $query = Classes::query();
 
-        $query->select('classes.id', 'classes.session_title', 'classes.duration', 'classes.session_thumbnail', 'classes.calories', 'classes.price', 'classes.session_avrage_rating','classes.is_publish','latitude','longitude','radius',
-        DB::raw("(6371 * acos(cos(radians(?)) * cos(radians(latitude)) * cos(radians(longitude) - radians(?)) + sin(radians(?)) * sin(radians(latitude)))) AS distance")
-    );
-        // $query->select('*');
-        $query->addBinding([$request->latitude, $request->longitude, $request->latitude], 'select');
+            $query->select(
+                'classes.id',
+                'classes.session_title',
+                'classes.duration',
+                'classes.session_thumbnail',
+                'classes.calories',
+                'classes.price',
+                'classes.session_avrage_rating',
+                'classes.is_publish',
+                'latitude',
+                'longitude',
+                'radius',
+                DB::raw("(6371 * acos(cos(radians(?)) * cos(radians(latitude)) * cos(radians(longitude) - radians(?)) + sin(radians(?)) * sin(radians(latitude)))) AS distance")
+            );
+            // $query->select('*');
+            $query->addBinding([$request->latitude, $request->longitude, $request->latitude], 'select');
 
-        if ($request->filled('session_title')) {
-            $query->where('session_title', 'LIKE', '%' . $request->session_title . '%');
-        }
-        if ($request->filled('category')) {
-            $query->where('session_type', 'LIKE', '%' . $request->category . '%');
-        }
-
-        if ($request->filled('duration')) {
-            $duration_range = str_replace(' min', '', $request->duration);
-            $duration_array = explode('-', $duration_range);
-            if (count($duration_array) == 2) {
-                $min_duration = $duration_array[0];
-                $max_duration = $duration_array[1];
-
-                $query->whereBetween('duration', [$min_duration, $max_duration]);
+            if ($request->filled('session_title')) {
+                $query->where('session_title', 'LIKE', '%' . $request->session_title . '%');
             }
-            // $query->where('duration', 'LIKE', '%' . $request->duration . '%');
-
-        }
-
-        if ($request->filled('intensity')) {
-            $query->where('intensity', 'LIKE', '%' . $request->intensity . '%');
-        }
-
-        if ($request->filled('fitness_goal')) {
-            $fitnessGoals = is_array($request->fitness_goal) ? $request->fitness_goal : json_decode($request->fitness_goal, true);
-
-            if (is_array($fitnessGoals)) {
-                $query->where(function ($q) use ($fitnessGoals) {
-                    foreach ($fitnessGoals as $goal) {
-                        $q->orWhereJsonContains('fitness_goal', $goal);
-                    }
-                });
+            if ($request->filled('category')) {
+                $query->where('session_type', 'LIKE', '%' . $request->category . '%');
             }
-        }
-        // $query->with('trainer');
-        $sessions = $query->orderBy('id' ,'desc')->paginate(20);
-        return response()->json([
-            'status' => 'success',
-            'message' => "Session fetched successfully",
-            'data' => $sessions->items(),
-            'pagination' => [
-                'current_page' => $sessions->currentPage(),
-                'total' => $sessions->total(),
-                'per_page' => $sessions->perPage(),
-                'last_page' => $sessions->lastPage(),
-            ]
-        ], 200);
-        } catch(\Exception $e) {
+
+            if ($request->filled('duration')) {
+                $duration_range = str_replace(' min', '', $request->duration);
+                $duration_array = explode('-', $duration_range);
+                if (count($duration_array) == 2) {
+                    $min_duration = $duration_array[0];
+                    $max_duration = $duration_array[1];
+
+                    $query->whereBetween('duration', [$min_duration, $max_duration]);
+                }
+                // $query->where('duration', 'LIKE', '%' . $request->duration . '%');
+
+            }
+
+            if ($request->filled('intensity')) {
+                $query->where('intensity', 'LIKE', '%' . $request->intensity . '%');
+            }
+
+            if ($request->filled('fitness_goal')) {
+                $fitnessGoals = is_array($request->fitness_goal) ? $request->fitness_goal : json_decode($request->fitness_goal, true);
+
+                if (is_array($fitnessGoals)) {
+                    $query->where(function ($q) use ($fitnessGoals) {
+                        foreach ($fitnessGoals as $goal) {
+                            $q->orWhereJsonContains('fitness_goal', $goal);
+                        }
+                    });
+                }
+            }
+            // $query->with('trainer');
+            $sessions = $query->orderBy('id', 'desc')->paginate(20);
             return response()->json([
-               'status' => 'failed',
-               'message' => $e->getMessage()
+                'status' => 'success',
+                'message' => "Session fetched successfully",
+                'data' => $sessions->items(),
+                'pagination' => [
+                    'current_page' => $sessions->currentPage(),
+                    'total' => $sessions->total(),
+                    'per_page' => $sessions->perPage(),
+                    'last_page' => $sessions->lastPage(),
+                ]
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 'failed',
+                'message' => $e->getMessage()
             ], 500);
         }
     }
@@ -314,26 +336,27 @@ class SessionsController extends Controller
 
     }
 
-    public function fetchActivePlans(){
-       $user = Auth::user();
+    public function fetchActivePlans()
+    {
+        $user = Auth::user();
 
-       // Fetch bookings based on user type
-       $query = Booking::query();
-       if ($user->user_type === 'user') {
-           $query->where('user_id', $user->id);
-       } elseif ($user->user_type === 'trainer') {
-           $query->where('trainer_id', $user->id);
-       } elseif ($user->user_type === 'gym') {
-           $query->where('gym_id', $user->id);
-       }
-       $bookings = $query->with([
-        'trainer',
-        'gym',
-        'session:id,session_title,duration,total_duration,calories,schedule,price,session_thumbnail,session_timing,session_type,is_publish',
-        // 'payment:customer_id,email'
-        'payment:id,payment_intent_id,amount,currency,status,email,name'
+        // Fetch bookings based on user type
+        $query = Booking::query();
+        if ($user->user_type === 'user') {
+            $query->where('user_id', $user->id);
+        } elseif ($user->user_type === 'trainer') {
+            $query->where('trainer_id', $user->id);
+        } elseif ($user->user_type === 'gym') {
+            $query->where('gym_id', $user->id);
+        }
+        $bookings = $query->with([
+            'trainer',
+            'gym',
+            'session:id,session_title,duration,total_duration,calories,schedule,price,session_thumbnail,session_timing,session_type,is_publish',
+            // 'payment:customer_id,email'
+            'payment:id,payment_intent_id,amount,currency,status,email,name'
         ])
-        // ->toSql();
-        ->get();
+            // ->toSql();
+            ->get();
     }
 }

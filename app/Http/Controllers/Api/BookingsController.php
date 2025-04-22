@@ -34,10 +34,10 @@ class BookingsController extends Controller
             'session:id,session_title,duration,total_duration,calories,schedule,price,session_thumbnail,session_timing,session_type,is_publish',
             // 'payment:customer_id,email'
             'payment:id,payment_intent_id,amount,currency,status,email,name'
-            ])
+        ])
             ->orderBy('bookings.id', 'desc')
-        // ->toSql();
-        ->get();
+            // ->toSql();
+            ->get();
 
         return response()->json([
             'status' => 'success',
@@ -115,7 +115,7 @@ class BookingsController extends Controller
             return response()->json([
                 'status' => 'failed',
                 'message' => $e->getMessage()
-             ], 500);
+            ], 500);
         }
     }
 }

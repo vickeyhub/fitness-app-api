@@ -32,10 +32,10 @@ class TagController extends Controller
                 'message' => 'tag generated.',
                 'data' => $tag,
             ], 201);
-        } catch(\Exception $e) {
+        } catch (\Exception $e) {
             return response()->json([
-               'status' => 'failed',
-               'message' => $e->getMessage()
+                'status' => 'failed',
+                'message' => $e->getMessage()
             ], 500);
         }
     }

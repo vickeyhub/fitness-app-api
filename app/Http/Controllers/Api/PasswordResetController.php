@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\Hash;
 
 class PasswordResetController extends Controller
 {
-        /**
+    /**
      * Handle a forgot password request
      *
      * @param  \Illuminate\Http\Request  $request
@@ -23,36 +23,36 @@ class PasswordResetController extends Controller
     public function forgotPassword(Request $request)
     {
         try {
-        // Validate the incoming request
-        $validator = Validator::make($request->all(), [
-            'email' => 'required|email|exists:users,email',
-        ]);
+            // Validate the incoming request
+            $validator = Validator::make($request->all(), [
+                'email' => 'required|email|exists:users,email',
+            ]);
 
-        if ($validator->fails()) {
+            if ($validator->fails()) {
+                return response()->json([
+                    'message' => 'Validation failed',
+                    'errors' => $validator->errors(),
+                ], 422);
+            }
+            $rawToken = Str::random(6);
+
+            DB::table('password_reset_tokens')->updateOrInsert(
+                ['email' => $request->email],
+                [
+                    'email' => $request->email,
+                    'token' => Hash::make($rawToken), // Store a hashed version of the token for security
+                    'created_at' => now(),
+                ]
+            );
+
+            Mail::to($request->email)->send(new ResetPasswordMail($request->email, $rawToken));
+
             return response()->json([
-                'message' => 'Validation failed',
-                'errors' => $validator->errors(),
-            ], 422);
+                'message' => 'A reset code has been sent to your email. Please use it to reset your password.',
+            ], 200);
+        } catch (\InvalidArgumentException $e) {
+            return response()->json([$e->getMessage(), 500]);
         }
-        $rawToken = Str::random(6);
-
-        DB::table('password_reset_tokens')->updateOrInsert(
-            ['email' => $request->email],
-            [
-                'email' => $request->email,
-                'token' => Hash::make($rawToken), // Store a hashed version of the token for security
-                'created_at' => now(),
-            ]
-        );
-
-        Mail::to($request->email)->send(new ResetPasswordMail($request->email, $rawToken));
-
-        return response()->json([
-            'message' => 'A reset code has been sent to your email. Please use it to reset your password.',
-        ], 200);
-    }  catch (\InvalidArgumentException $e) {
-        return response()->json([$e->getMessage(), 500]);
-    }
 
     }
 

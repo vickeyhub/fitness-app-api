@@ -44,9 +44,9 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('/tags', [Api\TagController::class, 'store']);
 });
 
-Route::post('signup',[Api\AuthController::class, 'register']);
+Route::post('signup', [Api\AuthController::class, 'register']);
 Route::post('verify-otp', [Api\AuthController::class, 'verifyOtp']);
-Route::post('login',[Api\AuthController::class, 'login']);
+Route::post('login', [Api\AuthController::class, 'login']);
 Route::post('forgot-password', [Api\PasswordResetController::class, 'forgotPassword']);
 Route::post('reset-password', [Api\PasswordResetController::class, 'resetPassword']);
 
@@ -60,7 +60,7 @@ Route::get('session-detail/{id}', [Api\SessionsController::class, 'session_detai
 Route::post('/stripe/webhook', [Api\StripeWebhookController::class, 'handle']);
 
 
-Route::get('login', function (){
+Route::get('login', function () {
     $output = [
         'status' => 'faild',
         'message' => 'Not Authorised',

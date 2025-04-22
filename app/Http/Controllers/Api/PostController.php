@@ -19,31 +19,31 @@ class PostController extends Controller
             'tags',
             'likes',
             'comments'
-            ])->latest()->paginate(20);
+        ])->latest()->paginate(20);
 
-            return response()->json([
-                'status' => 'success',
-                'message' => 'All post fetched',
-                'data' => $post->items(),
-                'pagination' => [
-                    'current_page' => $post->currentPage(),
-                    'total' => $post->total(),
-                    'per_page' => $post->perPage(),
-                    'last_page' => $post->lastPage(),
-                ]
-            ], 200);
+        return response()->json([
+            'status' => 'success',
+            'message' => 'All post fetched',
+            'data' => $post->items(),
+            'pagination' => [
+                'current_page' => $post->currentPage(),
+                'total' => $post->total(),
+                'per_page' => $post->perPage(),
+                'last_page' => $post->lastPage(),
+            ]
+        ], 200);
 
     }
 
     public function show($id)
-{
-    $post = Post::with(['user', 'tags', 'likes', 'comments.user'])->findOrFail($id);
-    return response()->json([
-        'status' => 'success',
-        'message' => 'post fetched',
-        'data' => $post,
-    ], 200);
-}
+    {
+        $post = Post::with(['user', 'tags', 'likes', 'comments.user'])->findOrFail($id);
+        return response()->json([
+            'status' => 'success',
+            'message' => 'post fetched',
+            'data' => $post,
+        ], 200);
+    }
 
     public function store(Request $request)
     {
@@ -99,8 +99,7 @@ class PostController extends Controller
                 'message' => 'post removed successfully',
                 // $post->load('tags')
             ], 200);
-        }
-        catch (\Exception $e) {
+        } catch (\Exception $e) {
             return response()->json([
                 'status' => 'failed',
                 'message' => 'Message ' . $e->getMessage(),

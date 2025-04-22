@@ -26,7 +26,7 @@ class PaymentController extends Controller
         if (!$user->stripe_customer_id) {
             $customer = Customer::create([
                 'email' => $user->email,
-                'name' => $user->first_name.' ' .$user->last_name
+                'name' => $user->first_name . ' ' . $user->last_name
             ]);
 
             // Store Customer ID in DB
@@ -60,7 +60,7 @@ class PaymentController extends Controller
             'user_id' => $user->id,
             'customer_id' => $customer->id,
             'email' => $user->email,
-            'name' => $user->first_name.' '.$user->last_name,
+            'name' => $user->first_name . ' ' . $user->last_name,
             'payment_intent_id' => $paymentIntent->id,
             'status' => $paymentIntent->status,
             'amount' => $request->amount,
@@ -111,7 +111,7 @@ class PaymentController extends Controller
             return response()->json([
                 'status' => 'failed',
                 'message' => $e->getMessage()
-             ], 500);
+            ], 500);
         }
     }
 }

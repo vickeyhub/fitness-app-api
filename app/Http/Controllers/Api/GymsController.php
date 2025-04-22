@@ -11,7 +11,8 @@ use Illuminate\Support\Facades\Auth;
 
 class GymsController extends Controller
 {
-    public function getGyms(Request $request){
+    public function getGyms(Request $request)
+    {
         try {
             // Validation Rules
             $validator = Validator::make($request->all(), [
@@ -32,8 +33,8 @@ class GymsController extends Controller
             $rating = $request->rating;
             $specialty = $request->specialty;
 
-            $trainers = User::select('id','first_name','last_name','email')
-            ->where(['user_type' => 'gym','status' => '1'])
+            $trainers = User::select('id', 'first_name', 'last_name', 'email')
+                ->where(['user_type' => 'gym', 'status' => '1'])
                 ->when($name, function ($query, $name) {
                     $query->where('name', 'LIKE', "%$name%")
                         ->orWhere('last_name', 'LIKE', "%$name%");
@@ -45,7 +46,7 @@ class GymsController extends Controller
                 })
                 ->with('profile:id,user_id,specialty,rating,location')
                 ->get();
-            if($trainers->isEmpty()) {
+            if ($trainers->isEmpty()) {
                 return response()->json([
                     'status' => 'success',
                     'message' => 'No gyms are available'
@@ -62,12 +63,13 @@ class GymsController extends Controller
         }
     }
 
-    public function getBookingsFromUsers(){
+    public function getBookingsFromUsers()
+    {
         $user = Auth::user();
 
         // Fetch bookings based on user type
         $query = Booking::query();
-        $query->select('id','user_id','session_id','payment_id','booking_date','time_slot','status','payment_status');
+        $query->select('id', 'user_id', 'session_id', 'payment_id', 'booking_date', 'time_slot', 'status', 'payment_status');
         if ($user->user_type === 'user') {
             $query->where('user_id', $user->id);
         } elseif ($user->user_type === 'trainer') {
@@ -82,8 +84,8 @@ class GymsController extends Controller
             'user.profile:id,user_id,profile_picture,age,dob,weight,weight_parameter,gender,location,specialty',
             'session:id,session_title,duration,total_duration,calories,schedule,price,session_thumbnail,session_timing,session_type,is_publish',
 
-            ])
-        ->get();
+        ])
+            ->get();
 
         return response()->json([
             'status' => 'success',
