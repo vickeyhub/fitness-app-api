@@ -13,23 +13,26 @@ class PostController extends Controller
 {
     public function index()
     {
-        $post = Post::with([
+        $posts = Post::with([
             'user:id,first_name,last_name,email,user_type',
             'user.profile:id,user_id,profile_picture,gender,specialty',
             'tags',
             'likes',
             'comments'
-        ])->latest()->paginate(20);
+        ])->latest()->cursorPaginate(2);
+
 
         return response()->json([
             'status' => 'success',
             'message' => 'All post fetched',
-            'data' => $post->items(),
+            'data' => $posts->items(),
             'pagination' => [
-                'current_page' => $post->currentPage(),
-                'total' => $post->total(),
-                'per_page' => $post->perPage(),
-                'last_page' => $post->lastPage(),
+                'per_page' => $posts->perPage(),
+                'next_cursor' => optional($posts->nextCursor())?->encode(),
+                'next_page_url' => $posts->nextPageUrl(),
+                'prev_cursor' => optional($posts->previousCursor())?->encode(),
+                'prev_page_url' => $posts->previousPageUrl(),
+                'path' => $posts->path(),
             ]
         ], 200);
 
