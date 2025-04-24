@@ -11,6 +11,45 @@ use Illuminate\Support\Facades\Validator;
 
 class CommentController extends Controller
 {
+    public function index(Post $post, Request $request){
+        $comments = $post->comments()
+        ->with(
+            'user:id,first_name,last_name',
+            'user.profile'
+        ) // load user
+        ->latest()
+        ->cursorPaginate(10);
+
+   $formatted = $comments->items();
+
+    $data = array_map(function ($comment) {
+        // return $comment->user->profile->profile_picture;
+        return [
+            'id' => $comment->id,
+            'comment' => $comment->comment,
+            'user' => [
+                'id' => $comment->user->id,
+                'name' => $comment->user->first_name . ' ' . $comment->user->last_name,
+                'profile_picture' => $comment->user->profile->profile_picture ? asset('storage/' . $comment->user->profile->profile_picture) : null,
+            ],
+            'time_ago' => $comment->created_at->diffForHumans(),
+        ];
+    }, $formatted);
+
+    return response()->json([
+        'status' => 'success',
+        'message' => 'Post comments fetched',
+        'data' => $data,
+        'pagination' => [
+            'per_page' => $comments->perPage(),
+            'next_cursor' => optional($comments->nextCursor())?->encode(),
+            'next_page_url' => $comments->nextPageUrl(),
+            'prev_cursor' => optional($comments->previousCursor())?->encode(),
+            'prev_page_url' => $comments->previousPageUrl(),
+            'path' => $comments->path(),
+        ]
+    ], 200);
+    }
     public function store(Request $request, Post $post)
     {
         $validator = Validator::make($request->all(), [

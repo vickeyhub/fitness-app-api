@@ -11,15 +11,17 @@ use Illuminate\Support\Facades\Validator;
 
 class PostController extends Controller
 {
-    public function index()
+    public function index_old()
     {
         $posts = Post::with([
             'user:id,first_name,last_name,email,user_type',
             'user.profile:id,user_id,profile_picture,gender,specialty',
             'tags',
-            'likes',
-            'comments'
-        ])->latest()->cursorPaginate(2);
+            'likes', //send counts / current user
+            // 'comments' send total counts of comments
+        ])
+            ->latest()
+            ->cursorPaginate(2);
 
 
         return response()->json([
@@ -36,6 +38,62 @@ class PostController extends Controller
             ]
         ], 200);
 
+    }
+
+    public function index()
+    {
+        try {
+            $userId = Auth::id();
+
+            $posts = Post::with([
+                'user:id,first_name,last_name,email,user_type',
+                'user.profile:id,user_id,profile_picture,gender,specialty',
+                'tags',
+                'likes:id,post_id,user_id', // include likes for processing
+            ])->withCount('comments') // for total comments
+                ->latest()
+                ->cursorPaginate(2);
+
+            $data = $posts->items();
+
+            $formatted = array_map(function ($post) use ($userId) {
+                $likes = $post->likes ?? [];
+
+                return [
+                    'id' => $post->id,
+                    'title' => $post->title,
+                    'description' => $post->description,
+                    'thumbnail' => $post->thumbnail ? asset('storage/' . $post->thumbnail) : null,
+                    'time_ago' => $post->created_at->diffForHumans(),
+                    'user' => $post->user,
+                    // 'profile' => $post->user->profile ?? null,
+                    'tags' => $post->tags,
+                    'likes_count' => count($likes),
+                    'liked_by_current_user' => collect($likes)->contains('user_id', $userId),
+                    'comments_count' => $post->comments_count,
+                    'created_at' => $post->created_at->toDateTimeString(),
+                ];
+            }, $data);
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'All posts fetched',
+                'data' => $formatted,
+                'pagination' => [
+                    'per_page' => $posts->perPage(),
+                    'next_cursor' => optional($posts->nextCursor())?->encode(),
+                    'next_page_url' => $posts->nextPageUrl(),
+                    'prev_cursor' => optional($posts->previousCursor())?->encode(),
+                    'prev_page_url' => $posts->previousPageUrl(),
+                    'path' => $posts->path(),
+                ]
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 'failed',
+                'message' => $e->getMessage()
+            ], 500);
+        }
     }
 
     public function show($id)

@@ -22,4 +22,7 @@ class Post extends Model
     public function likes() {
         return $this->hasMany(Like::class);
     }
+    public function likedByUser($user_id){
+        return $this->likes()->where('user_id', $user_id);
+    }
 }
