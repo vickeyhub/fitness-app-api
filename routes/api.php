@@ -9,6 +9,7 @@ use App\Http\Controllers\Api;
 // })->middleware('auth:sanctum');
 
 Route::middleware(['auth:sanctum'])->group(function () {
+    Route::post('/logout', [Api\AuthController::class, 'logout']);
     Route::get('/user/profile', [Api\UserController::class, 'show']);
     Route::post('/user/profile', [Api\UserController::class, 'updateProfile']);
     Route::post('bookings', [Api\BookingsController::class, 'createBookings']);

@@ -67,7 +67,7 @@ class AuthController extends Controller
             'email' => $request->email,
             'status' => '0'
         ])->first();
-        if($check_if_active){
+        if ($check_if_active) {
             $check_if_active->otp = $otp;
             $check_if_active->save();
             Mail::to($request->email)->send(new SendOtpMail($otp, $request->email));
@@ -174,6 +174,16 @@ class AuthController extends Controller
             'message' => 'Email verified successfully!',
             'token' => $token
         ], 200);
+    }
+
+    public function logout(Request $request)
+    {
+        $request->user()->currentAccessToken()->delete();
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Logged out successfully',
+        ]);
     }
 
 }
