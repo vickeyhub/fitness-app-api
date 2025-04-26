@@ -66,7 +66,8 @@ class SessionsController extends Controller
             $query->select(
                 'classes.id',
                 'classes.session_title',
-                'classes.duration',
+                // 'classes.duration',
+                DB::raw('CAST(classes.duration AS UNSIGNED) AS duration'),
                 'classes.session_thumbnail',
                 'classes.calories',
                 'classes.price',
