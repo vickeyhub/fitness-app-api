@@ -39,4 +39,62 @@ class LikeController extends Controller
             // $post->load('tags')
         ], 200);
     }
+
+    protected function new_storeReaction(Post $post, $type)
+{
+    $user = Auth::user();
+
+    $existing = $post->likes()->where('user_id', $user->id)->first();
+
+    if ($type === 'like') {
+        if ($existing && $existing->type === 'like') {
+            // already liked → do nothing
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Already liked',
+                'data' => $existing,
+            ]);
+        }
+
+        // remove dislike if exists
+        if ($existing && $existing->type === 'dislike') {
+            $existing->delete();
+        }
+
+        // add new like
+        $like = $post->likes()->create([
+            'user_id' => $user->id,
+            'type' => 'like',
+        ]);
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Liked post',
+            'data' => $like,
+        ]);
+    }
+
+    if ($type === 'dislike') {
+        // remove like if exists
+        if ($existing && $existing->type === 'like') {
+            $existing->delete();
+        }
+
+        // add new dislike (or replace old one)
+        if ($existing) $existing->delete(); // remove old dislike to prevent duplicates
+
+        $dislike = $post->likes()->create([
+            'user_id' => $user->id,
+            'type' => 'dislike',
+        ]);
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Disliked post',
+            'data' => $dislike,
+        ]);
+    }
+
+    return response()->json(['status' => 'error', 'message' => 'Invalid reaction type'], 422);
+}
 }
