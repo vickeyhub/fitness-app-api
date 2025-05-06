@@ -20,7 +20,7 @@ class LikeController extends Controller
         return $this->storeReaction($post, 'dislike');
     }
 
-    protected function storeReaction(Post $post, $type)
+    protected function old_storeReaction(Post $post, $type)
     {
         $user = Auth::user();
 
@@ -40,7 +40,7 @@ class LikeController extends Controller
         ], 200);
     }
 
-    protected function new_storeReaction(Post $post, $type)
+    protected function storeReaction(Post $post, $type)
 {
     $user = Auth::user();
 
@@ -83,15 +83,15 @@ class LikeController extends Controller
         // add new dislike (or replace old one)
         if ($existing) $existing->delete(); // remove old dislike to prevent duplicates
 
-        $dislike = $post->likes()->create([
-            'user_id' => $user->id,
-            'type' => 'dislike',
-        ]);
+        // $dislike = $post->likes()->create([
+        //     'user_id' => $user->id,
+        //     'type' => 'dislike',
+        // ]);
 
         return response()->json([
             'status' => 'success',
             'message' => 'Disliked post',
-            'data' => $dislike,
+            // 'data' => $dislike,
         ]);
     }
 
