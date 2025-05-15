@@ -71,3 +71,5 @@ Route::get('login', function () {
     return response()->json($output, 401);
 })->name('login');
 
+Route::post('/notification', [Api\NotificationController::class, 'index']);
+
