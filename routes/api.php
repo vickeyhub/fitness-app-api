@@ -26,6 +26,14 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
     Route::get('owner-bookings', [Api\GymsController::class, 'getBookingsFromUsers']);
 
+    // fetch all users data
+    Route::get('users', [Api\UserController::class, 'index'])->name('fetchAllUsers');
+    Route::post('/follow/{user}', [Api\FollowController::class, 'follow']);
+    Route::delete('/unfollow/{user}', [Api\FollowController::class, 'unfollow']);
+    Route::get('/following', [Api\FollowController::class, 'followingList']);
+    Route::get('/followers/{user}', [Api\FollowController::class, 'followersList']);
+    Route::get('/is-following/{user}', [Api\FollowController::class, 'isFollowing']);
+
     // newsfeed controllers
     // Posts
     Route::apiResource('posts', Api\PostController::class);

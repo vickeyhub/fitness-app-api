@@ -39,6 +39,7 @@ class User extends Authenticatable
     protected $hidden = [
         'password',
         'remember_token',
+        // 'pivot'
     ];
 
     /**
@@ -68,4 +69,20 @@ class User extends Authenticatable
     {
         return $this->hasMany(\App\Models\Post::class);
     }
+
+    public function followers()
+    {
+        return $this->belongsToMany(User::class, 'follows', 'following_id', 'follower_id')
+        ->select('users.id', 'users.first_name','users.last_name', 'users.email')
+        ->withTimestamps();
+    }
+
+    public function following()
+    {
+        return $this->belongsToMany(User::class, 'follows', 'follower_id', 'following_id')
+        ->select('users.id', 'users.first_name','users.last_name', 'users.email')
+        ->withTimestamps();
+    }
+
+
 }

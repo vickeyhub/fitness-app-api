@@ -34,6 +34,35 @@ class UserController extends Controller
     //     ], 200);
     // }
 
+    // fetch users list
+    public function index(Request $request)
+    {
+        $query = User::with('profile:id,user_id,profile_picture')
+            ->select('id', 'first_name', 'last_name', 'email')
+            ->where('user_type', ['user', 'trainer', 'gym']);
+
+        if ($request->has('q') && strlen($request->q) > 0) {
+            $query->where(function ($q) use ($request) {
+                $q->where('first_name', 'like', "%{$request->q}%")
+                    ->orWhere('last_name', 'like', "%{$request->q}%")
+                    ->orWhere('email', 'like', "%{$request->q}%");
+            });
+        }
+        $users = $query->paginate(20);
+
+        return response()->json([
+            'status' => 'success',
+            'message' => $request->has('q') ? 'Search results' : 'User list fetched',
+            'data' => $users->items(),
+            'pagination' => [
+                'current_page' => $users->currentPage(),
+                'total' => $users->total(),
+                'per_page' => $users->perPage(),
+                'last_page' => $users->lastPage(),
+            ]
+        ], 200);
+    }
+
     public function show()
     {
         $user = User::with('profile')->find(Auth::user()->id);
