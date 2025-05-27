@@ -34,6 +34,12 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('/followers/{user}', [Api\FollowController::class, 'followersList']);
     Route::get('/is-following/{user}', [Api\FollowController::class, 'isFollowing']);
 
+    // All status APIs
+    Route::post('status/upload', [Api\StatusController::class, 'upload']);
+    Route::get('status/feed', [Api\StatusController::class, 'feed']);
+    Route::get('status/me', [Api\StatusController::class, 'myStatuses']);
+    Route::delete('status/{id}', [Api\StatusController::class, 'delete']);
+
     // newsfeed controllers
     // Posts
     Route::apiResource('posts', Api\PostController::class);
