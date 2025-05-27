@@ -40,6 +40,15 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('status/me', [Api\StatusController::class, 'myStatuses']);
     Route::delete('status/{id}', [Api\StatusController::class, 'delete']);
 
+    // All nutrition APIs
+    Route::prefix('nutrition')->group(function () {
+        Route::post('/add', [Api\NutritionController::class, 'addOrUpdateMeal']);
+        Route::get('/', [Api\NutritionController::class, 'getNutritionByDate']);
+        Route::delete('/', [Api\NutritionController::class, 'deleteMeal']);
+        Route::post('/target/set', [Api\NutritionController::class, 'setTargets']);
+        Route::get('/target', [Api\NutritionController::class, 'getTargets']);
+    });
+
     // newsfeed controllers
     // Posts
     Route::apiResource('posts', Api\PostController::class);
