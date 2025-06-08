@@ -20,7 +20,6 @@ class DatabaseSeeder extends Seeder
         //     'name' => 'Test User',
         //     'email' => 'test@example.com',
         // ]);
-        $this->call(ExerciseSeeder::class);
 
 
         ExerciseCategory::insert([
@@ -31,5 +30,6 @@ class DatabaseSeeder extends Seeder
             ['name' => 'Core'],
             ['name' => 'Others'],
         ]);
+        $this->call(ExerciseSeeder::class);
     }
 }
