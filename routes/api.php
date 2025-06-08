@@ -48,6 +48,13 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::post('/target/set', [Api\NutritionController::class, 'setTargets']);
         Route::get('/target', [Api\NutritionController::class, 'getTargets']);
     });
+    Route::prefix('workout')->group(function () {
+        Route::get('/categories', [Api\ExerciseController::class, 'categories']);
+        Route::get('/exercises', [Api\ExerciseController::class, 'getByCategory']);
+        Route::post('/workout-plans', [Api\WorkoutPlanController::class, 'store']);
+        Route::get('/workout-plans', [Api\WorkoutPlanController::class, 'index']);
+        Route::get('/workout-plans/{id}', [Api\WorkoutPlanController::class, 'show']);
+    });
 
     // newsfeed controllers
     // Posts
