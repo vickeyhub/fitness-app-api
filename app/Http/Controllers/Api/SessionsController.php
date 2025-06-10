@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
+use Str;
 
 class SessionsController extends Controller
 {
@@ -274,7 +275,6 @@ class SessionsController extends Controller
                 'longitude' => 'required|numeric',
                 'radius' => 'required|numeric', // Radius in KM
             ]);
-
             if ($validator->fails()) {
                 return response()->json([
                     'message' => 'Validation failed',
@@ -290,6 +290,13 @@ class SessionsController extends Controller
             $end = Carbon::createFromFormat('h:i a', trim($timing_array[1]));
             $payload['duration'] = $start->diffInMinutes($end);
             $payload['user_id'] = Auth::user()->id;
+
+            if ($request->hasFile('session_thumbnail')) {
+                $file = $request->file('session_thumbnail');
+                $filename = Str::uuid() . '.' . $file->getClientOriginalExtension();
+                $filePath = $file->storeAs('uploads/session_thumbnail', $filename, 'public');
+                $payload['session_thumbnail'] = $filePath;
+            }
 
             $session = Classes::create($payload);
 
