@@ -20,7 +20,7 @@ class UserProfile extends Model
         'height_parameter',
         'gender',
         "dob","location","rating",
-        'specility',
+        'specialties', // Corrected spelling from 'specility' to 'specialties'
         'trainer_services',
         'user_description',
         'experience_level',

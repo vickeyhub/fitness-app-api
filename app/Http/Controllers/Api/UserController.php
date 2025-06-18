@@ -94,11 +94,10 @@ class UserController extends Controller
             'rating' => 'nullable|numeric|min:0|max:5',
             'file' => 'nullable|file|mimes:jpeg,png,jpg,mp4,mov,pdf|max:5120',
             // 'specialties' => 'required|array',
-            'specility' => 'string',
-            // 'trainer_services' => 'nullable|array',
-            // 'trainer_services.*' => 'string',
-            // 'user_description' => 'nullable|string|max:500',
-            // 'experiance_level' => 'nullable|in:beginner,intermediate,advanced',
+            'specialties' => 'string',
+            'trainer_services' => 'nullable|string',
+            'user_description' => 'nullable|string|max:500',
+            'experience_level' => 'nullable|in:beginner,intermediate,advanced',
             'gender' => 'nullable|in:male,female,other',
         ]);
 
@@ -138,10 +137,10 @@ class UserController extends Controller
             'dob' => $request->dob,
             'location' => $request->location,
             'rating' => $request->rating,
-            'specility' => $request->specialties,
-            // 'trainer_services' => is_array($request->trainer_services) ? json_encode($request->trainer_services) : null,
-            // 'user_description' => $request->user_description,
-            // 'experiance_level' => $request->experiance_level,
+            'specialties' => $request->specialties,
+            'trainer_services' => $request->trainer_services,
+            'user_description' => $request->user_description,
+            'experience_level' => $request->experiance_level,
         ];
 
 
@@ -161,7 +160,7 @@ class UserController extends Controller
         return response()->json([
             'message' => $filePath ? 'Profile updated with media' : 'Profile updated',
             'user' => $user,
-            'profile' => $profile,
+            // 'profile' => $profile,
             'file_url' => $filePath ? asset('storage/' . $filePath) : null,
         ], 200);
     }
