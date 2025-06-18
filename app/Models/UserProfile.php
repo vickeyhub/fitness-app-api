@@ -19,7 +19,16 @@ class UserProfile extends Model
         'height',
         'height_parameter',
         'gender',
-        "dob","location","rating","specialty"
+        "dob","location","rating",
+        'specility',
+        'trainer_services',
+        'user_description',
+        'experience_level',
+    ];
+
+    protected $casts = [
+        // 'specilities' => 'array',
+        // Add other casts as needed
     ];
 
     /**

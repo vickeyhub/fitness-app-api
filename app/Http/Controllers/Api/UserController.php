@@ -80,7 +80,7 @@ class UserController extends Controller
     public function updateProfile(Request $request)
     {
 
-        // Validation rules
+        // Validate
         $validator = Validator::make($request->all(), [
             'first_name' => 'required|string|min:1|max:150',
             'last_name' => 'required|string|min:1|max:150',
@@ -92,15 +92,16 @@ class UserController extends Controller
             'dob' => 'nullable|date',
             'location' => 'nullable|string|max:255',
             'rating' => 'nullable|numeric|min:0|max:5',
-            'specialty' => 'nullable|string|max:255',
-            'file' => 'nullable|file|mimes:jpeg,png,jpg,mp4,mov,pdf|max:5120' // 5MB max
+            'file' => 'nullable|file|mimes:jpeg,png,jpg,mp4,mov,pdf|max:5120',
+            // 'specialties' => 'required|array',
+            'specility' => 'string',
+            // 'trainer_services' => 'nullable|array',
+            // 'trainer_services.*' => 'string',
+            // 'user_description' => 'nullable|string|max:500',
+            // 'experiance_level' => 'nullable|in:beginner,intermediate,advanced',
+            'gender' => 'nullable|in:male,female,other',
         ]);
 
-        $user = Auth::user();
-        // Check if the user has a profile, or create one if it doesn't exist
-        $profile = $user->profile;
-
-        // If validation fails, return errors
         if ($validator->fails()) {
             return response()->json([
                 'message' => 'Validation failed',
@@ -108,82 +109,63 @@ class UserController extends Controller
             ], 422);
         }
 
+        $user = Auth::user();
+        $profile = $user->profile;
+
+        // Update User's name if changed
         $user->update([
             'first_name' => $request->first_name,
             'last_name' => $request->last_name,
         ]);
 
-        // $file = $request->file('file');
-        // $filename = Str::uuid() . '.' . $file->getClientOriginalExtension();
-        // $path = $file->storeAs('uploads', $filename, 'public');
-
+        // Handle file upload
         $filePath = null;
-
         if ($request->hasFile('file')) {
             $file = $request->file('file');
             $filename = Str::uuid() . '.' . $file->getClientOriginalExtension();
             $filePath = $file->storeAs('uploads/profile', $filename, 'public');
         }
 
+        // Prepare profile data (always encode arrays)
+        $profileData = [
+            'profile_picture' => $filePath,
+            'age' => $request->age,
+            'weight' => $request->weight,
+            'weight_parameter' => $request->weight_parameter,
+            'height' => $request->height,
+            'gender' => $request->gender,
+            'height_parameter' => $request->height_parameter,
+            'dob' => $request->dob,
+            'location' => $request->location,
+            'rating' => $request->rating,
+            'specility' => $request->specialties,
+            // 'trainer_services' => is_array($request->trainer_services) ? json_encode($request->trainer_services) : null,
+            // 'user_description' => $request->user_description,
+            // 'experiance_level' => $request->experiance_level,
+        ];
 
+
+        // Remove null profile picture if not uploaded
+        if (!$filePath && $profile) {
+            unset($profileData['profile_picture']);
+        }
+
+        // Create or update profile
         if (!$profile) {
-
-            // If no profile exists, create a new one
-            $profile = UserProfile::create([
-                'user_id' => $user->id,
-                'profile_picture' => $filePath,
-                'age' => $request->age,
-                'weight' => $request->weight,
-                'weight_parameter' => $request->weight_parameter,
-                'height' => $request->height,
-                'gender' => $request->gender,
-                'height_parameter' => $request->height_parameter,
-                'dob' => $request->dob,
-                'location' => $request->location,
-                'rating' => $request->rating,
-                'specialty' => $request->specialty,
-            ]);
+            $profileData['user_id'] = $user->id;
+            $profile = UserProfile::create($profileData);
         } else {
-            // Update existing profile
-            // $profile->update($request->only([
-            //     'age',
-            //     'weight',
-            //     'weight_parameter',
-            //     'height',
-            //     'height_parameter',
-            //     'gender',
-            //     'dob',
-            //     'location',
-            //     'rating',
-            //     'specialty'
-            // ]));
-
-            $updateData = $request->only([
-                'age',
-                'weight',
-                'weight_parameter',
-                'height',
-                'height_parameter',
-                'gender',
-                'dob',
-                'location',
-                'rating',
-                'specialty'
-            ]);
-            if ($filePath) {
-                $updateData['profile_picture'] = $filePath;
-            }
-            $profile->update($updateData);
+            $profile->update($profileData);
         }
 
         return response()->json([
-            // 'message' => 'User profile updated successfully!',
             'message' => $filePath ? 'Profile updated with media' : 'Profile updated',
             'user' => $user,
+            'profile' => $profile,
             'file_url' => $filePath ? asset('storage/' . $filePath) : null,
-            // 'profile' => $profile
         ], 200);
     }
+
 
     public function getTrainers(Request $request)
     {

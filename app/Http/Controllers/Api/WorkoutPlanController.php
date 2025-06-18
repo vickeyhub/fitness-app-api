@@ -155,5 +155,34 @@ class WorkoutPlanController extends Controller
             ], 500);
         }
     }
+    /**
+     * Remove the specified workout plan and its related exercises.
+     */
+    public function destroy($id)
+    {
+        try {
+            $plan = WorkoutPlan::where('user_id', auth()->id())->find($id);
+
+            if (!$plan) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Workout plan not found',
+                ], 404);
+            }
+
+            $plan->delete();
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Workout plan deleted successfully',
+            ], 200);
+        } catch (\Throwable $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Failed to delete workout plan',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
 
 }

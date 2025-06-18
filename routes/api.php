@@ -54,6 +54,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::post('/workout-plans', [Api\WorkoutPlanController::class, 'store']);
         Route::get('/workout-plans', [Api\WorkoutPlanController::class, 'index']);
         Route::get('/workout-plans/{id}', [Api\WorkoutPlanController::class, 'show']);
+        Route::delete('/workout-plans/{id}', [Api\WorkoutPlanController::class, 'destroy']);
     });
 
     // newsfeed controllers
