@@ -198,7 +198,7 @@ class UserController extends Controller
                 ->when($name, function ($query, $name) {
                     $query->where(function ($q) use ($name) {
                         $q->where('first_name', 'LIKE', "%$name%")
-                          ->orWhere('last_name', 'LIKE', "%$name%");
+                            ->orWhere('last_name', 'LIKE', "%$name%");
                     });
                 })
                 ->when($gender, function ($query, $gender) {
@@ -227,7 +227,7 @@ class UserController extends Controller
                     });
                 })
                 ->with('profile:id,user_id,specialties,rating,location,gender,experience_level,trainer_services')
-                ->get();
+                ->paginate(20);
             if ($trainers->isEmpty()) {
                 return response()->json([
                     'status' => 'success',
@@ -236,9 +236,15 @@ class UserController extends Controller
             }
 
             return response()->json([
-                'data' => $trainers,
                 'status' => 'success',
-                'message' => 'Trainers fetched successfully'
+                'message' => 'Trainers fetched successfully',
+                'data' => $trainers->items(),
+                'pagination' => [
+                    'current_page' => $trainers->currentPage(),
+                    'total' => $trainers->total(),
+                    'per_page' => $trainers->perPage(),
+                    'last_page' => $trainers->lastPage(),
+                ]
             ], 200);
         } catch (ValidationException $e) {
             return response()->json([
