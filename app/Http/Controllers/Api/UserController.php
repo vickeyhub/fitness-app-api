@@ -226,7 +226,7 @@ class UserController extends Controller
                         $q->where('location', 'LIKE', "%$location%");
                     });
                 })
-                ->with('profile:id,user_id,specialties,rating,location,gender,experience_level,trainer_services')
+                ->with('profile:id,user_id,specialties,rating,location,gender,experience_level,trainer_services,profile_picture')
                 ->paginate(20);
             if ($trainers->isEmpty()) {
                 return response()->json([
