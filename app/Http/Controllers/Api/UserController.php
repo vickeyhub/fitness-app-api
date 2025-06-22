@@ -171,36 +171,62 @@ class UserController extends Controller
         try {
             // Validation Rules
             $validator = Validator::make($request->all(), [
+                'name' => 'nullable|string|max:150',
+                'gender' => 'nullable|in:male,female,other',
+                'experience_level' => 'nullable|in:beginner,intermediate,advanced',
+                'specialties' => 'nullable|string|max:255',
+                'service_offered' => 'nullable|string|max:255',
                 'location' => 'nullable|string|max:255',
-                'rating' => 'nullable|numeric|min:0|max:5',
-                'specialty' => 'nullable|string|max:255',
             ]);
 
             // If validation fails, return errors
             if ($validator->fails()) {
                 return response()->json([
-                    'status' => 'error',
-                    'message' => 'Invalid credentials',
-                    'errors' => $validator->errors()
+                    'message' => 'Validation failed',
+                    'errors' => array_values($validator->errors()->all())
                 ], 422);
             }
-            $name = $request->first_name;
+            $name = $request->name;
+            $gender = $request->gender;
+            $experience_level = $request->experience_level;
+            $specialties = $request->specialties;
+            $service_offered = $request->service_offered;
             $location = $request->location;
-            $rating = $request->rating;
-            $specialty = $request->specialty;
 
-            $trainers = User::select('id', 'first_name as first_name', 'last_name')
+            $trainers = User::select('id', 'first_name', 'last_name')
                 ->where(['user_type' => 'trainer', 'status' => '1'])
                 ->when($name, function ($query, $name) {
-                    $query->where('first_name', 'LIKE', "%$name%")
-                        ->orWhere('last_name', 'LIKE', "%$name%");
+                    $query->where(function ($q) use ($name) {
+                        $q->where('first_name', 'LIKE', "%$name%")
+                          ->orWhere('last_name', 'LIKE', "%$name%");
+                    });
                 })
-                ->whereHas('profile', function ($query) use ($location, $rating, $specialty) {
-                    $query->when($location, fn($q) => $q->where('location', 'LIKE', "%$location%"))
-                        ->when($rating, fn($q) => $q->where('rating', 'LIKE', "%$rating%"))
-                        ->when($specialty, fn($q) => $q->where('specialty', 'LIKE', "%$specialty%"));
+                ->when($gender, function ($query, $gender) {
+                    $query->whereHas('profile', function ($q) use ($gender) {
+                        $q->where('gender', $gender);
+                    });
                 })
-                ->with('profile:id,user_id,specialty,rating,location')
+                ->when($experience_level, function ($query, $experience_level) {
+                    $query->whereHas('profile', function ($q) use ($experience_level) {
+                        $q->where('experience_level', $experience_level);
+                    });
+                })
+                ->when($specialties, function ($query, $specialties) {
+                    $query->whereHas('profile', function ($q) use ($specialties) {
+                        $q->where('specialties', 'LIKE', "%$specialties%");
+                    });
+                })
+                ->when($service_offered, function ($query, $service_offered) {
+                    $query->whereHas('profile', function ($q) use ($service_offered) {
+                        $q->where('trainer_services', 'LIKE', "%$service_offered%");
+                    });
+                })
+                ->when($location, function ($query, $location) {
+                    $query->whereHas('profile', function ($q) use ($location) {
+                        $q->where('location', 'LIKE', "%$location%");
+                    });
+                })
+                ->with('profile:id,user_id,specialties,rating,location,gender,experience_level,trainer_services')
                 ->get();
             if ($trainers->isEmpty()) {
                 return response()->json([
@@ -209,7 +235,11 @@ class UserController extends Controller
                 ], 200);
             }
 
-            return response()->json($trainers, 200);
+            return response()->json([
+                'data' => $trainers,
+                'status' => 'success',
+                'message' => 'Trainers fetched successfully'
+            ], 200);
         } catch (ValidationException $e) {
             return response()->json([
                 'status' => 'error',
