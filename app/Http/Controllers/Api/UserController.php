@@ -254,4 +254,102 @@ class UserController extends Controller
             ], 422);
         }
     }
+
+    public function findBuddy(Request $request)
+    {
+        try {
+            // Validate input
+            $validator = Validator::make($request->all(), [
+                'name' => 'nullable|string|max:150',
+                'gender' => 'nullable|in:male,female,other',
+                'activities' => 'nullable|array',
+                'activities.*' => 'string|max:100',
+                'location' => 'nullable|string|max:255',
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Validation failed',
+                    'errors' => $validator->errors()
+                ], 422);
+            }
+
+            $filters = $validator->validated();
+
+            $query = User::with('profile:id,user_id,profile_picture,gender,location,specialties')
+                ->where('user_type', 'user')
+                ->where('status', '1');
+
+            // Filter by name
+            if (!empty($filters['name'])) {
+                $query->where(function ($q) use ($filters) {
+                    $q->where('first_name', 'like', "%{$filters['name']}%")
+                        ->orWhere('last_name', 'like', "%{$filters['name']}%");
+                });
+            }
+
+            // Filter by gender
+            if (!empty($filters['gender'])) {
+                $query->whereHas('profile', function ($q) use ($filters) {
+                    $q->where('gender', $filters['gender']);
+                });
+            }
+
+            // Filter by location
+            if (!empty($filters['location'])) {
+                $query->whereHas('profile', function ($q) use ($filters) {
+                    $q->where('location', 'like', "%{$filters['location']}%");
+                });
+            }
+
+            // Filter by activities (specialties)
+            if (!empty($filters['activities'])) {
+                $query->whereHas('profile', function ($q) use ($filters) {
+                    foreach ($filters['activities'] as $activity) {
+                        $q->orWhereJsonContains('specialties', $activity);
+                    }
+                });
+            }
+
+            $buddies = $query->paginate(20);
+
+            if ($buddies->isEmpty()) {
+                return response()->json([
+                    'status' => 'success',
+                    'message' => 'No matching buddies found',
+                    'data' => [],
+                    'pagination' => [
+                        'current_page' => $buddies->currentPage(),
+                        'per_page' => $buddies->perPage(),
+                        'total' => $buddies->total(),
+                        'last_page' => $buddies->lastPage(),
+                    ]
+                ], 200);
+            }
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Buddy search results',
+                'data' => $buddies->items(),
+                'pagination' => [
+                    'current_page' => $buddies->currentPage(),
+                    'per_page' => $buddies->perPage(),
+                    'total' => $buddies->total(),
+                    'last_page' => $buddies->lastPage(),
+                ]
+            ], 200);
+
+        } catch (\Throwable $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Something went wrong while searching for buddies',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+
+
+
 }

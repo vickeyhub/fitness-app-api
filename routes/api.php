@@ -87,6 +87,7 @@ Route::post('reset-password', [Api\PasswordResetController::class, 'resetPasswor
 // trainers/gym api for search and bookings routes
 Route::post('trainers', [Api\UserController::class, 'getTrainers']);
 Route::get('gyms', [Api\GymsController::class, 'getGyms']);
+Route::post('find-buddy', [Api\UserController::class, 'findBuddy']);
 
 // sessions/classes management
 Route::post('search-sessions', [Api\SessionsController::class, 'search_sessions']);
