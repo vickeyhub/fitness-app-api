@@ -12,8 +12,8 @@ return new class extends Migration {
     {
         Schema::table('user_profile', function (Blueprint $table) {
             // Rename the column to the correct spelling ('specialties')
-            if (Schema::hasColumn('user_profile', 'specility')) {
-                $table->renameColumn('specility', 'specialties');
+            if (Schema::hasColumn('user_profile', 'specialty')) {
+                $table->renameColumn('specialty', 'specialties');
             }
 
             // Add new columns (use 'text' for trainer_services if not using MySQL JSON)
