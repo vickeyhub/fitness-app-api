@@ -37,7 +37,7 @@ class FollowController extends Controller
         $authUser = Auth::user();
 
         $users = $authUser->following()
-            ->with(['profile:id,user_id,profile_picture,gender,specialty'])
+            ->with(['profile:id,user_id,profile_picture,gender,specialties'])
             ->select('users.id', 'users.first_name', 'users.last_name', 'users.email') // only these fields
             ->paginate(20);
 

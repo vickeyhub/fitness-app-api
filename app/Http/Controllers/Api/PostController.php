@@ -15,7 +15,7 @@ class PostController extends Controller
     {
         $posts = Post::with([
             'user:id,first_name,last_name,email,user_type',
-            'user.profile:id,user_id,profile_picture,gender,specialty',
+            'user.profile:id,user_id,profile_picture,gender,specialties',
             'tags',
             'likes', //send counts / current user
             // 'comments' send total counts of comments
@@ -47,7 +47,7 @@ class PostController extends Controller
 
             $posts = Post::with([
                 'user:id,first_name,last_name,email,user_type',
-                'user.profile:id,user_id,profile_picture,gender,specialty',
+                'user.profile:id,user_id,profile_picture,gender,specialties',
                 'tags',
                 'likes:id,post_id,user_id', // include likes for processing
             ])->withCount('comments') // for total comments

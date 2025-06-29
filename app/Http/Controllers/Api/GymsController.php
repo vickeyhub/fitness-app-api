@@ -18,7 +18,7 @@ class GymsController extends Controller
             $validator = Validator::make($request->all(), [
                 'location' => 'nullable|string|max:255',
                 'rating' => 'nullable|numeric|min:0|max:5',
-                'specialty' => 'nullable|string|max:255',
+                'specialties' => 'nullable|string|max:255',
             ]);
 
             if ($validator->fails()) {
@@ -31,7 +31,7 @@ class GymsController extends Controller
             $name = $request->name;
             $location = $request->location;
             $rating = $request->rating;
-            $specialty = $request->specialty;
+            $specialties = $request->specialties;
 
             $trainers = User::select('id', 'first_name', 'last_name', 'email')
                 ->where(['user_type' => 'gym', 'status' => '1'])
@@ -39,12 +39,12 @@ class GymsController extends Controller
                     $query->where('name', 'LIKE', "%$name%")
                         ->orWhere('last_name', 'LIKE', "%$name%");
                 })
-                ->whereHas('profile', function ($query) use ($location, $rating, $specialty) {
+                ->whereHas('profile', function ($query) use ($location, $rating, $specialties) {
                     $query->when($location, fn($q) => $q->where('location', 'LIKE', "%$location%"))
                         ->when($rating, fn($q) => $q->where('rating', 'LIKE', "%$rating%"))
-                        ->when($specialty, fn($q) => $q->where('specialty', 'LIKE', "%$specialty%"));
+                        ->when($specialties, fn($q) => $q->where('specialties', 'LIKE', "%$specialties%"));
                 })
-                ->with('profile:id,user_id,specialty,rating,location')
+                ->with('profile:id,user_id,specialties,rating,location')
                 ->get();
             if ($trainers->isEmpty()) {
                 return response()->json([
@@ -81,7 +81,7 @@ class GymsController extends Controller
 
         $bookings = $query->with([
             'user:id,first_name,last_name,email,mobile_number',
-            'user.profile:id,user_id,profile_picture,age,dob,weight,weight_parameter,gender,location,specialty',
+            'user.profile:id,user_id,profile_picture,age,dob,weight,weight_parameter,gender,location,specialties',
             'session:id,session_title,duration,total_duration,calories,schedule,price,session_thumbnail,session_timing,session_type,is_publish',
 
         ])
