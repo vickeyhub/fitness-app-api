@@ -56,6 +56,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::get('/workout-plans/{id}', [Api\WorkoutPlanController::class, 'show']);
         Route::delete('/workout-plans/{id}', [Api\WorkoutPlanController::class, 'destroy']);
     });
+    Route::get('/workouts/history', [Api\WorkoutLogController::class, 'getHistory']);
     Route::post('/workout/log', [Api\WorkoutLogController::class, 'log']);
     Route::post('/exercises/log', [Api\WorkoutLogController::class, 'exercise_log']);
 

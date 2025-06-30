@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\WorkoutLog;
 use App\Models\ExerciseLog;
+// use App\Models\WorkoutPlan;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 
@@ -45,7 +46,7 @@ class WorkoutLogController extends Controller
             'status' => 'success',
             'message' => 'Workout logged successfully',
             'workout_id' => $log->workout_id,
-        ],201);
+        ], 201);
     }
 
     public function exercise_log(Request $request)
@@ -74,6 +75,49 @@ class WorkoutLogController extends Controller
             'status' => 'success',
             'message' => 'Execise logged successfully',
             'exercise_log_id' => $exercise->id
-        ],201);
+        ], 201);
     }
+
+    public function getHistory(Request $request)
+    {
+        try {
+            $validated = $request->validate([
+                // 'user_id' => 'required|exists:users,id',
+                'from_date' => 'nullable|date',
+                'to_date' => 'nullable|date',
+            ]);
+
+            $query = WorkoutLog::where('user_id', Auth::id());
+
+            if (!empty($validated['from_date'])) {
+                $query->whereDate('start_time', '>=', $validated['from_date']);
+            }
+
+            if (!empty($validated['to_date'])) {
+                $query->whereDate('end_time', '<=', $validated['to_date']);
+            }
+
+            $workouts = $query->orderByDesc('start_time')->get([
+                'id as workout_id',
+                'workout_type',
+                'start_time',
+                'end_time',
+                'duration_minutes',
+                'calories_burned',
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'workouts' => $workouts
+            ], 200);
+
+        } catch (\Throwable $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Something went wrong while fetching history.',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
 }
