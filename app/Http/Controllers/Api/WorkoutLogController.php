@@ -107,13 +107,13 @@ class WorkoutLogController extends Controller
             ]);
 
             return response()->json([
-                'success' => true,
-                'workouts' => $workouts
+                'status' => "success",
+                'data' => $workouts
             ], 200);
 
         } catch (\Throwable $e) {
             return response()->json([
-                'success' => false,
+                'status' => false,
                 'message' => 'Something went wrong while fetching history.',
                 'error' => $e->getMessage()
             ], 500);
