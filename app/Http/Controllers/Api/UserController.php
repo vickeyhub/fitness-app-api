@@ -174,8 +174,8 @@ class UserController extends Controller
                 'name' => 'nullable|string|max:150',
                 'gender' => 'nullable|in:male,female,other',
                 'experience_level' => 'nullable|in:beginner,intermediate,advanced',
-                'specialties' => 'nullable|string|max:255',
-                'service_offered' => 'nullable|string|max:255',
+                'specialties' => 'nullable|array|max:255',
+                'service_offered' => 'nullable|array|max:255',
                 'location' => 'nullable|string|max:255',
             ]);
 
@@ -211,14 +211,39 @@ class UserController extends Controller
                         $q->where('experience_level', $experience_level);
                     });
                 })
+                // ->when($specialties, function ($query, $specialties) {
+                //     $query->whereHas('profile', function ($q) use ($specialties) {
+                //         $q->where('specialties', 'LIKE', "%$specialties%");
+                //     });
+                // })
+
                 ->when($specialties, function ($query, $specialties) {
                     $query->whereHas('profile', function ($q) use ($specialties) {
-                        $q->where('specialties', 'LIKE', "%$specialties%");
+                        // If specialties is an array, filter for any match
+                        if (is_array($specialties)) {
+                            foreach ($specialties as $specialty) {
+                                $q->orWhereJsonContains('specialties', $specialty);
+                            }
+                        } else {
+                            // fallback for string input
+                            $q->whereJsonContains('specialties', $specialties);
+                        }
                     });
                 })
+                // ->when($service_offered, function ($query, $service_offered) {
+                //     $query->whereHas('profile', function ($q) use ($service_offered) {
+                //         $q->where('trainer_services', 'LIKE', "%$service_offered%");
+                //     });
+                // })
                 ->when($service_offered, function ($query, $service_offered) {
                     $query->whereHas('profile', function ($q) use ($service_offered) {
-                        $q->where('trainer_services', 'LIKE', "%$service_offered%");
+                        if (is_array($service_offered)) {
+                            foreach ($service_offered as $service) {
+                                $q->orWhereJsonContains('trainer_services', $service);
+                            }
+                        } else {
+                            $q->whereJsonContains('trainer_services', $service_offered);
+                        }
                     });
                 })
                 ->when($location, function ($query, $location) {
