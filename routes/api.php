@@ -79,6 +79,9 @@ Route::middleware(['auth:sanctum'])->group(function () {
     // Tags
     Route::get('/tags', [Api\TagController::class, 'index']);
     Route::post('/tags', [Api\TagController::class, 'store']);
+
+    // Agora RTM Token
+    Route::post('/agora/token', [Api\AgoraController::class, 'token']);
 });
 
 Route::post('signup', [Api\AuthController::class, 'register']);

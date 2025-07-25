@@ -28,7 +28,8 @@ class User extends Authenticatable
         'user_type',
         'otp',
         'status',
-        'stripe_customer_id'
+        'stripe_customer_id',
+        'agora_uid',
     ];
 
     /**

@@ -24,6 +24,7 @@ return new class extends Migration
             $table->string('otp', 4)->nullable();
             $table->enum('status',['0','1','2'])->default('0');
             $table->enum('paid_status',['0','1','2'])->default('0');
+            $table->string('agora_uid')->nullable()->unique();
             $table->rememberToken();
             $table->timestamps();
             $table->softDeletes();
