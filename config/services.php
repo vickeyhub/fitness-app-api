@@ -34,5 +34,9 @@ return [
             'channel' => env('SLACK_BOT_USER_DEFAULT_CHANNEL'),
         ],
     ],
+    'stream' => [
+        'key' => env('STREAM_API_KEY'),
+        'secret' => env('STREAM_API_SECRET'),
+    ],
 
 ];

@@ -29,7 +29,6 @@ class User extends Authenticatable
         'otp',
         'status',
         'stripe_customer_id',
-        'agora_chat_username',
     ];
 
     /**
