@@ -7,18 +7,16 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
-use GetStream\StreamChat\Client;
+use App\Services\GetStreamService;
+use App\Models\User;
 
 class GetStreamController extends Controller
 {
-    protected Client $client;
+    protected GetStreamService $getStreamService;
 
     public function __construct()
     {
-        $this->client = new Client(
-            config('services.stream.key'),
-            config('services.stream.secret')
-        );
+        $this->getStreamService = new GetStreamService();
     }
 
     /**
@@ -26,29 +24,25 @@ class GetStreamController extends Controller
      */
     public function generateToken(Request $request)
     {
-        // $request->validate([
-        //     'user_id' => 'required|string|max:255'
-        // ]);
-
         try {
             $user = $request->user();
-            $streamUserId = 'user-' . $user->id;
+            $result = $this->getStreamService->generateToken($user);
 
-            $this->client->upsertUser([
-                'id' => $streamUserId,
-                'name' => $user->first_name . ' ' . $user->last_name,
-            ]);
-
-            $token = $this->client->createToken($streamUserId);
-
-            return response()->json([
-                'token' => $token,
-                'streamUserId' => $streamUserId,
-            ]);
+            if ($result['success']) {
+                return response()->json([
+                    'token' => $result['token'],
+                    'streamUserId' => $result['stream_user_id'],
+                ]);
+            } else {
+                return response()->json([
+                    'success' => false,
+                    'message' => $result['error']
+                ], 500);
+            }
         } catch (\Exception $e) {
             Log::error('Exception in generateToken', [
                 'error' => $e->getMessage(),
-                'user_id' => $request->user_id ?? 'unknown'
+                'user_id' => $user->id ?? 'unknown'
             ]);
 
             return response()->json([
@@ -69,19 +63,21 @@ class GetStreamController extends Controller
         $channelType = $request->channel_type;
         $channelId = $request->channel_id;
         $members = $request->members;
+        $creatorId = 'user-' . $request->user()->id;
 
-        $channel = $this->client->Channel($channelType, $channelId, [
-            'name' => ucfirst($channelId),
-            'members' => $members,
-        ]);
+        $result = $this->getStreamService->createChannel($channelType, $channelId, $members, $creatorId);
 
-        // Create the channel on Stream (if not exists)
-        $channel->create($request->user()->id);
-
-        return response()->json([
-            'channel_id' => $channelId,
-            'channel_type' => $channelType,
-            'members' => $members,
-        ]);
+        if ($result['success']) {
+            return response()->json([
+                'channel_id' => $channelId,
+                'channel_type' => $channelType,
+                'members' => $members,
+            ]);
+        } else {
+            return response()->json([
+                'success' => false,
+                'message' => $result['error']
+            ], 500);
+        }
     }
 }
