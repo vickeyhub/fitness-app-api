@@ -3,6 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api;
+use App\Http\Controllers\ChatTokenController;
 
 // Route::get('/user', function (Request $request) {
 //     return $request->user();
@@ -80,8 +81,46 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('/tags', [Api\TagController::class, 'index']);
     Route::post('/tags', [Api\TagController::class, 'store']);
 
-    // Agora RTM Token
-    Route::post('/agora/token', [Api\AgoraController::class, 'token']);
+    // Agora Chat APIs
+    Route::prefix('chat')->group(function () {
+        Route::get('/test', [Api\AgoraChatController::class, 'testConnection']);
+        Route::post('/register', [Api\AgoraChatController::class, 'registerUser']);
+        Route::post('/auto-register', [Api\AgoraChatController::class, 'autoRegisterUser']);
+        Route::get('/token', [Api\AgoraChatController::class, 'getChatToken']);
+        Route::get('/users', [Api\AgoraChatController::class, 'getChatUsers']);
+        Route::get('/status', [Api\AgoraChatController::class, 'checkRegistrationStatus']);
+    });
+
+    // Agora Chat Test APIs (for development)
+    Route::prefix('chat-test')->group(function () {
+        Route::get('/all', [Api\ChatTestController::class, 'testAll']);
+        Route::get('/system', [Api\ChatTestController::class, 'systemInfo']);
+    });
+
+    // Agora Token Generation APIs
+    Route::prefix('agora')->group(function () {
+        Route::post('/rtc-token', [Api\AgoraController::class, 'generateRtcToken']);
+        Route::post('/rtm-token', [Api\AgoraController::class, 'generateRtmToken']);
+        Route::post('/app-access-token', [Api\AgoraController::class, 'generateAppAccessToken']);
+        Route::get('/all-tokens', [Api\AgoraController::class, 'getAllTokens']);
+        Route::get('/test', [Api\AgoraController::class, 'testAllServices']);
+        Route::post('/validate-token', [Api\AgoraController::class, 'validateToken']);
+        Route::post('/debug-token', [Api\AgoraController::class, 'debugToken']);
+        Route::get('/config-status', [Api\AgoraController::class, 'getConfigStatus']);
+    });
+
+    // Agora User Registration APIs
+    Route::prefix('agora-users')->group(function () {
+        Route::post('/register', [Api\AgoraUserController::class, 'registerNewUser']);
+        Route::post('/register-existing', [Api\AgoraUserController::class, 'registerExistingUser']);
+        Route::post('/register-current', [Api\AgoraUserController::class, 'registerCurrentUser']);
+        Route::get('/status', [Api\AgoraUserController::class, 'getCurrentUserStatus']);
+        Route::post('/status', [Api\AgoraUserController::class, 'getUserStatus']);
+        Route::post('/bulk-register', [Api\AgoraUserController::class, 'bulkRegisterUsers']);
+        Route::get('/test', [Api\AgoraUserController::class, 'testRegistration']);
+        Route::get('/all', [Api\AgoraUserController::class, 'getAllAgoraUsers']);
+    });
+
 });
 
 Route::post('signup', [Api\AuthController::class, 'register']);

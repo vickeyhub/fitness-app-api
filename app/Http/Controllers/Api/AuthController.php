@@ -104,9 +104,7 @@ class AuthController extends Controller
             'status' => '0', // Set status as pending
         ]);
 
-        // Set agora_uid after user is created
-        $user->agora_uid = 'fitnofy_' . $user->id;
-        $user->save();
+
 
 
         if (!$user->profile) {
