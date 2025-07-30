@@ -84,9 +84,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     // GetStream.io APIs
     Route::prefix('getstream')->group(function () {
         Route::post('/token', [Api\GetStreamController::class, 'generateToken']);
-        // Route::get('/token', [Api\GetStreamController::class, 'generateCurrentUserToken']);
-        // Route::post('/user', [Api\GetStreamController::class, 'createOrUpdateUser']);
-        // Route::delete('/user', [Api\GetStreamController::class, 'deleteUser']);
+        Route::post('/channel', [Api\GetStreamController::class, 'createChannel']);
     });
 
 });

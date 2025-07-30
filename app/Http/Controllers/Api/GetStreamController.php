@@ -11,15 +11,13 @@ use GetStream\StreamChat\Client;
 
 class GetStreamController extends Controller
 {
-    private $apiKey = 'kcfev3rnnt2m';
-    private $apiSecret = '365mua92euxua7nunbhbcgctb4aa3pv9hkbyj46bxhdahv4s4zfsmf32xgzw9rmd';
     protected Client $client;
 
     public function __construct()
     {
         $this->client = new Client(
-            $this->apiKey,
-            $this->apiSecret
+            config('services.stream.key'),
+            config('services.stream.secret')
         );
     }
 
@@ -28,9 +26,9 @@ class GetStreamController extends Controller
      */
     public function generateToken(Request $request)
     {
-        $request->validate([
-            'user_id' => 'required|string|max:255'
-        ]);
+        // $request->validate([
+        //     'user_id' => 'required|string|max:255'
+        // ]);
 
         try {
             $user = $request->user();
@@ -38,7 +36,7 @@ class GetStreamController extends Controller
 
             $this->client->upsertUser([
                 'id' => $streamUserId,
-                'name' => $user->first_name.' '.$user->last_name,
+                'name' => $user->first_name . ' ' . $user->last_name,
             ]);
 
             $token = $this->client->createToken($streamUserId);
@@ -58,5 +56,32 @@ class GetStreamController extends Controller
                 'message' => 'Token generation failed: ' . $e->getMessage()
             ], 500);
         }
+    }
+
+    public function createChannel(Request $request)
+    {
+        $request->validate([
+            'channel_type' => 'required|string', // e.g. messaging
+            'channel_id' => 'required|string', // e.g. room-1
+            'members' => 'required|array',  // user IDs
+        ]);
+
+        $channelType = $request->channel_type;
+        $channelId = $request->channel_id;
+        $members = $request->members;
+
+        $channel = $this->client->Channel($channelType, $channelId, [
+            'name' => ucfirst($channelId),
+            'members' => $members,
+        ]);
+
+        // Create the channel on Stream (if not exists)
+        $channel->create($request->user()->id);
+
+        return response()->json([
+            'channel_id' => $channelId,
+            'channel_type' => $channelType,
+            'members' => $members,
+        ]);
     }
 }
