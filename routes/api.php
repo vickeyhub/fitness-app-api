@@ -85,6 +85,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::prefix('getstream')->group(function () {
         Route::post('/token', [Api\GetStreamController::class, 'generateToken']);
         Route::post('/channel', [Api\GetStreamController::class, 'createChannel']);
+        Route::post('/register-all-users', [Api\GetStreamController::class, 'registerUser']);
     });
 
 });

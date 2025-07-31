@@ -215,7 +215,8 @@ class GetStreamService
             ]);
 
             // Save GetStream user ID to database
-            $user->update(['getstream_user_id' => $streamUserId]);
+            // $user->update(['getstream_user_id' => $streamUserId]);
+             User::where('id', $user->id)->update(['getstream_user_id' => $streamUserId]);
 
             Log::info('User registered in GetStream and saved to database', [
                 'user_id' => $user->id,

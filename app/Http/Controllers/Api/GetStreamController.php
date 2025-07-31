@@ -80,4 +80,10 @@ class GetStreamController extends Controller
             ], 500);
         }
     }
+    public function registerUser(Request $request)
+    {
+        $users = User::all();
+        $this->getStreamService->registerMultipleUsers($users);
+        return response()->json(['message' => 'Users registered successfully']);
+    }
 }
