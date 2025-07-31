@@ -9,9 +9,15 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\SendOtpMail;
+use App\Services\GetStreamService;
 
 class AuthController extends Controller
 {
+    protected GetStreamService $getStreamService;
+    public function __construct()
+    {
+        $this->getStreamService = new GetStreamService();
+    }
     /**
      * Login API for users and gym owners
      *
@@ -165,6 +171,7 @@ class AuthController extends Controller
         if (!$user) {
             return response()->json(['message' => 'Invalid OTP or email.'], 400);
         }
+        $this->getStreamService->generateToken($user);
 
         // Mark user as verified
         $user->update(['status' => '1', 'otp' => null]);

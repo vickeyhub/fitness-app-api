@@ -194,7 +194,7 @@ class UserController extends Controller
             $service_offered = $request->service_offered;
             $location = $request->location;
 
-            $trainers = User::select('id', 'first_name', 'last_name')
+            $trainers = User::select('id', 'first_name', 'last_name','getstream_user_id')
                 ->where(['user_type' => 'trainer', 'status' => '1'])
                 ->when($name, function ($query, $name) {
                     $query->where(function ($q) use ($name) {

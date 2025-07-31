@@ -26,6 +26,7 @@ class User extends Authenticatable
         'mobile_number',
         'password',
         'user_type',
+        'getstream_user_id',
         'otp',
         'status',
         'stripe_customer_id',

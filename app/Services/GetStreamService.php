@@ -4,6 +4,7 @@ namespace App\Services;
 
 use GetStream\StreamChat\Client;
 use Illuminate\Support\Facades\Log;
+use App\Models\User;
 
 class GetStreamService
 {
@@ -35,6 +36,8 @@ class GetStreamService
                     'phone' => $user->phone ?? null,
                 ]
             ]);
+
+            User::where('id', $user->id)->update(['getstream_user_id' => $streamUserId]);
 
             Log::info('User registered in GetStream', [
                 'user_id' => $user->id,
@@ -158,7 +161,7 @@ class GetStreamService
             $streamUserId = 'user-' . $userId;
 
             // Try to get user from GetStream
-            $response = $this->client->getUser($streamUserId);
+            $response = $this->client->queryUsers(['id' => $streamUserId]);
 
             Log::info('User exists in GetStream', [
                 'user_id' => $userId,
@@ -211,7 +214,10 @@ class GetStreamService
                 ]
             ]);
 
-            Log::info('User registered in GetStream', [
+            // Save GetStream user ID to database
+            $user->update(['getstream_user_id' => $streamUserId]);
+
+            Log::info('User registered in GetStream and saved to database', [
                 'user_id' => $user->id,
                 'stream_user_id' => $streamUserId
             ]);
