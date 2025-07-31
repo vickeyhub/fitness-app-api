@@ -88,6 +88,8 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::post('/register-all-users', [Api\GetStreamController::class, 'registerUser']);
     });
 
+    Route::post('find-buddy', [Api\UserController::class, 'findBuddy']);
+    Route::post('trainers', [Api\UserController::class, 'getTrainers']);
 });
 
 Route::post('signup', [Api\AuthController::class, 'register']);
@@ -97,9 +99,7 @@ Route::post('forgot-password', [Api\PasswordResetController::class, 'forgotPassw
 Route::post('reset-password', [Api\PasswordResetController::class, 'resetPassword']);
 
 // trainers/gym api for search and bookings routes
-Route::post('trainers', [Api\UserController::class, 'getTrainers']);
 Route::get('gyms', [Api\GymsController::class, 'getGyms']);
-Route::post('find-buddy', [Api\UserController::class, 'findBuddy']);
 
 // sessions/classes management
 Route::post('search-sessions', [Api\SessionsController::class, 'search_sessions']);

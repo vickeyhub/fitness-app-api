@@ -196,6 +196,7 @@ class UserController extends Controller
 
             $trainers = User::select('id', 'first_name', 'last_name','getstream_user_id')
                 ->where(['user_type' => 'trainer', 'status' => '1'])
+                ->where('id', '!=', Auth::user()->id)
                 ->when($name, function ($query, $name) {
                     $query->where(function ($q) use ($name) {
                         $q->where('first_name', 'LIKE', "%$name%")
@@ -305,7 +306,8 @@ class UserController extends Controller
 
             $query = User::with('profile:id,user_id,profile_picture,gender,location,specialties')
                 ->where('user_type', 'user')
-                ->where('status', '1');
+                ->where('status', '1')
+                ->where('id', '!=', Auth::user()->id);
 
             // Filter by name
             if (!empty($filters['name'])) {
