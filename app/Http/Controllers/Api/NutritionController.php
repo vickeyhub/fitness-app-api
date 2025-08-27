@@ -156,10 +156,17 @@ class NutritionController extends Controller
         $target = NutritionTarget::where('user_id', $userId)->first();
 
         if (!$target) {
-            return response()->json([
-                'success' => false,
-                'message' => 'No target set yet.'
-            ], 404);
+            $target = NutritionTarget::updateOrCreate(
+                [
+                    'user_id' => $userId,
+                ],
+                [
+                    'calories' => 2000,
+                    'proteins' => 100,
+                    'fats' => 70,
+                    'carbs' => 250,
+                ]
+            );
         }
 
         return response()->json([

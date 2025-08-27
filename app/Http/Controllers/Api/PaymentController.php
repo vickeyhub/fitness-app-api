@@ -14,7 +14,7 @@ class PaymentController extends Controller
 {
     public function createPaymentIntent(Request $request)
     {
-        Stripe::setApiKey(env('STRIPE_SECRET'));
+        Stripe::setApiKey(apiKey: config('app.STRIPE_SECRET'));
 
         $request->validate([
             'amount' => 'required|integer',
@@ -48,7 +48,7 @@ class PaymentController extends Controller
                 'gym_id' => $request->gym_id,
                 'booking_date' => $request->booking_date,
                 'time_slot' => $request->time_slot,
-                'days' => $request->days,
+                'days' => is_array($request->days) ? json_encode($request->days) : (string)$request->days,
                 'contact_no' => $request->contact_no
             ]
             // 'payment_method' => 'pm_card_visa', // ✅ Attach test payment method

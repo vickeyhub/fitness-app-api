@@ -122,5 +122,7 @@ return [
         'driver' => env('APP_MAINTENANCE_DRIVER', 'file'),
         'store' => env('APP_MAINTENANCE_STORE', 'database'),
     ],
-
+    'STRIPE_KEY' => env('STRIPE_KEY','pk_test_51N0KnXSJ7oSNVZYGsY7vJGGruhgKSxUiq6mOOwOM6wEIH9UuGscLBhobuu3WgI7QIA0cSHTY0BYKiSuSy1ufDKNE00G96g6YZe'),
+    'STRIPE_SECRET' => env('STRIPE_SECRET','sk_test_51N0KnXSJ7oSNVZYGNtXS0RPTCJtzFadzgut1iZ2eLkGCGP8j5Es6lO1JWhT4MdbkxvemKJuefgG4vQbdGLlbWZdj00GMmnAxso'),
+    'STRIPE_WEBHOOK_SECRET' => env('STRIPE_WEBHOOK_SECRET','whsec_SnsebWXhMPd8lvcJEopkFTMl39eTBJzf')
 ];
