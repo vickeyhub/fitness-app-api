@@ -59,6 +59,7 @@ class NutritionController extends Controller
             ->whereDate('date', $date)
             ->get();
 
+
         $consumed = [
             'calories' => $meals->sum('calories'),
             'proteins' => $meals->sum('proteins'),
