@@ -76,9 +76,9 @@ class NutritionController extends Controller
             'targetCalories' => $target->calories,
             'consumedCalories' => $consumed['calories'],
             'macros' => [
-                'proteins' => $target->proteins,
-                'fats' => $target->fats,
-                'carbs' => $target->carbs
+                'proteins' => $consumed['proteins'],
+                'fats' => $consumed['fats'],
+                'carbs' => $consumed['carbs']
             ],
             'meals' => $meals
         ]);
@@ -138,9 +138,8 @@ class NutritionController extends Controller
 
         $userId = Auth::id();
 
-        $target = NutritionTarget::updateOrCreate(
-            ['user_id' => $userId],
-            $request->only('calories', 'proteins', 'fats', 'carbs')
+        $target = NutritionTarget::create(
+            $request->only('calories', 'proteins', 'fats', 'carbs') + ['user_id' => $userId]
         );
 
         return response()->json([
