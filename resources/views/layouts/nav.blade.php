@@ -18,8 +18,7 @@
 
             </li>
             <li class="{{ Request::is('admin/users') ? 'active' : '' }}">
-                <a href="{{ route('admin.users')}}"><i class="fa fa-user-plus"></i> <span class="nav-label">Users
-                    </span></a>
+                <a href="{{ route('admin.users')}}"><i class="fa fa-user-plus"></i> <span class="nav-label">Users</span></a>
             </li>
             <li class="{{ Request::is('admin/classes*') ? 'active' : '' }}">
                 <a href="{{ route('admin.classes.index') }}"><i class="fa fa-calendar"></i> <span class="nav-label">Sessions</span></a>
@@ -33,10 +32,11 @@
             <li class="{{ Request::is('admin/posts*') ? 'active' : '' }}">
                 <a href="{{ route('admin.posts.index') }}"><i class="fa fa-comments"></i> <span class="nav-label">Social/Content (Posts)</span></a>
             </li>
-            <li class="">
-                <a href="gym-management.html"><i class="fa fa-building"></i> <span class="nav-label">Gym
-                        Management
-                    </span></a>
+            <li class="{{ Request::is('admin/users/gyms') ? 'active' : '' }}">
+                <a href="{{ route('admin.users.gyms') }}"><i class="fa fa-building"></i> <span class="nav-label">Gym Management</span></a>
+            </li>
+            <li class="{{ Request::is('admin/users/trainers') ? 'active' : '' }}">
+                <a href="{{ route('admin.users.trainers') }}"><i class="fa fa-user-secret"></i> <span class="nav-label">Trainer Management</span></a>
             </li>
             <li class="">
                 <a href=""><i class="fa fa-file"></i> <span class="nav-label">Booking Management

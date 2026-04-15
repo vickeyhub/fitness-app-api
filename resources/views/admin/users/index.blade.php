@@ -2,13 +2,13 @@
 @section('content')
     <div class="row wrapper border-bottom white-bg page-heading">
         <div class="col-lg-10">
-            <h2>Users</h2>
+            <h2>{{ $scopeLabel ?? 'Users' }}</h2>
             <ol class="breadcrumb">
                 <li>
                     <a href="{{ route('admin.dashboard') }}">Home</a>
                 </li>
                 <li class="active">
-                    <strong>Users</strong>
+                    <strong>{{ $scopeLabel ?? 'Users' }}</strong>
                 </li>
             </ol>
         </div>
@@ -16,6 +16,15 @@
         </div>
     </div>
     <div class="wrapper wrapper-content animated fadeInRight">
+        @php
+            $isTrainersScope = ($scopeType ?? null) === 'trainer';
+            $isGymsScope = ($scopeType ?? null) === 'gym';
+        @endphp
+        <div class="m-b-sm">
+            <a href="{{ route('admin.users') }}" class="btn btn-sm {{ !$isTrainersScope && !$isGymsScope ? 'btn-primary' : 'btn-white' }}">All Users</a>
+            <a href="{{ route('admin.users.trainers') }}" class="btn btn-sm {{ $isTrainersScope ? 'btn-primary' : 'btn-white' }}">Trainers</a>
+            <a href="{{ route('admin.users.gyms') }}" class="btn btn-sm {{ $isGymsScope ? 'btn-primary' : 'btn-white' }}">Gyms</a>
+        </div>
         <button type="button" class="btn btn-primary m-b-sm" data-toggle="modal" data-target="#addUserModal">
             <i class="fa fa-plus"></i> Add User
         </button>
@@ -69,11 +78,11 @@
                                         <label>User type <span class="text-danger">*</span></label>
                                         <select name="user_type" class="form-control" required>
                                             <option value="">Select</option>
-                                            <option value="super_admin">Super admin</option>
-                                            <option value="admin">Admin</option>
-                                            <option value="trainer">Trainer</option>
+                                            <option value="super_admin" {{ !$isTrainersScope && !$isGymsScope ? '' : 'disabled' }}>Super admin</option>
+                                            <option value="admin" {{ !$isTrainersScope && !$isGymsScope ? '' : 'disabled' }}>Admin</option>
+                                            <option value="trainer" {{ $isTrainersScope ? 'selected' : '' }}>Trainer</option>
                                             <option value="user">User (customer)</option>
-                                            <option value="gym">Gym</option>
+                                            <option value="gym" {{ $isGymsScope ? 'selected' : '' }}>Gym</option>
                                         </select>
                                     </div>
                                 </div>

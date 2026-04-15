@@ -18,6 +18,8 @@ Route::middleware('auth')->group(function () {
     Route::get('admin/dashboard', [Admin\DashboardController::class, 'dashboard'])->name('admin.dashboard');
     Route::get('chart-data-line',[Admin\DashboardController::class, 'newChartDataLine']);
     Route::get('admin/users', [Admin\UsersController::class, 'index'])->name('admin.users');
+    Route::get('admin/users/trainers', [Admin\UsersController::class, 'trainers'])->name('admin.users.trainers');
+    Route::get('admin/users/gyms', [Admin\UsersController::class, 'gyms'])->name('admin.users.gyms');
     Route::post('admin/users', [Admin\UsersController::class, 'store'])->name('admin.users.store');
     Route::get('admin/users/{user}', [Admin\UsersController::class, 'show'])->name('admin.users.show');
     Route::put('admin/users/{user}', [Admin\UsersController::class, 'update'])->name('admin.users.update');

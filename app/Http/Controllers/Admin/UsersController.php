@@ -11,9 +11,33 @@ class UsersController extends Controller
 {
     public function index()
     {
-        $data['users'] = User::with('profile')->orderByDesc('id')->get();
+        return $this->renderIndex(null);
+    }
 
-        return view('admin.users.index', $data);
+    public function trainers()
+    {
+        return $this->renderIndex('trainer');
+    }
+
+    public function gyms()
+    {
+        return $this->renderIndex('gym');
+    }
+
+    private function renderIndex(?string $scopeType)
+    {
+        $query = User::with('profile')->orderByDesc('id');
+        if (in_array($scopeType, ['trainer', 'gym'], true)) {
+            $query->where('user_type', $scopeType);
+        }
+
+        return view('admin.users.index', [
+            'users' => $query->get(),
+            'scopeType' => $scopeType,
+            'scopeLabel' => $scopeType === 'trainer'
+                ? 'Trainers'
+                : ($scopeType === 'gym' ? 'Gyms' : 'Users'),
+        ]);
     }
 
     public function show(User $user)
