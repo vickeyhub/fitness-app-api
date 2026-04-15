@@ -27,21 +27,32 @@
         <div class="ibox">
             <div class="ibox-content table-responsive">
                 <table class="table table-striped table-bordered">
-                    <thead><tr><th>#</th><th>Name</th><th>Posts linked</th><th>Created</th><th class="text-right">Action</th></tr></thead>
+                    <thead><tr><th>#</th><th>Name</th><th>Posts linked</th><th>Created</th><th>Updated</th><th class="text-right">Action</th></tr></thead>
                     <tbody>
                         @forelse ($tags as $tag)
                             <tr>
                                 <td>{{ $tag->id }}</td>
                                 <td>{{ $tag->name }}</td>
                                 <td>{{ $tag->posts_count }}</td>
-                                <td>{{ optional($tag->created_at)->format('d M Y h:i A') }}</td>
+                                <td>
+                                    @if($tag->created_at)
+                                        <div>{{ $tag->created_at->format('d M Y, h:i A') }}</div>
+                                        <small class="text-muted">{{ $tag->created_at->diffForHumans() }}</small>
+                                    @else — @endif
+                                </td>
+                                <td>
+                                    @if($tag->updated_at)
+                                        <div>{{ $tag->updated_at->format('d M Y, h:i A') }}</div>
+                                        <small class="text-muted">{{ $tag->updated_at->diffForHumans() }}</small>
+                                    @else — @endif
+                                </td>
                                 <td class="text-right">
                                     <button class="btn btn-xs btn-info js-edit-tag" data-id="{{ $tag->id }}" data-name="{{ $tag->name }}"><i class="fa fa-pencil"></i> Edit</button>
                                     <button class="btn btn-xs btn-danger js-delete-tag" data-id="{{ $tag->id }}"><i class="fa fa-trash"></i> Delete</button>
                                 </td>
                             </tr>
                         @empty
-                            <tr><td colspan="5" class="text-center text-muted">No tags found.</td></tr>
+                            <tr><td colspan="6" class="text-center text-muted">No tags found.</td></tr>
                         @endforelse
                     </tbody>
                 </table>

@@ -9,6 +9,7 @@ use App\Models\Like;
 use App\Models\Post;
 use App\Models\Tag;
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -21,6 +22,8 @@ class PostsController extends Controller
             'user_id' => ['nullable', 'integer', 'exists:users,id'],
             'created_from' => ['nullable', 'date'],
             'created_to' => ['nullable', 'date'],
+            'is_hidden' => ['nullable', 'in:0,1'],
+            'include_deleted' => ['nullable', 'in:0,1'],
             'per_page' => ['nullable', 'integer', 'in:10,15,25,50,100'],
         ]);
 
@@ -28,6 +31,10 @@ class PostsController extends Controller
             ->with(['user:id,first_name,last_name,email', 'tags:id,name'])
             ->withCount(['comments', 'likes'])
             ->latest('id');
+
+        if (($filters['include_deleted'] ?? '0') === '1') {
+            $query->withTrashed();
+        }
 
         if (!empty($filters['q'])) {
             $q = trim((string) $filters['q']);
@@ -47,6 +54,10 @@ class PostsController extends Controller
 
         if (!empty($filters['created_to'])) {
             $query->whereDate('created_at', '<=', $filters['created_to']);
+        }
+
+        if (isset($filters['is_hidden']) && $filters['is_hidden'] !== '') {
+            $query->where('is_hidden', (string) $filters['is_hidden'] === '1');
         }
 
         $posts = $query->paginate((int) ($filters['per_page'] ?? 15))->appends($request->query());
@@ -99,12 +110,22 @@ class PostsController extends Controller
 
     public function show(Post $post)
     {
+        $post = Post::withTrashed()->findOrFail($post->id);
+
         $post->load([
             'user:id,first_name,last_name,email',
             'tags:id,name',
             'comments' => fn ($q) => $q->with('user:id,first_name,last_name,email')->latest()->limit(25),
             'likes' => fn ($q) => $q->with('user:id,first_name,last_name,email')->latest()->limit(20),
         ])->loadCount(['comments', 'likes']);
+        $post->setAttribute(
+            'created_at_formatted',
+            $post->created_at ? Carbon::parse($post->created_at)->format('d M Y, h:i A') : null
+        );
+        $post->setAttribute(
+            'updated_at_formatted',
+            $post->updated_at ? Carbon::parse($post->updated_at)->format('d M Y, h:i A') : null
+        );
 
         return response()->json([
             'data' => $post,
@@ -213,6 +234,29 @@ class PostsController extends Controller
 
         return response()->json([
             'message' => 'Post deleted successfully.',
+        ]);
+    }
+
+    public function toggleVisibility(Post $post)
+    {
+        $post->is_hidden = ! $post->is_hidden;
+        $post->save();
+        AuditTrailLogger::log('posts', $post->is_hidden ? 'hide' : 'unhide', $post, ['title' => $post->title, 'user_id' => $post->user_id]);
+
+        return response()->json([
+            'message' => $post->is_hidden ? 'Post hidden successfully.' : 'Post unhidden successfully.',
+            'is_hidden' => $post->is_hidden,
+        ]);
+    }
+
+    public function restore(int $postId)
+    {
+        $post = Post::onlyTrashed()->findOrFail($postId);
+        $post->restore();
+        AuditTrailLogger::log('posts', 'restore', $post, ['title' => $post->title, 'user_id' => $post->user_id]);
+
+        return response()->json([
+            'message' => 'Post restored successfully.',
         ]);
     }
 }

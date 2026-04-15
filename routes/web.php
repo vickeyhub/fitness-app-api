@@ -89,12 +89,16 @@ Route::middleware('auth')->group(function () {
     Route::put('admin/posts/{post}', [Admin\PostsController::class, 'update'])->name('admin.posts.update');
     Route::post('admin/posts/{post}/like', [Admin\PostsController::class, 'like'])->name('admin.posts.like');
     Route::post('admin/posts/{post}/comments', [Admin\PostsController::class, 'comment'])->name('admin.posts.comment');
+    Route::post('admin/posts/{post}/toggle-visibility', [Admin\PostsController::class, 'toggleVisibility'])->name('admin.posts.toggle-visibility');
+    Route::post('admin/posts/{postId}/restore', [Admin\PostsController::class, 'restore'])->name('admin.posts.restore');
     Route::delete('admin/posts/{post}', [Admin\PostsController::class, 'destroy'])->name('admin.posts.destroy');
 
     Route::get('admin/comments', [Admin\CommentsController::class, 'index'])->name('admin.comments.index');
+    Route::post('admin/comments/{comment}/toggle-visibility', [Admin\CommentsController::class, 'toggleVisibility'])->name('admin.comments.toggle-visibility');
     Route::delete('admin/comments/{comment}', [Admin\CommentsController::class, 'destroy'])->name('admin.comments.destroy');
 
     Route::get('admin/statuses', [Admin\StatusesController::class, 'index'])->name('admin.statuses.index');
+    Route::post('admin/statuses/{status}/toggle-visibility', [Admin\StatusesController::class, 'toggleVisibility'])->name('admin.statuses.toggle-visibility');
     Route::delete('admin/statuses/{status}', [Admin\StatusesController::class, 'destroy'])->name('admin.statuses.destroy');
     Route::get('admin/follows', [Admin\FollowsController::class, 'index'])->name('admin.follows.index');
     Route::delete('admin/follows/{follow}', [Admin\FollowsController::class, 'destroy'])->name('admin.follows.destroy');

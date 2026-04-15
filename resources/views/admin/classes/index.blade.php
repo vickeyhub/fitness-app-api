@@ -228,6 +228,8 @@
                                         <th>Trainer</th>
                                         <th>Price</th>
                                         <th>Published</th>
+                                        <th>Created</th>
+                                        <th>Updated</th>
                                         <th></th>
                                         <th></th>
                                         <th></th>
@@ -246,6 +248,18 @@
                                                 @else
                                                     <span class="label label-default">No</span>
                                                 @endif
+                                            </td>
+                                            <td>
+                                                @if($row->created_at)
+                                                    <div>{{ $row->created_at->format('d M Y, h:i A') }}</div>
+                                                    <small class="text-muted">{{ $row->created_at->diffForHumans() }}</small>
+                                                @else — @endif
+                                            </td>
+                                            <td>
+                                                @if($row->updated_at)
+                                                    <div>{{ $row->updated_at->format('d M Y, h:i A') }}</div>
+                                                    <small class="text-muted">{{ $row->updated_at->diffForHumans() }}</small>
+                                                @else — @endif
                                             </td>
                                             <td><a href="#" class="btn-view-class text-navy" data-id="{{ $row->id }}"><i class="fa fa-eye"></i></a></td>
                                             <td><a href="#" class="btn-edit-class text-navy" data-id="{{ $row->id }}"><i class="fa fa-pencil"></i></a></td>

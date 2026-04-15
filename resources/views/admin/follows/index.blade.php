@@ -27,7 +27,7 @@
         <div class="ibox">
             <div class="ibox-content table-responsive">
                 <table class="table table-striped table-bordered">
-                    <thead><tr><th>#</th><th>Follower</th><th>Following</th><th>Created</th><th class="text-right">Action</th></tr></thead>
+                    <thead><tr><th>#</th><th>Follower</th><th>Following</th><th>Created</th><th>Updated</th><th class="text-right">Action</th></tr></thead>
                     <tbody>
                         @forelse ($follows as $follow)
                             <tr>
@@ -40,11 +40,22 @@
                                     <div>{{ optional($follow->following)->first_name }} {{ optional($follow->following)->last_name }}</div>
                                     <div class="small text-muted">{{ optional($follow->following)->email }}</div>
                                 </td>
-                                <td>{{ optional($follow->created_at)->format('d M Y h:i A') }}</td>
+                                <td>
+                                    @if($follow->created_at)
+                                        <div>{{ $follow->created_at->format('d M Y, h:i A') }}</div>
+                                        <small class="text-muted">{{ $follow->created_at->diffForHumans() }}</small>
+                                    @else — @endif
+                                </td>
+                                <td>
+                                    @if($follow->updated_at)
+                                        <div>{{ $follow->updated_at->format('d M Y, h:i A') }}</div>
+                                        <small class="text-muted">{{ $follow->updated_at->diffForHumans() }}</small>
+                                    @else — @endif
+                                </td>
                                 <td class="text-right"><button class="btn btn-xs btn-danger js-delete-follow" data-id="{{ $follow->id }}"><i class="fa fa-chain-broken"></i> Remove</button></td>
                             </tr>
                         @empty
-                            <tr><td colspan="5" class="text-center text-muted">No follow links found.</td></tr>
+                            <tr><td colspan="6" class="text-center text-muted">No follow links found.</td></tr>
                         @endforelse
                     </tbody>
                 </table>

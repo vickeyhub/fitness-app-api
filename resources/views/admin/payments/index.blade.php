@@ -180,7 +180,8 @@
                                 <thead>
                                     <tr>
                                         <th>ID</th>
-                                        <th>When</th>
+                                        <th>Created</th>
+                                        <th>Updated</th>
                                         <th>User</th>
                                         <th>Email</th>
                                         <th>Intent</th>
@@ -193,7 +194,18 @@
                                     @foreach ($payments as $p)
                                         <tr>
                                             <td>{{ $p->id }}</td>
-                                            <td>{{ $p->created_at?->format('d/m/Y H:i') }}</td>
+                                            <td>
+                                                @if($p->created_at)
+                                                    <div>{{ $p->created_at->format('d M Y, h:i A') }}</div>
+                                                    <small class="text-muted">{{ $p->created_at->diffForHumans() }}</small>
+                                                @else — @endif
+                                            </td>
+                                            <td>
+                                                @if($p->updated_at)
+                                                    <div>{{ $p->updated_at->format('d M Y, h:i A') }}</div>
+                                                    <small class="text-muted">{{ $p->updated_at->diffForHumans() }}</small>
+                                                @else — @endif
+                                            </td>
                                             <td>{{ optional($p->user)->first_name }} {{ optional($p->user)->last_name }}</td>
                                             <td>{{ $p->email }}</td>
                                             <td><small>{{ \Illuminate\Support\Str::limit($p->payment_intent_id, 24) }}</small></td>
@@ -289,6 +301,7 @@
                     $grid.append(renderRow('Name', p.name));
                     $grid.append(renderRow('Method', p.payment_method));
                     $grid.append(renderRow('Created', p.created_at));
+                    $grid.append(renderRow('Updated', p.updated_at));
                     $main.append($grid);
                     $root.append($main);
 

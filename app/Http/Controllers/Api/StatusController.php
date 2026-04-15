@@ -59,6 +59,7 @@ class StatusController extends Controller
 
         // Fetch statuses from mutual followers in the last 24 hours
         $statuses = Status::whereIn('user_id', $mutualFollowerIds)
+            ->where('is_hidden', false)
             ->where('created_at', '>=', now()->subDay())
             ->with('user.profile')
             ->latest()
@@ -95,6 +96,7 @@ class StatusController extends Controller
     public function myStatuses()
     {
         $statuses = Status::where('user_id', Auth::id())
+            ->where('is_hidden', false)
             ->where('created_at', '>=', Carbon::now()->subDay())
             ->latest()
             ->get();

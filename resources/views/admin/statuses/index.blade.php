@@ -16,6 +16,7 @@
                     <div class="col-md-3"><div class="form-group"><label>Caption search</label><input class="form-control" name="q" value="{{ request('q') }}" placeholder="Caption"></div></div>
                     <div class="col-md-3"><div class="form-group"><label>User</label><select name="user_id" class="form-control js-select2"><option value="">All</option>@foreach ($users as $u)<option value="{{ $u->id }}" {{ (string) request('user_id') === (string) $u->id ? 'selected' : '' }}>{{ $u->first_name }} {{ $u->last_name }} — {{ $u->email }}</option>@endforeach</select></div></div>
                     <div class="col-md-2"><div class="form-group"><label>Type</label><select name="type" class="form-control js-select2"><option value="">All</option><option value="photo" {{ request('type') === 'photo' ? 'selected' : '' }}>Photo</option><option value="video" {{ request('type') === 'video' ? 'selected' : '' }}>Video</option></select></div></div>
+                    <div class="col-md-2"><div class="form-group"><label>Visibility</label><select name="is_hidden" class="form-control"><option value="">All</option><option value="0" {{ request('is_hidden') === '0' ? 'selected' : '' }}>Visible</option><option value="1" {{ request('is_hidden') === '1' ? 'selected' : '' }}>Hidden</option></select></div></div>
                     <div class="col-md-2"><div class="form-group"><label>From</label><input class="form-control js-flatpickr-date" name="created_from" value="{{ request('created_from') }}"></div></div>
                     <div class="col-md-2"><div class="form-group"><label>To</label><input class="form-control js-flatpickr-date" name="created_to" value="{{ request('created_to') }}"></div></div>
                     <div class="col-md-2"><div class="form-group"><label>Per page</label><select class="form-control" name="per_page">@foreach ([10,15,25,50,100] as $pp)<option value="{{ $pp }}" {{ (int) request('per_page', 15) === $pp ? 'selected' : '' }}>{{ $pp }}</option>@endforeach</select></div></div>
@@ -27,7 +28,7 @@
         <div class="ibox">
             <div class="ibox-content table-responsive">
                 <table class="table table-striped table-bordered">
-                    <thead><tr><th>#</th><th>User</th><th>Type</th><th>Caption</th><th>Media</th><th>Created</th><th class="text-right">Action</th></tr></thead>
+                    <thead><tr><th>#</th><th>User</th><th>Type</th><th>Caption</th><th>Visibility</th><th>Media</th><th>Created</th><th>Updated</th><th class="text-right">Action</th></tr></thead>
                     <tbody>
                         @forelse ($statuses as $status)
                             <tr>
@@ -35,6 +36,7 @@
                                 <td>{{ optional($status->user)->first_name }} {{ optional($status->user)->last_name }}</td>
                                 <td><span class="label label-{{ $status->type === 'video' ? 'danger' : 'primary' }}">{{ ucfirst($status->type) }}</span></td>
                                 <td>{{ $status->caption ?: '—' }}</td>
+                                <td>{!! $status->is_hidden ? '<span class="label label-warning">Hidden</span>' : '<span class="label label-primary">Visible</span>' !!}</td>
                                 <td>
                                     @if ($status->media)
                                         <a href="{{ asset('storage/' . $status->media) }}" target="_blank" class="btn btn-xs btn-white"><i class="fa fa-external-link"></i> Open</a>
@@ -42,11 +44,25 @@
                                         —
                                     @endif
                                 </td>
-                                <td>{{ optional($status->created_at)->format('d M Y h:i A') }}</td>
-                                <td class="text-right"><button class="btn btn-xs btn-danger js-delete-status" data-id="{{ $status->id }}"><i class="fa fa-trash"></i> Delete</button></td>
+                                <td>
+                                    @if($status->created_at)
+                                        <div>{{ $status->created_at->format('d M Y, h:i A') }}</div>
+                                        <small class="text-muted">{{ $status->created_at->diffForHumans() }}</small>
+                                    @else — @endif
+                                </td>
+                                <td>
+                                    @if($status->updated_at)
+                                        <div>{{ $status->updated_at->format('d M Y, h:i A') }}</div>
+                                        <small class="text-muted">{{ $status->updated_at->diffForHumans() }}</small>
+                                    @else — @endif
+                                </td>
+                                <td class="text-right">
+                                    <button class="btn btn-xs btn-default js-toggle-status-visibility" data-id="{{ $status->id }}"><i class="fa fa-eye-slash"></i> {{ $status->is_hidden ? 'Unhide' : 'Hide' }}</button>
+                                    <button class="btn btn-xs btn-danger js-delete-status" data-id="{{ $status->id }}"><i class="fa fa-trash"></i> Delete</button>
+                                </td>
                             </tr>
                         @empty
-                            <tr><td colspan="7" class="text-center text-muted">No statuses found.</td></tr>
+                            <tr><td colspan="9" class="text-center text-muted">No statuses found.</td></tr>
                         @endforelse
                     </tbody>
                 </table>
@@ -67,6 +83,16 @@ $(function () {
             .done(function (res) { toastr.success(res.message || 'Deleted'); location.reload(); })
             .fail(function (xhr) {
                 var msg = (xhr.responseJSON && xhr.responseJSON.message) ? xhr.responseJSON.message : 'Delete failed';
+                toastr.error(msg);
+            });
+    });
+
+    $(document).on('click', '.js-toggle-status-visibility', function () {
+        const id = $(this).data('id');
+        $.post("{{ url('admin/statuses') }}/" + id + "/toggle-visibility")
+            .done(function (res) { toastr.success(res.message || 'Updated'); location.reload(); })
+            .fail(function (xhr) {
+                var msg = (xhr.responseJSON && xhr.responseJSON.message) ? xhr.responseJSON.message : 'Update failed';
                 toastr.error(msg);
             });
     });

@@ -55,6 +55,8 @@
                         <div class="col-md-4"><div class="form-group"><label>User</label><select name="user_id" class="form-control js-select2"><option value="">All</option>@foreach ($users as $u)<option value="{{ $u->id }}" {{ (string) request('user_id') === (string) $u->id ? 'selected' : '' }}>{{ $u->first_name }} {{ $u->last_name }} — {{ $u->email }}</option>@endforeach</select></div></div>
                         <div class="col-md-2"><div class="form-group"><label>From</label><input class="form-control js-flatpickr-date" name="created_from" value="{{ request('created_from') }}" placeholder="YYYY-MM-DD"></div></div>
                         <div class="col-md-2"><div class="form-group"><label>To</label><input class="form-control js-flatpickr-date" name="created_to" value="{{ request('created_to') }}" placeholder="YYYY-MM-DD"></div></div>
+                        <div class="col-md-2"><div class="form-group"><label>Visibility</label><select class="form-control" name="is_hidden"><option value="">All</option><option value="0" {{ request('is_hidden') === '0' ? 'selected' : '' }}>Visible</option><option value="1" {{ request('is_hidden') === '1' ? 'selected' : '' }}>Hidden</option></select></div></div>
+                        <div class="col-md-2"><div class="form-group"><label>Deleted</label><select class="form-control" name="include_deleted"><option value="0" {{ request('include_deleted', '0') === '0' ? 'selected' : '' }}>Active only</option><option value="1" {{ request('include_deleted') === '1' ? 'selected' : '' }}>Include deleted</option></select></div></div>
                         <div class="col-md-2"><div class="form-group"><label>Per page</label><select class="form-control" name="per_page">@foreach ([10,15,25,50,100] as $pp)<option value="{{ $pp }}" {{ (int) request('per_page', 15) === $pp ? 'selected' : '' }}>{{ $pp }}</option>@endforeach</select></div></div>
                         <div class="col-md-10 text-right">
                             <button class="btn btn-primary"><i class="fa fa-search"></i> Apply</button>
@@ -76,17 +78,40 @@
                             @endif
                         </div>
                         <div style="padding: 12px;">
-                            <div class="small text-muted">#{{ $post->id }} • {{ optional($post->created_at)->format('d M Y h:i A') }}</div>
+                            <div class="small text-muted">
+                                #{{ $post->id }}<br>
+                                @if($post->created_at)
+                                    Created: {{ $post->created_at->format('d M Y, h:i A') }} ({{ $post->created_at->diffForHumans() }})
+                                @endif
+                                @if($post->updated_at)
+                                    <br>Updated: {{ $post->updated_at->format('d M Y, h:i A') }} ({{ $post->updated_at->diffForHumans() }})
+                                @endif
+                            </div>
                             <h4 style="margin: 8px 0 6px;">{{ \Illuminate\Support\Str::limit($post->title, 48) }}</h4>
                             <p class="text-muted small m-b-sm">{{ \Illuminate\Support\Str::limit(strip_tags($post->description), 90) }}</p>
                             <div class="small m-b-sm">
                                 <strong>{{ $post->likes_count }}</strong> likes •
                                 <strong>{{ $post->comments_count }}</strong> comments
                             </div>
+                            <div class="small m-b-sm">
+                                @if($post->trashed())
+                                    <span class="label label-danger">Deleted</span>
+                                @endif
+                                @if($post->is_hidden)
+                                    <span class="label label-warning">Hidden</span>
+                                @else
+                                    <span class="label label-primary">Visible</span>
+                                @endif
+                            </div>
                             <div class="text-right">
-                                <button class="btn btn-xs btn-info js-view-post" data-id="{{ $post->id }}"><i class="fa fa-eye"></i> Open</button>
-                                <button class="btn btn-xs btn-warning js-edit-post" data-id="{{ $post->id }}"><i class="fa fa-pencil"></i> Edit</button>
-                                <button class="btn btn-xs btn-danger js-delete-post" data-id="{{ $post->id }}"><i class="fa fa-trash"></i> Delete</button>
+                                @if($post->trashed())
+                                    <button class="btn btn-xs btn-success js-restore-post" data-id="{{ $post->id }}"><i class="fa fa-undo"></i> Restore</button>
+                                @else
+                                    <button class="btn btn-xs btn-info js-view-post" data-id="{{ $post->id }}"><i class="fa fa-eye"></i> Open</button>
+                                    <button class="btn btn-xs btn-warning js-edit-post" data-id="{{ $post->id }}"><i class="fa fa-pencil"></i> Edit</button>
+                                    <button class="btn btn-xs btn-default js-toggle-post-visibility" data-id="{{ $post->id }}"><i class="fa fa-eye-slash"></i> {{ $post->is_hidden ? 'Unhide' : 'Hide' }}</button>
+                                    <button class="btn btn-xs btn-danger js-delete-post" data-id="{{ $post->id }}"><i class="fa fa-trash"></i> Delete</button>
+                                @endif
                             </div>
                         </div>
                     </div>
@@ -338,7 +363,8 @@ $(function () {
                     '<div class="insta-right">' +
                         '<div class="insta-right-head">' +
                             '<div><strong>' + escHtml(author) + '</strong></div>' +
-                            '<div class="small text-muted">' + (p.created_at || '') + '</div>' +
+                            '<div class="small text-muted">' + escHtml(p.created_at_formatted || p.created_at || '—') + '</div>' +
+                            '<div class="small text-muted">Updated: ' + escHtml(p.updated_at_formatted || p.updated_at || '—') + '</div>' +
                             '<div style="margin-top:8px;"><strong>' + likes + '</strong> likes</div>' +
                             (likedBy ? '<div class="small text-muted">Liked by ' + likedBy + '</div>' : '') +
                         '</div>' +
@@ -409,11 +435,31 @@ $(function () {
 
     $(document).on('click', '.js-delete-post', function () {
         const id = $(this).data('id');
-        if (!confirm('Delete this post?')) return;
+        if (!confirm('Delete this post? You can restore it later.')) return;
         $.ajax({ url: "{{ url('admin/posts') }}/" + id, method: 'DELETE' })
             .done(function (res) { toastr.success(res.message || 'Deleted'); location.reload(); })
             .fail(function (xhr) {
                 const msg = (xhr.responseJSON && xhr.responseJSON.message) ? xhr.responseJSON.message : 'Delete failed';
+                toastr.error(msg);
+            });
+    });
+
+    $(document).on('click', '.js-toggle-post-visibility', function () {
+        const id = $(this).data('id');
+        $.post("{{ url('admin/posts') }}/" + id + "/toggle-visibility")
+            .done(function (res) { toastr.success(res.message || 'Updated'); location.reload(); })
+            .fail(function (xhr) {
+                const msg = (xhr.responseJSON && xhr.responseJSON.message) ? xhr.responseJSON.message : 'Update failed';
+                toastr.error(msg);
+            });
+    });
+
+    $(document).on('click', '.js-restore-post', function () {
+        const id = $(this).data('id');
+        $.post("{{ url('admin/posts') }}/" + id + "/restore")
+            .done(function (res) { toastr.success(res.message || 'Restored'); location.reload(); })
+            .fail(function (xhr) {
+                const msg = (xhr.responseJSON && xhr.responseJSON.message) ? xhr.responseJSON.message : 'Restore failed';
                 toastr.error(msg);
             });
     });

@@ -75,6 +75,8 @@
                                 <th>Weight</th>
                                 <th>Duration</th>
                                 <th>Distance</th>
+                                <th>Created</th>
+                                <th>Updated</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -88,9 +90,21 @@
                                     <td>{{ $log->weight_kg ?? '—' }}</td>
                                     <td>{{ $log->duration_seconds ? $log->duration_seconds . ' sec' : '—' }}</td>
                                     <td>{{ $log->distance_km ? $log->distance_km . ' km' : '—' }}</td>
+                                    <td>
+                                        @if($log->created_at)
+                                            <div>{{ \Carbon\Carbon::parse($log->created_at)->format('d M Y, h:i A') }}</div>
+                                            <small class="text-muted">{{ \Carbon\Carbon::parse($log->created_at)->diffForHumans() }}</small>
+                                        @else — @endif
+                                    </td>
+                                    <td>
+                                        @if($log->updated_at)
+                                            <div>{{ \Carbon\Carbon::parse($log->updated_at)->format('d M Y, h:i A') }}</div>
+                                            <small class="text-muted">{{ \Carbon\Carbon::parse($log->updated_at)->diffForHumans() }}</small>
+                                        @else — @endif
+                                    </td>
                                 </tr>
                             @empty
-                                <tr><td colspan="8" class="text-center text-muted">No exercise logs found.</td></tr>
+                                <tr><td colspan="10" class="text-center text-muted">No exercise logs found.</td></tr>
                             @endforelse
                         </tbody>
                     </table>

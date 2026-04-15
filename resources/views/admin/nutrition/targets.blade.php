@@ -24,7 +24,7 @@
         </div>
         <div class="ibox"><div class="ibox-content table-responsive">
             <table class="table table-striped table-bordered">
-                <thead><tr><th>#</th><th>User</th><th>Calories</th><th>Proteins</th><th>Fats</th><th>Carbs</th><th>Updated</th><th class="text-right">Action</th></tr></thead>
+                <thead><tr><th>#</th><th>User</th><th>Calories</th><th>Proteins</th><th>Fats</th><th>Carbs</th><th>Created</th><th>Updated</th><th class="text-right">Action</th></tr></thead>
                 <tbody>
                 @forelse ($targets as $target)
                     <tr>
@@ -34,14 +34,25 @@
                         <td>{{ $target->proteins }}</td>
                         <td>{{ $target->fats }}</td>
                         <td>{{ $target->carbs }}</td>
-                        <td>{{ optional($target->updated_at)->format('d M Y h:i A') }}</td>
+                        <td>
+                            @if($target->created_at)
+                                <div>{{ $target->created_at->format('d M Y, h:i A') }}</div>
+                                <small class="text-muted">{{ $target->created_at->diffForHumans() }}</small>
+                            @else — @endif
+                        </td>
+                        <td>
+                            @if($target->updated_at)
+                                <div>{{ $target->updated_at->format('d M Y, h:i A') }}</div>
+                                <small class="text-muted">{{ $target->updated_at->diffForHumans() }}</small>
+                            @else — @endif
+                        </td>
                         <td class="text-right">
                             <button class="btn btn-xs btn-info js-edit-target" data-id="{{ $target->id }}"><i class="fa fa-pencil"></i> Edit</button>
                             <button class="btn btn-xs btn-danger js-delete-target" data-id="{{ $target->id }}"><i class="fa fa-trash"></i> Delete</button>
                         </td>
                     </tr>
                 @empty
-                    <tr><td colspan="8" class="text-center text-muted">No targets found.</td></tr>
+                    <tr><td colspan="9" class="text-center text-muted">No targets found.</td></tr>
                 @endforelse
                 </tbody>
             </table>

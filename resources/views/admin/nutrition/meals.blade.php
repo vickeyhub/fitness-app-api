@@ -25,7 +25,7 @@
         </div>
         <div class="ibox"><div class="ibox-content table-responsive">
             <table class="table table-striped table-bordered">
-                <thead><tr><th>#</th><th>User</th><th>Date</th><th>Meal Type</th><th>Proteins</th><th>Fats</th><th>Carbs</th><th>Calories</th><th class="text-right">Action</th></tr></thead>
+                <thead><tr><th>#</th><th>User</th><th>Date</th><th>Meal Type</th><th>Proteins</th><th>Fats</th><th>Carbs</th><th>Calories</th><th>Created</th><th>Updated</th><th class="text-right">Action</th></tr></thead>
                 <tbody>
                 @forelse ($meals as $meal)
                     <tr>
@@ -37,13 +37,25 @@
                         <td>{{ $meal->fats }}</td>
                         <td>{{ $meal->carbs }}</td>
                         <td>{{ $meal->calories }}</td>
+                        <td>
+                            @if($meal->created_at)
+                                <div>{{ $meal->created_at->format('d M Y, h:i A') }}</div>
+                                <small class="text-muted">{{ $meal->created_at->diffForHumans() }}</small>
+                            @else — @endif
+                        </td>
+                        <td>
+                            @if($meal->updated_at)
+                                <div>{{ $meal->updated_at->format('d M Y, h:i A') }}</div>
+                                <small class="text-muted">{{ $meal->updated_at->diffForHumans() }}</small>
+                            @else — @endif
+                        </td>
                         <td class="text-right">
                             <button class="btn btn-xs btn-info js-edit-meal" data-id="{{ $meal->id }}"><i class="fa fa-pencil"></i> Edit</button>
                             <button class="btn btn-xs btn-danger js-delete-meal" data-id="{{ $meal->id }}"><i class="fa fa-trash"></i> Delete</button>
                         </td>
                     </tr>
                 @empty
-                    <tr><td colspan="9" class="text-center text-muted">No meals found.</td></tr>
+                    <tr><td colspan="11" class="text-center text-muted">No meals found.</td></tr>
                 @endforelse
                 </tbody>
             </table>

@@ -29,7 +29,7 @@
         </div>
         <div class="ibox"><div class="ibox-content table-responsive">
             <table class="table table-striped table-bordered">
-                <thead><tr><th>#</th><th>Name</th><th>Category</th><th>Description</th><th class="text-right">Action</th></tr></thead>
+                <thead><tr><th>#</th><th>Name</th><th>Category</th><th>Description</th><th>Created</th><th>Updated</th><th class="text-right">Action</th></tr></thead>
                 <tbody>
                 @forelse ($exercises as $exercise)
                     <tr>
@@ -37,13 +37,25 @@
                         <td>{{ $exercise->name }}</td>
                         <td>{{ optional($exercise->category)->name ?: '—' }}</td>
                         <td>{{ \Illuminate\Support\Str::limit($exercise->description, 100) ?: '—' }}</td>
+                        <td>
+                            @if($exercise->created_at)
+                                <div>{{ $exercise->created_at->format('d M Y, h:i A') }}</div>
+                                <small class="text-muted">{{ $exercise->created_at->diffForHumans() }}</small>
+                            @else — @endif
+                        </td>
+                        <td>
+                            @if($exercise->updated_at)
+                                <div>{{ $exercise->updated_at->format('d M Y, h:i A') }}</div>
+                                <small class="text-muted">{{ $exercise->updated_at->diffForHumans() }}</small>
+                            @else — @endif
+                        </td>
                         <td class="text-right">
                             <button class="btn btn-xs btn-info js-edit-exercise" data-id="{{ $exercise->id }}"><i class="fa fa-pencil"></i> Edit</button>
                             <button class="btn btn-xs btn-danger js-delete-exercise" data-id="{{ $exercise->id }}"><i class="fa fa-trash"></i> Delete</button>
                         </td>
                     </tr>
                 @empty
-                    <tr><td colspan="5" class="text-center text-muted">No exercises found.</td></tr>
+                    <tr><td colspan="7" class="text-center text-muted">No exercises found.</td></tr>
                 @endforelse
                 </tbody>
             </table>

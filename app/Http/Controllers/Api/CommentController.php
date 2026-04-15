@@ -13,6 +13,7 @@ class CommentController extends Controller
 {
     public function index(Post $post, Request $request){
         $comments = $post->comments()
+        ->where('is_hidden', false)
         ->with(
             'user:id,first_name,last_name',
             'user.profile'

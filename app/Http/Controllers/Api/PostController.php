@@ -50,7 +50,8 @@ class PostController extends Controller
                 'user.profile:id,user_id,profile_picture,gender,specialties',
                 'tags',
                 'likes:id,post_id,user_id', // include likes for processing
-            ])->withCount('comments') // for total comments
+            ])->where('is_hidden', false)
+                ->withCount(['comments' => fn ($q) => $q->where('is_hidden', false)]) // for total comments
                 ->latest()
                 ->cursorPaginate(2);
 
@@ -98,7 +99,9 @@ class PostController extends Controller
 
     public function show($id)
     {
-        $post = Post::with(['user', 'tags', 'likes', 'comments.user'])->findOrFail($id);
+        $post = Post::where('is_hidden', false)
+            ->with(['user', 'tags', 'likes', 'comments' => fn ($q) => $q->where('is_hidden', false)->with('user')])
+            ->findOrFail($id);
         return response()->json([
             'status' => 'success',
             'message' => 'post fetched',

@@ -16,6 +16,7 @@ class CommentsController extends Controller
             'q' => ['nullable', 'string', 'max:255'],
             'post_id' => ['nullable', 'integer', 'exists:posts,id'],
             'user_id' => ['nullable', 'integer', 'exists:users,id'],
+            'is_hidden' => ['nullable', 'in:0,1'],
             'created_from' => ['nullable', 'date'],
             'created_to' => ['nullable', 'date'],
             'per_page' => ['nullable', 'integer', 'in:10,15,25,50,100'],
@@ -48,6 +49,10 @@ class CommentsController extends Controller
             $query->whereDate('created_at', '<=', $filters['created_to']);
         }
 
+        if (isset($filters['is_hidden']) && $filters['is_hidden'] !== '') {
+            $query->where('is_hidden', (string) $filters['is_hidden'] === '1');
+        }
+
         return view('admin.comments.index', [
             'comments' => $query->paginate((int) ($filters['per_page'] ?? 15))->appends($request->query()),
             'posts' => Post::query()->latest('id')->limit(200)->get(['id', 'title']),
@@ -62,6 +67,17 @@ class CommentsController extends Controller
 
         return response()->json([
             'message' => 'Comment deleted successfully.',
+        ]);
+    }
+
+    public function toggleVisibility(Comment $comment)
+    {
+        $comment->is_hidden = ! $comment->is_hidden;
+        $comment->save();
+
+        return response()->json([
+            'message' => $comment->is_hidden ? 'Comment hidden successfully.' : 'Comment unhidden successfully.',
+            'is_hidden' => $comment->is_hidden,
         ]);
     }
 }

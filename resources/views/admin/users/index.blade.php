@@ -309,6 +309,7 @@
                                     <tr>
                                         <th>S.No.</th>
                                         <th>Joined</th>
+                                        <th>Updated</th>
                                         <th>Name</th>
                                         <th>Email</th>
                                         <th>Type</th>
@@ -324,7 +325,18 @@
                                     @foreach ($users as $user)
                                         <tr data-user-id="{{ $user->id }}">
                                             <td>{{ $user->id }}</td>
-                                            <td>{{ $user->created_at ? $user->created_at->format('d/m/Y') : '—' }}</td>
+                                            <td>
+                                                @if($user->created_at)
+                                                    <div>{{ $user->created_at->format('d M Y, h:i A') }}</div>
+                                                    <small class="text-muted">{{ $user->created_at->diffForHumans() }}</small>
+                                                @else — @endif
+                                            </td>
+                                            <td>
+                                                @if($user->updated_at)
+                                                    <div>{{ $user->updated_at->format('d M Y, h:i A') }}</div>
+                                                    <small class="text-muted">{{ $user->updated_at->diffForHumans() }}</small>
+                                                @else — @endif
+                                            </td>
                                             <td>{{ trim($user->first_name . ' ' . $user->last_name) }}</td>
                                             <td>{{ $user->email }}</td>
                                             <td><span class="label label-default">{{ str_replace('_', ' ', $user->user_type ?? '—') }}</span></td>
@@ -497,6 +509,7 @@
                         + '<dt>Height</dt><dd>' + $('<div/>').text((p.height || '—') + (p.height_parameter ? ' ' + p.height_parameter : '')).html() + '</dd>'
                         + '<dt>Weight</dt><dd>' + $('<div/>').text((p.weight || '—') + (p.weight_parameter ? ' ' + p.weight_parameter : '')).html() + '</dd>'
                         + '<dt>Joined</dt><dd>' + $('<div/>').text(u.created_at || '—').html() + '</dd>'
+                        + '<dt>Last updated</dt><dd>' + $('<div/>').text(u.updated_at || '—').html() + '</dd>'
                         + '<dt>Quick links</dt><dd>'
                         + '<a class="btn btn-xs btn-white m-r-xs" href="' + links.bookings + '">Bookings</a>'
                         + '<a class="btn btn-xs btn-white m-r-xs" href="' + links.payments + '">Payments</a>'

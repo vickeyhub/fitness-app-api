@@ -408,6 +408,8 @@
                                         <th>Session</th>
                                         <th>Status</th>
                                         <th>Pay</th>
+                                        <th>Created</th>
+                                        <th>Updated</th>
                                         <th></th>
                                         <th></th>
                                         <th></th>
@@ -430,6 +432,18 @@
                                                 @endif
                                             </td>
                                             <td><span class="label label-default">{{ $b->payment_status }}</span></td>
+                                            <td>
+                                                @if($b->created_at)
+                                                    <div>{{ $b->created_at->format('d M Y, h:i A') }}</div>
+                                                    <small class="text-muted">{{ $b->created_at->diffForHumans() }}</small>
+                                                @else — @endif
+                                            </td>
+                                            <td>
+                                                @if($b->updated_at)
+                                                    <div>{{ $b->updated_at->format('d M Y, h:i A') }}</div>
+                                                    <small class="text-muted">{{ $b->updated_at->diffForHumans() }}</small>
+                                                @else — @endif
+                                            </td>
                                             <td><a href="#" class="btn-view-booking text-navy" data-id="{{ $b->id }}"><i class="fa fa-eye"></i></a></td>
                                             <td><a href="#" class="btn-edit-booking text-navy" data-id="{{ $b->id }}"><i class="fa fa-pencil"></i></a></td>
                                             <td><a href="#" class="btn-delete-booking text-danger" data-id="{{ $b->id }}"><i class="fa fa-trash"></i></a></td>
@@ -602,6 +616,8 @@
                     $grid.append(renderRow('Status', bookingStatusChip(b.status)));
                     $grid.append(renderRow('Payment status', paymentStatusChip(b.payment_status)));
                     $grid.append(renderRow('Payment intent', b.payment_id));
+                    $grid.append(renderRow('Created', b.created_at));
+                    $grid.append(renderRow('Updated', b.updated_at));
                     $overview.append($grid);
                     $root.append($overview);
 

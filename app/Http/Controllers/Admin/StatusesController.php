@@ -16,6 +16,7 @@ class StatusesController extends Controller
             'q' => ['nullable', 'string', 'max:255'],
             'user_id' => ['nullable', 'integer', 'exists:users,id'],
             'type' => ['nullable', 'in:photo,video'],
+            'is_hidden' => ['nullable', 'in:0,1'],
             'created_from' => ['nullable', 'date'],
             'created_to' => ['nullable', 'date'],
             'per_page' => ['nullable', 'integer', 'in:10,15,25,50,100'],
@@ -45,6 +46,10 @@ class StatusesController extends Controller
             $query->whereDate('created_at', '<=', $filters['created_to']);
         }
 
+        if (isset($filters['is_hidden']) && $filters['is_hidden'] !== '') {
+            $query->where('is_hidden', (string) $filters['is_hidden'] === '1');
+        }
+
         return view('admin.statuses.index', [
             'statuses' => $query->paginate((int) ($filters['per_page'] ?? 15))->appends($request->query()),
             'users' => User::query()->orderBy('first_name')->get(['id', 'first_name', 'last_name', 'email']),
@@ -62,6 +67,17 @@ class StatusesController extends Controller
 
         return response()->json([
             'message' => 'Status deleted successfully.',
+        ]);
+    }
+
+    public function toggleVisibility(Status $status)
+    {
+        $status->is_hidden = ! $status->is_hidden;
+        $status->save();
+
+        return response()->json([
+            'message' => $status->is_hidden ? 'Status hidden successfully.' : 'Status unhidden successfully.',
+            'is_hidden' => $status->is_hidden,
         ]);
     }
 }

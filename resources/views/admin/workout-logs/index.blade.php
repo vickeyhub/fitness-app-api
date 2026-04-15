@@ -28,7 +28,7 @@
         </div>
         <div class="ibox"><div class="ibox-content">
             <table class="table table-striped table-bordered">
-                <thead><tr><th>#</th><th>User</th><th>Workout ID</th><th>Type</th><th>Start</th><th>End</th><th>Duration</th><th>Calories</th><th>Notes</th><th class="text-right">Action</th></tr></thead>
+                <thead><tr><th>#</th><th>User</th><th>Workout ID</th><th>Type</th><th>Start</th><th>End</th><th>Duration</th><th>Calories</th><th>Notes</th><th>Created</th><th>Updated</th><th class="text-right">Action</th></tr></thead>
                 <tbody>
                 @forelse ($logs as $log)
                     <tr>
@@ -41,13 +41,25 @@
                         <td>{{ $log->duration_minutes }} min</td>
                         <td>{{ $log->calories_burned ?? '—' }}</td>
                         <td>{{ \Illuminate\Support\Str::limit($log->notes, 80) ?: '—' }}</td>
+                        <td>
+                            @if($log->created_at)
+                                <div>{{ $log->created_at->format('d M Y, h:i A') }}</div>
+                                <small class="text-muted">{{ $log->created_at->diffForHumans() }}</small>
+                            @else — @endif
+                        </td>
+                        <td>
+                            @if($log->updated_at)
+                                <div>{{ $log->updated_at->format('d M Y, h:i A') }}</div>
+                                <small class="text-muted">{{ $log->updated_at->diffForHumans() }}</small>
+                            @else — @endif
+                        </td>
                         <td class="text-right">
                             <button class="btn btn-xs btn-info js-edit-log" data-id="{{ $log->id }}"><i class="fa fa-pencil"></i> Edit</button>
                             <button class="btn btn-xs btn-danger js-delete-log" data-id="{{ $log->id }}"><i class="fa fa-trash"></i> Delete</button>
                         </td>
                     </tr>
                 @empty
-                    <tr><td colspan="10" class="text-center text-muted">No workout logs found.</td></tr>
+                    <tr><td colspan="12" class="text-center text-muted">No workout logs found.</td></tr>
                 @endforelse
                 </tbody>
             </table>

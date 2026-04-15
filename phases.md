@@ -90,21 +90,24 @@ This file tracks phased delivery of the **Classes (sessions)**, **Bookings**, **
 - [x] Added `Admin\PostsController` with list/filter/view/create/edit/delete endpoints.
 - [x] Added `Admin\CommentsController` with global moderation list/filter/delete.
 - [x] Added `Admin\StatusesController` with list/filter/delete and storage cleanup.
+- [x] Added `Admin\FollowsController` with list/filter/remove support tooling.
 - [x] Added `Admin\TagsController` with list + create/update/delete.
 - [x] Added routes under `auth` middleware: `admin/posts` (CRUD + like/comment actions), `admin/comments`, `admin/statuses`, `admin/tags`.
+- [x] Added routes under `auth` middleware: `admin/follows` (index + delete).
 - [x] Added sidebar link to **Social/Content (Posts)** and dedicated management links for gyms/trainers.
 - [x] Added views:
   - `resources/views/admin/posts/index.blade.php`
   - `resources/views/admin/comments/index.blade.php`
   - `resources/views/admin/statuses/index.blade.php`
+  - `resources/views/admin/follows/index.blade.php`
   - `resources/views/admin/tags/index.blade.php`
 - [x] Upgraded post popup to Instagram-like desktop layout with admin like/unlike and comment actions.
 - [x] Added admin post edit flow (prefill modal + update endpoint) for post correction.
 
 **Follow-up (optional later):**
 
-- [ ] Add soft-delete restore workflow for posts if moderation policy requires undo.
-- [ ] Add "hide vs delete" moderation state for posts/comments.
+- [x] Add soft-delete restore workflow for posts.
+- [x] Add "hide vs delete" moderation state for posts/comments/statuses.
 - [ ] Add direct jump links from post detail to comments and user profile drill-down.
 
 ---
@@ -115,26 +118,52 @@ This file tracks phased delivery of the **Classes (sessions)**, **Bookings**, **
 
 - [x] Added `Admin\ExerciseCategoriesController` with list/create/show/update/delete.
 - [x] Added `Admin\ExercisesController` with list/filter/create/show/update/delete.
-- [x] Added `Admin\WorkoutPlansController` (read-only oversight with user/name filters and exercise line preview).
-- [x] Added `Admin\WorkoutLogsController` (read-only oversight with user/type/date filters).
+- [x] Added `Admin\WorkoutPlansController` full CRUD (create/edit/delete) with plan exercise line management.
+- [x] Added `Admin\WorkoutLogsController` full CRUD with user/type/date filters and auto duration derivation.
+- [x] Added `Admin\ExerciseLogsController` oversight page with workout/user/date filters.
 - [x] Added routes under `auth` middleware:
   - `admin/exercise-categories` CRUD
   - `admin/exercises` CRUD
   - `admin/workout-plans` (index)
   - `admin/workout-logs` (index)
+  - `admin/exercise-logs` (index)
 - [x] Added sidebar **Workouts & Exercises** nav group with links for categories, exercises, plans, logs.
 - [x] Added views:
   - `resources/views/admin/exercise-categories/index.blade.php`
   - `resources/views/admin/exercises/index.blade.php`
   - `resources/views/admin/workout-plans/index.blade.php`
   - `resources/views/admin/workout-logs/index.blade.php`
+  - `resources/views/admin/exercise-logs/index.blade.php`
 - [x] Updated model fillables for `ExerciseCategory` and `Exercise` to support admin CRUD.
+- [x] Standardized workout type allowed list + improved workout plan linkage in admin/API flows.
 
 **Follow-up (optional later):**
 
-- [ ] Add dedicated drill-down modal/page for `exercise_logs` linked by `workout_id`.
+- [x] Add dedicated drill-down/page for `exercise_logs` linked by workout filters.
 - [ ] Add bulk import tools for exercises and categories.
 - [ ] Add soft-delete/restore workflow if product policy requires archive behavior.
+
+---
+
+## Phase 7 — Nutrition + Dashboard + Audit hardening
+
+**Goal:** Close operational visibility gaps and improve consistency/auditability.
+
+- [x] Added nutrition admin modules:
+  - `resources/views/admin/nutrition/meals.blade.php` + CRUD controller
+  - `resources/views/admin/nutrition/targets.blade.php` + CRUD controller
+  - `resources/views/admin/nutrition/adherence.blade.php` + adherence report controller
+- [x] Implemented Dashboard 2.0 KPI cards/charts from existing tables (bookings/revenue/active users/posts/comments/workout logs/adherence).
+- [x] Added audit trail infrastructure (`audit_trails` migration/model/logger).
+- [x] Wired audit logging for critical create/update/delete/upsert actions in users, sessions, posts, workout plans/logs, nutrition meals/targets.
+- [x] Added friendlier duplicate validation errors for meals/targets.
+- [x] Fixed API parity issue: nutrition `setTargets` now update-or-create.
+
+**Follow-up (optional later):**
+
+- [ ] Enforce role middleware (`admin`/`super_admin`) on admin route group.
+- [x] Content moderation state model (hide/unhide + restore) for posts/comments/statuses.
+- [ ] Stripe deep links + device token support page.
 
 ---
 
@@ -143,12 +172,12 @@ This file tracks phased delivery of the **Classes (sessions)**, **Bookings**, **
 | Area | Files |
 |------|--------|
 | Routes | `routes/web.php` |
-| Controllers | `app/Http/Controllers/Admin/ClassesController.php`, `BookingsController.php`, `PaymentsController.php`, `PostsController.php`, `CommentsController.php`, `StatusesController.php`, `TagsController.php`, `UsersController.php`, `ExerciseCategoriesController.php`, `ExercisesController.php`, `WorkoutPlansController.php`, `WorkoutLogsController.php` |
-| Views | `resources/views/admin/classes/*`, `admin/bookings/index.blade.php`, `admin/payments/index.blade.php`, `admin/posts/index.blade.php`, `admin/comments/index.blade.php`, `admin/statuses/index.blade.php`, `admin/tags/index.blade.php`, `admin/exercise-categories/index.blade.php`, `admin/exercises/index.blade.php`, `admin/workout-plans/index.blade.php`, `admin/workout-logs/index.blade.php` |
+| Controllers | `app/Http/Controllers/Admin/ClassesController.php`, `BookingsController.php`, `PaymentsController.php`, `PostsController.php`, `CommentsController.php`, `StatusesController.php`, `FollowsController.php`, `TagsController.php`, `UsersController.php`, `ExerciseCategoriesController.php`, `ExercisesController.php`, `WorkoutPlansController.php`, `WorkoutLogsController.php`, `ExerciseLogsController.php`, `NutritionMealsController.php`, `NutritionTargetsController.php`, `NutritionAdherenceController.php`, `DashboardController.php` |
+| Views | `resources/views/admin/classes/*`, `admin/bookings/index.blade.php`, `admin/payments/index.blade.php`, `admin/posts/index.blade.php`, `admin/comments/index.blade.php`, `admin/statuses/index.blade.php`, `admin/follows/index.blade.php`, `admin/tags/index.blade.php`, `admin/exercise-categories/index.blade.php`, `admin/exercises/index.blade.php`, `admin/workout-plans/index.blade.php`, `admin/workout-logs/index.blade.php`, `admin/exercise-logs/index.blade.php`, `admin/nutrition/*`, `admin/dashboard.blade.php` |
 | Nav | `resources/views/layouts/nav.blade.php` |
 | Models | `app/Models/Booking.php`, `app/Models/Classes.php` |
 | Provider | `app/Providers/AppServiceProvider.php` |
 
 ---
 
-*Status: Phases 0–3, 5, and 6 implemented. Phase 4 remains checklist for hardening and QA.*
+*Status: Phases 0–3, 5, 6, and 7 implemented. Phase 4 remains checklist for hardening and QA plus moderation-state follow-ups.*
