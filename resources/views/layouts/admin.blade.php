@@ -205,6 +205,20 @@
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                 }
             });
+
+            // Bootstrap 3 sidebar dropdown support when theme bootstrap script is disabled.
+            if ($.fn.metisMenu) {
+                $('#side-menu').metisMenu();
+            }
+            $('#side-menu > li > a').on('click', function(e) {
+                var $link = $(this);
+                var $submenu = $link.next('ul.nav-second-level');
+                if ($submenu.length) {
+                    e.preventDefault();
+                    $submenu.collapse('toggle');
+                }
+            });
+
             window.initUiEnhancements(document);
         });
     </script>

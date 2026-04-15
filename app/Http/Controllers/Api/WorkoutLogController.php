@@ -6,20 +6,21 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\WorkoutLog;
 use App\Models\ExerciseLog;
-// use App\Models\WorkoutPlan;
+use App\Models\WorkoutPlan;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rule;
 
 class WorkoutLogController extends Controller
 {
     public function log(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'workout_type' => 'required|string',
-            'workout_id' => 'required|string',
+            'workout_type' => ['required', 'string', Rule::in(WorkoutLog::allowedTypes())],
+            'workout_id' => ['required', 'integer'],
             'start_time' => 'required',
             'end_time' => 'required',
-            'duration_minutes' => 'required|integer|min:1',
+            'duration_minutes' => 'nullable|integer|min:1',
             'calories_burned' => 'nullable|integer|min:0',
             'notes' => 'nullable|string',
         ]);
@@ -31,13 +32,28 @@ class WorkoutLogController extends Controller
             ], 422);
         }
 
+        $plan = WorkoutPlan::query()
+            ->where('id', (int) $request->workout_id)
+            ->where('user_id', Auth::id())
+            ->first();
+        if (!$plan) {
+            return response()->json([
+                'success' => false,
+                'errors' => ['Workout plan not found for the current user.']
+            ], 422);
+        }
+
+        $duration = $request->duration_minutes
+            ? (int) $request->duration_minutes
+            : max(1, (int) round((strtotime((string) $request->end_time) - strtotime((string) $request->start_time)) / 60));
+
         $log = WorkoutLog::create([
             'user_id' => Auth::id(),
             'workout_type' => $request->workout_type,
-            'workout_id' => $request->workout_id,
+            'workout_id' => (string) $request->workout_id,
             'start_time' => $request->start_time,
             'end_time' => $request->end_time,
-            'duration_minutes' => $request->duration_minutes,
+            'duration_minutes' => $duration,
             'calories_burned' => $request->calories_burned,
             'notes' => $request->notes,
         ]);

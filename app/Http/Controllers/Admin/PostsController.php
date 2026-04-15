@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Support\AuditTrailLogger;
 use App\Models\Comment;
 use App\Models\Like;
 use App\Models\Post;
@@ -88,6 +89,7 @@ class PostsController extends Controller
             $tagIds = $tagNames->map(fn ($name) => Tag::firstOrCreate(['name' => $name])->id);
             $post->tags()->sync($tagIds);
         }
+        AuditTrailLogger::log('posts', 'create', $post, ['title' => $post->title, 'user_id' => $post->user_id]);
 
         return response()->json([
             'message' => 'Post created successfully.',
@@ -150,6 +152,7 @@ class PostsController extends Controller
         } else {
             $post->tags()->detach();
         }
+        AuditTrailLogger::log('posts', 'update', $post, ['title' => $post->title, 'user_id' => $post->user_id]);
 
         return response()->json([
             'message' => 'Post updated successfully.',
@@ -205,6 +208,7 @@ class PostsController extends Controller
 
     public function destroy(Post $post)
     {
+        AuditTrailLogger::log('posts', 'delete', $post, ['title' => $post->title, 'user_id' => $post->user_id]);
         $post->delete();
 
         return response()->json([

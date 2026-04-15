@@ -6,11 +6,13 @@ This document maps your **database schema (migrations)**, **REST API (`routes/ap
 
 ## Progress update (implemented)
 
-- **Users:** Full admin CRUD with profile fields, jQuery modal workflows.
+- **Users:** Full admin CRUD with profile fields, jQuery modal workflows, plus separate management entry points for **All Users**, **Trainer Management**, and **Gym Management**.
 - **Sessions (classes):** CRUD, trainer-linked creation, catalog-backed checkboxes (muscles/goals/types/keywords), session filters + pagination, modern detail popup with inline edit action.
 - **Session catalog:** New `session_catalog_items` table + admin endpoints/modal for managing selectable options.
 - **Bookings:** CRUD, filters + pagination, separate `start_time`/`end_time` form inputs with controller-side normalized `time_slot`, modern detail popup.
 - **Payments:** Read-only index + detail, filters + pagination, structured modal view (no raw payload dump as primary UI).
+- **Social/Content:** Posts/Comments/Statuses/Tags modules implemented; posts now support admin create, edit, delete, like/unlike, and comment actions from a modern popup.
+- **Workouts & Exercises (2.5):** Exercise categories CRUD, exercises CRUD with category filter, and read-only oversight pages for workout plans/logs are implemented.
 - **UI foundation:** Select2 + Flatpickr integrated globally in admin with modal stacking/z-index fixes.
 
 ---
@@ -20,13 +22,15 @@ This document maps your **database schema (migrations)**, **REST API (`routes/ap
 | Area | Admin (web) today | API coverage |
 |------|-------------------|--------------|
 | Dashboard | User aggregates + chart endpoint (`DashboardController`) | N/A (app-facing) |
-| Users | Full CRUD + profile fields (`Admin\UsersController`) | Profile update, list users, trainers, buddy search (`UserController`) |
+| Users | Full CRUD + profile fields + separate trainer/gym management views (`Admin\UsersController`) | Profile update, list users, trainers, buddy search (`UserController`) |
 | Sessions (classes) | CRUD + filtering + modern detail + catalog management | Sessions/search/filter endpoints |
 | Bookings | CRUD + filtering + modern detail | Booking list/create endpoints |
 | Payments | Read-only listing + filtering + structured detail view | Payment + webhook pipeline |
-| Other domains (social/workout/nutrition/etc.) | Not yet in admin | Rich API coverage exists |
+| Social/content | Posts + comments + statuses + tags moderation, post create/edit, admin like/comment flows | Rich API coverage exists |
+| Workouts & exercises | Exercise categories CRUD, exercises CRUD, workout plans/logs oversight (read-first) | API coverage exists |
+| Other domains (nutrition/etc.) | Not yet in admin | Rich API coverage exists |
 
-**Gap:** Core operations (**users/sessions/bookings/payments**) are now operational in admin. Remaining gap is mostly social/workout/nutrition moderation/support tooling.
+**Gap:** Core operations, baseline social moderation, and workout/exercise management are operational in admin. Remaining gap is mostly nutrition/support tooling and deeper moderation workflows.
 
 ---
 
@@ -144,22 +148,22 @@ Use the same stack as today: **Blade + Inspinia-style layout + jQuery + server r
 
 ### P1 — Content moderation
 
-4. **Posts** — ✅ Implemented list/search/view/delete moderation screen (`admin/posts`).
+4. **Posts** — ✅ Implemented list/search/view/create/edit/delete moderation screen (`admin/posts`) with popup interactions.
 5. **Comments** — ✅ Implemented global moderation list + filters + delete (`admin/comments`).
 6. **Statuses** — ✅ Implemented list/filter/delete moderation screen with media open link (`admin/statuses`).
 7. **Tags** — ✅ Implemented CRUD screen with modal create/edit + delete (`admin/tags`).
 
 ### P2 — Catalog & fitness data
 
-8. **Exercise categories** — CRUD `exercise_categories` (seeded today; admin should manage long-term).
-9. **Exercises** — CRUD `exercises` per category (matches `ExerciseController` data model).
-10. **Workout oversight (read-first)** — Browse `workout_plans`, `workout_plan_exercises`, `workout_logs`, `exercise_logs` by user for support; write access only if product requires it.
+8. **Exercise categories** — ✅ Implemented CRUD `exercise_categories`.
+9. **Exercises** — ✅ Implemented CRUD `exercises` per category (aligned with `ExerciseController`).
+10. **Workout oversight (read-first)** — ✅ Implemented browsing of `workout_plans` (+ plan exercises) and `workout_logs` with filters; `exercise_logs` deep-linking can be added next.
 
 ### P3 — Users & engagement depth
 
 11. **User drill-down** — Extend current user admin: linked **bookings**, **posts**, **payments**, **plans**, **nutrition** summaries (read-only tabs).
 12. **Follows** — Read-only graph or list of `follows` for disputes/abuse.
-13. **Likes** — Rarely needed as standalone; usually folded into post detail.
+13. **Likes** — ✅ Admin like/unlike is available in post detail popup; standalone module still optional.
 
 ### P4 — Nutrition & devices
 
@@ -208,9 +212,9 @@ Use the same stack as today: **Blade + Inspinia-style layout + jQuery + server r
 ## 7. Suggested order of execution
 
 1. Harden **dashboard** metrics (P5) + role gates.  
-2. **Content moderation** posts → comments → statuses (P1).  
-3. **Exercise catalog** (P2).  
-4. **User drill-down** and support tools (P3–P4).  
+2. **Exercise catalog** (P2).  
+3. **User drill-down** and support tools (P3–P4).  
+4. Deepen **content moderation** (hide/restore/report workflows) beyond current CRUD (P1).  
 5. Integrations polish (P6).
 
 ---

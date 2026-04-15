@@ -31,6 +31,44 @@ Route::middleware('auth')->group(function () {
     Route::put('admin/classes/{classes}', [Admin\ClassesController::class, 'update'])->name('admin.classes.update');
     Route::delete('admin/classes/{classes}', [Admin\ClassesController::class, 'destroy'])->name('admin.classes.destroy');
 
+    Route::get('admin/exercise-categories', [Admin\ExerciseCategoriesController::class, 'index'])->name('admin.exercise-categories.index');
+    Route::post('admin/exercise-categories', [Admin\ExerciseCategoriesController::class, 'store'])->name('admin.exercise-categories.store');
+    Route::get('admin/exercise-categories/{exercise_category}', [Admin\ExerciseCategoriesController::class, 'show'])->name('admin.exercise-categories.show');
+    Route::put('admin/exercise-categories/{exercise_category}', [Admin\ExerciseCategoriesController::class, 'update'])->name('admin.exercise-categories.update');
+    Route::delete('admin/exercise-categories/{exercise_category}', [Admin\ExerciseCategoriesController::class, 'destroy'])->name('admin.exercise-categories.destroy');
+
+    Route::get('admin/exercises', [Admin\ExercisesController::class, 'index'])->name('admin.exercises.index');
+    Route::post('admin/exercises', [Admin\ExercisesController::class, 'store'])->name('admin.exercises.store');
+    Route::get('admin/exercises/{exercise}', [Admin\ExercisesController::class, 'show'])->name('admin.exercises.show');
+    Route::put('admin/exercises/{exercise}', [Admin\ExercisesController::class, 'update'])->name('admin.exercises.update');
+    Route::delete('admin/exercises/{exercise}', [Admin\ExercisesController::class, 'destroy'])->name('admin.exercises.destroy');
+
+    Route::get('admin/workout-plans', [Admin\WorkoutPlansController::class, 'index'])->name('admin.workout-plans.index');
+    Route::post('admin/workout-plans', [Admin\WorkoutPlansController::class, 'store'])->name('admin.workout-plans.store');
+    Route::get('admin/workout-plans/{workout_plan}', [Admin\WorkoutPlansController::class, 'show'])->name('admin.workout-plans.show');
+    Route::put('admin/workout-plans/{workout_plan}', [Admin\WorkoutPlansController::class, 'update'])->name('admin.workout-plans.update');
+    Route::delete('admin/workout-plans/{workout_plan}', [Admin\WorkoutPlansController::class, 'destroy'])->name('admin.workout-plans.destroy');
+
+    Route::get('admin/workout-logs', [Admin\WorkoutLogsController::class, 'index'])->name('admin.workout-logs.index');
+    Route::post('admin/workout-logs', [Admin\WorkoutLogsController::class, 'store'])->name('admin.workout-logs.store');
+    Route::get('admin/workout-logs/{workout_log}', [Admin\WorkoutLogsController::class, 'show'])->name('admin.workout-logs.show');
+    Route::put('admin/workout-logs/{workout_log}', [Admin\WorkoutLogsController::class, 'update'])->name('admin.workout-logs.update');
+    Route::delete('admin/workout-logs/{workout_log}', [Admin\WorkoutLogsController::class, 'destroy'])->name('admin.workout-logs.destroy');
+    Route::get('admin/exercise-logs', [Admin\ExerciseLogsController::class, 'index'])->name('admin.exercise-logs.index');
+
+    Route::get('admin/nutrition/meals', [Admin\NutritionMealsController::class, 'index'])->name('admin.nutrition.meals.index');
+    Route::post('admin/nutrition/meals', [Admin\NutritionMealsController::class, 'store'])->name('admin.nutrition.meals.store');
+    Route::get('admin/nutrition/meals/{nutrition_meal}', [Admin\NutritionMealsController::class, 'show'])->name('admin.nutrition.meals.show');
+    Route::put('admin/nutrition/meals/{nutrition_meal}', [Admin\NutritionMealsController::class, 'update'])->name('admin.nutrition.meals.update');
+    Route::delete('admin/nutrition/meals/{nutrition_meal}', [Admin\NutritionMealsController::class, 'destroy'])->name('admin.nutrition.meals.destroy');
+
+    Route::get('admin/nutrition/targets', [Admin\NutritionTargetsController::class, 'index'])->name('admin.nutrition.targets.index');
+    Route::post('admin/nutrition/targets', [Admin\NutritionTargetsController::class, 'store'])->name('admin.nutrition.targets.store');
+    Route::get('admin/nutrition/targets/{nutrition_target}', [Admin\NutritionTargetsController::class, 'show'])->name('admin.nutrition.targets.show');
+    Route::put('admin/nutrition/targets/{nutrition_target}', [Admin\NutritionTargetsController::class, 'update'])->name('admin.nutrition.targets.update');
+    Route::delete('admin/nutrition/targets/{nutrition_target}', [Admin\NutritionTargetsController::class, 'destroy'])->name('admin.nutrition.targets.destroy');
+    Route::get('admin/nutrition/adherence', [Admin\NutritionAdherenceController::class, 'index'])->name('admin.nutrition.adherence.index');
+
     Route::get('admin/session-catalog', [Admin\SessionCatalogController::class, 'index'])->name('admin.session-catalog.index');
     Route::post('admin/session-catalog', [Admin\SessionCatalogController::class, 'store'])->name('admin.session-catalog.store');
     Route::put('admin/session-catalog/{session_catalog_item}', [Admin\SessionCatalogController::class, 'update'])->name('admin.session-catalog.update');

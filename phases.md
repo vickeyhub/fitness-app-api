@@ -87,17 +87,19 @@ This file tracks phased delivery of the **Classes (sessions)**, **Bookings**, **
 
 **Goal:** Admin can moderate community content from web panel.
 
-- [x] Added `Admin\PostsController` with list/filter/view/delete endpoints.
+- [x] Added `Admin\PostsController` with list/filter/view/create/edit/delete endpoints.
 - [x] Added `Admin\CommentsController` with global moderation list/filter/delete.
 - [x] Added `Admin\StatusesController` with list/filter/delete and storage cleanup.
 - [x] Added `Admin\TagsController` with list + create/update/delete.
-- [x] Added routes under `auth` middleware: `admin/posts`, `admin/comments`, `admin/statuses`, `admin/tags`.
-- [x] Added sidebar **Social/Content** dropdown with Posts, Comments, Statuses, Tags links.
+- [x] Added routes under `auth` middleware: `admin/posts` (CRUD + like/comment actions), `admin/comments`, `admin/statuses`, `admin/tags`.
+- [x] Added sidebar link to **Social/Content (Posts)** and dedicated management links for gyms/trainers.
 - [x] Added views:
   - `resources/views/admin/posts/index.blade.php`
   - `resources/views/admin/comments/index.blade.php`
   - `resources/views/admin/statuses/index.blade.php`
   - `resources/views/admin/tags/index.blade.php`
+- [x] Upgraded post popup to Instagram-like desktop layout with admin like/unlike and comment actions.
+- [x] Added admin post edit flow (prefill modal + update endpoint) for post correction.
 
 **Follow-up (optional later):**
 
@@ -107,17 +109,46 @@ This file tracks phased delivery of the **Classes (sessions)**, **Bookings**, **
 
 ---
 
+## Phase 6 — Workouts & Exercises admin
+
+**Goal:** Admin can manage exercise master data and inspect workout activity from web panel.
+
+- [x] Added `Admin\ExerciseCategoriesController` with list/create/show/update/delete.
+- [x] Added `Admin\ExercisesController` with list/filter/create/show/update/delete.
+- [x] Added `Admin\WorkoutPlansController` (read-only oversight with user/name filters and exercise line preview).
+- [x] Added `Admin\WorkoutLogsController` (read-only oversight with user/type/date filters).
+- [x] Added routes under `auth` middleware:
+  - `admin/exercise-categories` CRUD
+  - `admin/exercises` CRUD
+  - `admin/workout-plans` (index)
+  - `admin/workout-logs` (index)
+- [x] Added sidebar **Workouts & Exercises** nav group with links for categories, exercises, plans, logs.
+- [x] Added views:
+  - `resources/views/admin/exercise-categories/index.blade.php`
+  - `resources/views/admin/exercises/index.blade.php`
+  - `resources/views/admin/workout-plans/index.blade.php`
+  - `resources/views/admin/workout-logs/index.blade.php`
+- [x] Updated model fillables for `ExerciseCategory` and `Exercise` to support admin CRUD.
+
+**Follow-up (optional later):**
+
+- [ ] Add dedicated drill-down modal/page for `exercise_logs` linked by `workout_id`.
+- [ ] Add bulk import tools for exercises and categories.
+- [ ] Add soft-delete/restore workflow if product policy requires archive behavior.
+
+---
+
 ## Files touched (reference)
 
 | Area | Files |
 |------|--------|
 | Routes | `routes/web.php` |
-| Controllers | `app/Http/Controllers/Admin/ClassesController.php`, `BookingsController.php`, `PaymentsController.php`, `PostsController.php`, `CommentsController.php`, `StatusesController.php`, `TagsController.php` |
-| Views | `resources/views/admin/classes/*`, `admin/bookings/index.blade.php`, `admin/payments/index.blade.php`, `admin/posts/index.blade.php`, `admin/comments/index.blade.php`, `admin/statuses/index.blade.php`, `admin/tags/index.blade.php` |
+| Controllers | `app/Http/Controllers/Admin/ClassesController.php`, `BookingsController.php`, `PaymentsController.php`, `PostsController.php`, `CommentsController.php`, `StatusesController.php`, `TagsController.php`, `UsersController.php`, `ExerciseCategoriesController.php`, `ExercisesController.php`, `WorkoutPlansController.php`, `WorkoutLogsController.php` |
+| Views | `resources/views/admin/classes/*`, `admin/bookings/index.blade.php`, `admin/payments/index.blade.php`, `admin/posts/index.blade.php`, `admin/comments/index.blade.php`, `admin/statuses/index.blade.php`, `admin/tags/index.blade.php`, `admin/exercise-categories/index.blade.php`, `admin/exercises/index.blade.php`, `admin/workout-plans/index.blade.php`, `admin/workout-logs/index.blade.php` |
 | Nav | `resources/views/layouts/nav.blade.php` |
 | Models | `app/Models/Booking.php`, `app/Models/Classes.php` |
 | Provider | `app/Providers/AppServiceProvider.php` |
 
 ---
 
-*Status: Phases 0–3 and Phase 5 implemented. Phase 4 remains checklist for hardening and QA.*
+*Status: Phases 0–3, 5, and 6 implemented. Phase 4 remains checklist for hardening and QA.*

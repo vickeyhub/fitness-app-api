@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Support\AuditTrailLogger;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
@@ -54,6 +55,7 @@ class UsersController extends Controller
 
         $user = User::create($validated);
         $user->profile()->create($profileData);
+        AuditTrailLogger::log('users', 'create', $user, ['email' => $user->email, 'user_type' => $user->user_type]);
 
         return response()->json([
             'message' => 'User created successfully.',
@@ -72,6 +74,7 @@ class UsersController extends Controller
         } else {
             $user->profile()->create($profileData);
         }
+        AuditTrailLogger::log('users', 'update', $user, ['email' => $user->email, 'user_type' => $user->user_type]);
 
         return response()->json([
             'message' => 'User updated successfully.',
@@ -90,6 +93,7 @@ class UsersController extends Controller
         if ($user->profile) {
             $user->profile->delete();
         }
+        AuditTrailLogger::log('users', 'delete', $user, ['email' => $user->email, 'user_type' => $user->user_type]);
         $user->delete();
 
         return response()->json(['message' => 'User deleted successfully.']);

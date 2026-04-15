@@ -138,8 +138,9 @@ class NutritionController extends Controller
 
         $userId = Auth::id();
 
-        $target = NutritionTarget::create(
-            $request->only('calories', 'proteins', 'fats', 'carbs') + ['user_id' => $userId]
+        $target = NutritionTarget::updateOrCreate(
+            ['user_id' => $userId],
+            $request->only('calories', 'proteins', 'fats', 'carbs')
         );
 
         return response()->json([

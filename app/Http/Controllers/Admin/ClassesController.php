@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Support\AuditTrailLogger;
 use App\Models\Classes;
 use App\Models\SessionCatalogItem;
 use App\Models\User;
@@ -77,6 +78,7 @@ class ClassesController extends Controller
     {
         $data = $this->validatedClassPayload($request);
         $class = Classes::create($data);
+        AuditTrailLogger::log('sessions', 'create', $class, ['title' => $class->session_title, 'trainer_id' => $class->user_id]);
 
         return response()->json([
             'message' => 'Session created successfully.',
@@ -88,6 +90,7 @@ class ClassesController extends Controller
     {
         $data = $this->validatedClassPayload($request);
         $classes->update($data);
+        AuditTrailLogger::log('sessions', 'update', $classes, ['title' => $classes->session_title, 'trainer_id' => $classes->user_id]);
 
         return response()->json([
             'message' => 'Session updated successfully.',
@@ -97,6 +100,7 @@ class ClassesController extends Controller
 
     public function destroy(Classes $classes)
     {
+        AuditTrailLogger::log('sessions', 'delete', $classes, ['title' => $classes->session_title, 'trainer_id' => $classes->user_id]);
         $classes->delete();
 
         return response()->json(['message' => 'Session deleted successfully.']);

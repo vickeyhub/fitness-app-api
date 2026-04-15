@@ -6,6 +6,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class ExerciseCategory extends Model
 {
+    protected $fillable = ['name'];
+
     public function exercises()
     {
         return $this->hasMany(Exercise::class, 'exercise_category_id');

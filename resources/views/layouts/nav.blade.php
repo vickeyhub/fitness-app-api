@@ -23,6 +23,24 @@
             <li class="{{ Request::is('admin/classes*') ? 'active' : '' }}">
                 <a href="{{ route('admin.classes.index') }}"><i class="fa fa-calendar"></i> <span class="nav-label">Sessions</span></a>
             </li>
+            <li class="{{ Request::is('admin/exercise-categories*') || Request::is('admin/exercises*') || Request::is('admin/workout-plans*') || Request::is('admin/workout-logs*') || Request::is('admin/exercise-logs*') ? 'active' : '' }}">
+                <a href=""><i class="fa fa-heartbeat"></i> <span class="nav-label">Workouts & Exercises</span><span class="fa arrow"></span></a>
+                <ul class="nav nav-second-level collapse {{ Request::is('admin/exercise-categories*') || Request::is('admin/exercises*') || Request::is('admin/workout-plans*') || Request::is('admin/workout-logs*') || Request::is('admin/exercise-logs*') ? 'in' : '' }}">
+                    <li class="{{ Request::is('admin/exercise-categories*') ? 'active' : '' }}"><a href="{{ route('admin.exercise-categories.index') }}">Exercise Categories</a></li>
+                    <li class="{{ Request::is('admin/exercises*') ? 'active' : '' }}"><a href="{{ route('admin.exercises.index') }}">Exercises</a></li>
+                    <li class="{{ Request::is('admin/workout-plans*') ? 'active' : '' }}"><a href="{{ route('admin.workout-plans.index') }}">Workout Plans</a></li>
+                    <li class="{{ Request::is('admin/workout-logs*') ? 'active' : '' }}"><a href="{{ route('admin.workout-logs.index') }}">Workout Logs</a></li>
+                    <li class="{{ Request::is('admin/exercise-logs*') ? 'active' : '' }}"><a href="{{ route('admin.exercise-logs.index') }}">Exercise Logs</a></li>
+                </ul>
+            </li>
+            <li class="{{ Request::is('admin/nutrition/*') ? 'active' : '' }}">
+                <a href=""><i class="fa fa-cutlery"></i> <span class="nav-label">Nutrition</span><span class="fa arrow"></span></a>
+                <ul class="nav nav-second-level collapse {{ Request::is('admin/nutrition/*') ? 'in' : '' }}">
+                    <li class="{{ Request::is('admin/nutrition/meals*') ? 'active' : '' }}"><a href="{{ route('admin.nutrition.meals.index') }}">Meals</a></li>
+                    <li class="{{ Request::is('admin/nutrition/targets*') ? 'active' : '' }}"><a href="{{ route('admin.nutrition.targets.index') }}">Targets</a></li>
+                    <li class="{{ Request::is('admin/nutrition/adherence*') ? 'active' : '' }}"><a href="{{ route('admin.nutrition.adherence.index') }}">Adherence</a></li>
+                </ul>
+            </li>
             <li class="{{ Request::is('admin/bookings*') ? 'active' : '' }}">
                 <a href="{{ route('admin.bookings.index') }}"><i class="fa fa-ticket"></i> <span class="nav-label">Bookings</span></a>
             </li>
@@ -37,14 +55,6 @@
             </li>
             <li class="{{ Request::is('admin/users/trainers') ? 'active' : '' }}">
                 <a href="{{ route('admin.users.trainers') }}"><i class="fa fa-user-secret"></i> <span class="nav-label">Trainer Management</span></a>
-            </li>
-            <li class="">
-                <a href=""><i class="fa fa-file"></i> <span class="nav-label">Booking Management
-                    </span><span class="fa arrow"></span></a>
-                <ul class="nav nav-second-level collapse">
-                    <li class=""><a href="{{ route('admin.bookings.index') }}">All bookings</a></li>
-                    <li><a href="gym-wise.html">Gym Wise</a></li>
-                </ul>
             </li>
             <li class="">
                 <a href="report.html"><i class="fa fa-file-text"></i> <span class="nav-label">Report

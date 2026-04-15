@@ -476,6 +476,15 @@
                     var u = res.user;
                     var p = u.profile || {};
                     var name = $.trim((u.first_name || '') + ' ' + (u.last_name || ''));
+                    var links = {
+                        bookings: "{{ url('admin/bookings') }}" + '?user_id=' + encodeURIComponent(u.id),
+                        payments: "{{ url('admin/payments') }}" + '?user_id=' + encodeURIComponent(u.id),
+                        posts: "{{ url('admin/posts') }}" + '?user_id=' + encodeURIComponent(u.id),
+                        plans: "{{ url('admin/workout-plans') }}" + '?user_id=' + encodeURIComponent(u.id),
+                        logs: "{{ url('admin/workout-logs') }}" + '?user_id=' + encodeURIComponent(u.id),
+                        meals: "{{ url('admin/nutrition/meals') }}" + '?user_id=' + encodeURIComponent(u.id),
+                        targets: "{{ url('admin/nutrition/targets') }}" + '?user_id=' + encodeURIComponent(u.id)
+                    };
                     var html = ''
                         + '<dt>ID</dt><dd>' + u.id + '</dd>'
                         + '<dt>Name</dt><dd>' + $('<div/>').text(name).html() + '</dd>'
@@ -487,7 +496,16 @@
                         + '<dt>Gender</dt><dd>' + $('<div/>').text(p.gender || '—').html() + '</dd>'
                         + '<dt>Height</dt><dd>' + $('<div/>').text((p.height || '—') + (p.height_parameter ? ' ' + p.height_parameter : '')).html() + '</dd>'
                         + '<dt>Weight</dt><dd>' + $('<div/>').text((p.weight || '—') + (p.weight_parameter ? ' ' + p.weight_parameter : '')).html() + '</dd>'
-                        + '<dt>Joined</dt><dd>' + $('<div/>').text(u.created_at || '—').html() + '</dd>';
+                        + '<dt>Joined</dt><dd>' + $('<div/>').text(u.created_at || '—').html() + '</dd>'
+                        + '<dt>Quick links</dt><dd>'
+                        + '<a class="btn btn-xs btn-white m-r-xs" href="' + links.bookings + '">Bookings</a>'
+                        + '<a class="btn btn-xs btn-white m-r-xs" href="' + links.payments + '">Payments</a>'
+                        + '<a class="btn btn-xs btn-white m-r-xs" href="' + links.posts + '">Posts</a>'
+                        + '<a class="btn btn-xs btn-white m-r-xs" href="' + links.plans + '">Workout Plans</a>'
+                        + '<a class="btn btn-xs btn-white m-r-xs" href="' + links.logs + '">Workout Logs</a>'
+                        + '<a class="btn btn-xs btn-white m-r-xs" href="' + links.meals + '">Meals</a>'
+                        + '<a class="btn btn-xs btn-white" href="' + links.targets + '">Targets</a>'
+                        + '</dd>';
                     $('#viewUserContent').html(html);
                     $('#viewUserModal').modal('show');
                 }).fail(function (xhr) {

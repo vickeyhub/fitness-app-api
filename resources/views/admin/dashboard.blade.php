@@ -1,410 +1,89 @@
 @extends('layouts.admin')
+
 @section('content')
+    <div class="row wrapper border-bottom white-bg page-heading">
+        <div class="col-lg-10">
+            <h2>Dashboard 2.0</h2>
+            <ol class="breadcrumb">
+                <li><a href="{{ route('admin.dashboard') }}">Home</a></li>
+                <li class="active"><strong>Dashboard</strong></li>
+            </ol>
+        </div>
+    </div>
 
+    <div class="wrapper wrapper-content animated fadeInRight">
+        <div class="row">
+            <div class="col-md-3"><div class="ibox"><div class="ibox-content"><h5>Daily bookings</h5><h2>{{ number_format($kpis['daily_bookings']) }}</h2></div></div></div>
+            <div class="col-md-3"><div class="ibox"><div class="ibox-content"><h5>Daily revenue</h5><h2>{{ number_format($kpis['daily_revenue'], 2) }}</h2></div></div></div>
+            <div class="col-md-3"><div class="ibox"><div class="ibox-content"><h5>Active users</h5><h2>{{ number_format($kpis['active_users']) }}</h2></div></div></div>
+            <div class="col-md-3"><div class="ibox"><div class="ibox-content"><h5>Nutrition adherence</h5><h2>{{ number_format($kpis['nutrition_adherence'], 1) }}%</h2></div></div></div>
+        </div>
+        <div class="row">
+            <div class="col-md-4"><div class="ibox"><div class="ibox-content"><h5>Post volume (today)</h5><h2>{{ number_format($kpis['post_volume']) }}</h2></div></div></div>
+            <div class="col-md-4"><div class="ibox"><div class="ibox-content"><h5>Comment volume (today)</h5><h2>{{ number_format($kpis['comment_volume']) }}</h2></div></div></div>
+            <div class="col-md-4"><div class="ibox"><div class="ibox-content"><h5>Workout logs (today)</h5><h2>{{ number_format($kpis['workout_logs_count']) }}</h2></div></div></div>
+        </div>
 
-        <div class="wrapper wrapper-content  animated fadeInRight">
-            <!-- <a href="addcategory.html" class="btn btn-primary">Add
-                        Category</a> -->
-            <div class="row m-t-xs">
-                <div class="col-md-12">
-                    <h2>Hello, Welcome Here.</h2>
-                    <div class="row">
-                        <div class="col-lg-4">
-                            <div class="ibox float-e-margins">
-                                <!-- <div class="ibox-title">
-                                            <h5 class="text-center">Total No of Clients</h5>
-                                        </div> -->
-                                <div class="ibox-content"
-                                    style="border-bottom: 10px solid transparent; border-image: linear-gradient(to right, #47c1cf, #3e558b); border-image-slice: 1;">
-                                    <div>
-                                        <a href="" class="text-info">
-                                            <h2 class=""><span><i class="fa fa-users"></i></span> Total No of
-                                                Users
-                                            </h2>
-                                        </a>
-                                    </div>
-                                    <div class="counter" data-target="{{ $users->total_users }}"></div>
-                                    <!-- <h1 class="no-margins ">2,346</h1> -->
-                                    <!-- <div style="margin-bottom:40px"> -->
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-lg-4">
-                            <div class="ibox float-e-margins">
-                                <!-- <div class="ibox-title">
-                                                <h5>Total No of Technician</h5>
-                                            </div> -->
-                                <div class="ibox-content"
-                                    style="border-bottom: 10px solid transparent; border-image: linear-gradient(to right, #47c1cf, #3e558b); border-image-slice: 1;">
-                                    <div>
-                                        <a href="" class="text-info">
-                                            <h2><span><i class="fa fa-building"></i></span> Total No of Gym
-                                            </h2>
-                                        </a>
-                                    </div>
-                                    <div class="counter" data-target="{{ $users->total_gym_count }}"></div>
-                                    <!-- <h1 class="no-margins ">2,346</h1> -->
-
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-lg-4">
-                            <div class="ibox float-e-margins">
-                                <!-- <div class="ibox-title">
-                                                <h5>Total No of Tickets</h5>
-                                            </div> -->
-                                <div class="ibox-content"
-                                    style="border-bottom: 10px solid transparent; border-image: linear-gradient(to right, #47c1cf, #3e558b); border-image-slice: 1;">
-                                    <div>
-                                        <a href="" class="text-info">
-                                            <h2><span><i class="fa fa-file"></i></span> Total No of Trainers</h2>
-                                        </a>
-                                    </div>
-                                    <div class="counter" data-target="{{ $users->total_trainer_count }}"></div>
-                                    <!-- <h1 class="no-margins ">2,346</h1> -->
-                                    <!-- <div style="margin-bottom:40px"></div> -->
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-lg-6">
-
-                            <div class="ibox float-e-margins">
-                                <div class="ibox-title">
-                                    <h5>Total Users
-                                        <small></small>
-                                    </h5>
-                                </div>
-                                <div class="ibox-content">
-                                    <div class="row">
-                                        <div class="col-sm-9 m-b-xs">
-                                            <div data-toggle="buttons" class="btn-group">
-                                                <label class="btn btn-sm btn-white"> <input type="radio" id="option1"
-                                                        name="options"> Day </label>
-                                                <label class="btn btn-sm btn-white"> <input type="radio" id="option2"
-                                                        name="options"> Week </label>
-                                                <label class="btn btn-sm btn-white active"> <input type="radio"
-                                                        id="option3" name="options"> Month </label>
-                                            </div>
-                                        </div>
-                                        <div class="col-sm-3">
-                                            <div class="input-group"><input type="text" placeholder="Search"
-                                                    class="input-sm form-control"> <span class="input-group-btn">
-                                                    <button type="button" class="btn btn-sm btn-primary">
-                                                        Go!</button> </span></div>
-                                        </div>
-                                    </div>
-                                    <div>
-                                        <canvas id="myChart"></canvas>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-lg-6">
-
-                            <div class="ibox float-e-margins">
-                                <div class="ibox-title">
-                                    <h5>Total Bookings
-                                        <small></small>
-                                    </h5>
-                                </div>
-                                <div class="ibox-content">
-                                    <div class="row">
-                                        <div class="col-sm-9 m-b-xs">
-                                            <div data-toggle="buttons" class="btn-group">
-                                                <label class="btn btn-sm btn-white"> <input type="radio" id="option1"
-                                                        name="options"> Day </label>
-                                                <label class="btn btn-sm btn-white"> <input type="radio" id="option2"
-                                                        name="options"> Week </label>
-                                                <label class="btn btn-sm btn-white active"> <input type="radio"
-                                                        id="option3" name="options"> Month </label>
-                                            </div>
-                                        </div>
-                                        <div class="col-sm-3">
-                                            <div class="input-group"><input type="text" placeholder="Search"
-                                                    class="input-sm form-control"> <span class="input-group-btn">
-                                                    <button type="button" class="btn btn-sm btn-primary">
-                                                        Go!</button> </span></div>
-                                        </div>
-                                    </div>
-                                    <div>
-                                        <canvas id="myChartone"></canvas>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+        <div class="row">
+            <div class="col-md-6">
+                <div class="ibox">
+                    <div class="ibox-title"><h5>Bookings & Revenue (14 days)</h5></div>
+                    <div class="ibox-content"><canvas id="bookingRevenueChart" height="130"></canvas></div>
                 </div>
-
+            </div>
+            <div class="col-md-6">
+                <div class="ibox">
+                    <div class="ibox-title"><h5>Content & Workout Activity (14 days)</h5></div>
+                    <div class="ibox-content"><canvas id="activityChart" height="130"></canvas></div>
+                </div>
             </div>
         </div>
+    </div>
 @endsection
+
 @section('script')
-    <script>
-        $(document).ready(function() {
-            setTimeout(function() {
-                toastr.options = {
-                    closeButton: true,
-                    progressBar: true,
-                    showMethod: 'slideDown',
-                    timeOut: 4000
-                };
-                toastr.success( 'Welcome to Panel', 'Hello There');
-
-            }, 1300);
-
-
-            var data1 = [
-                [0, 4],
-                [1, 8],
-                [2, 5],
-                [3, 10],
-                [4, 4],
-                [5, 16],
-                [6, 5],
-                [7, 11],
-                [8, 6],
-                [9, 11],
-                [10, 30],
-                [11, 10],
-                [12, 13],
-                [13, 4],
-                [14, 3],
-                [15, 3],
-                [16, 6]
-            ];
-            var data2 = [
-                [0, 1],
-                [1, 0],
-                [2, 2],
-                [3, 0],
-                [4, 1],
-                [5, 3],
-                [6, 1],
-                [7, 5],
-                [8, 2],
-                [9, 3],
-                [10, 2],
-                [11, 1],
-                [12, 0],
-                [13, 2],
-                [14, 8],
-                [15, 0],
-                [16, 0]
-            ];
-            $("#flot-dashboard-chart").length && $.plot($("#flot-dashboard-chart"), [
-                data1, data2
-            ], {
-                series: {
-                    lines: {
-                        show: false,
-                        fill: true
-                    },
-                    splines: {
-                        show: true,
-                        tension: 0.4,
-                        lineWidth: 1,
-                        fill: 0.4
-                    },
-                    points: {
-                        radius: 0,
-                        show: true
-                    },
-                    shadowSize: 2
-                },
-                grid: {
-                    hoverable: true,
-                    clickable: true,
-                    tickColor: "#d5d5d5",
-                    borderWidth: 1,
-                    color: '#d5d5d5'
-                },
-                colors: ["#1ab394", "#1C84C6"],
-                xaxis: {},
-                yaxis: {
-                    ticks: 4
-                },
-                tooltip: false
-            });
-
-            var doughnutData = {
-                labels: ["App", "Software", "Laptop"],
-                datasets: [{
-                    data: [300, 50, 100],
-                    backgroundColor: ["#a3e1d4", "#dedede", "#9CC3DA"]
-                }]
-            };
-
-
-            var doughnutOptions = {
-                responsive: false,
-                legend: {
-                    display: false
-                }
-            };
-
-
-            var ctx4 = document.getElementById("doughnutChart").getContext("2d");
-            new Chart(ctx4, {
-                type: 'doughnut',
-                data: doughnutData,
-                options: doughnutOptions
-            });
-
-            var doughnutData = {
-                labels: ["App", "Software", "Laptop"],
-                datasets: [{
-                    data: [70, 27, 85],
-                    backgroundColor: ["#a3e1d4", "#dedede", "#9CC3DA"]
-                }]
-            };
-
-
-            var doughnutOptions = {
-                responsive: false,
-                legend: {
-                    display: false
-                }
-            };
-
-
-            var ctx4 = document.getElementById("doughnutChart2").getContext("2d");
-            new Chart(ctx4, {
-                type: 'doughnut',
-                data: doughnutData,
-                options: doughnutOptions
-            });
-
-        });
-    </script>
-    <!-- counterscript -->
-    <script>
-        const counters = document.querySelectorAll('.counter');
-
-        counters.forEach(counter => {
-            counter.innerText = '0';
-
-            const updateCounter = () => {
-                const target = +counter.getAttribute('data-target')
-                const c = +counter.innerText;
-
-                const increment = target / 150;
-
-                if (c < target) {
-                    counter.innerText = `${Math.ceil(c + increment)}`
-                    setTimeout(updateCounter, 1)
-                } else {
-                    counter.innerText = target
-                }
-            }
-            updateCounter();
-        })
-    </script>
-    <!-- mychartjs -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
     <script>
-        const ctx = document.getElementById('myChart');
+        (function () {
+            var labels = @json($series['labels']);
+            var bookings = @json($series['bookings']);
+            var revenue = @json($series['revenue']);
+            var posts = @json($series['posts']);
+            var comments = @json($series['comments']);
+            var workoutLogs = @json($series['workout_logs']);
 
-        new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels:  {!! json_encode($labels) !!},
-                datasets: [{
-                    label: 'Total Users',
-                    data: {!! json_encode($user_count) !!},
-                    borderWidth: 1,
-                    backgroundColor: "#3e558b"
-                }]
-            },
-            options: {
-                scales: {
-                    y: {
-                        beginAtZero: true
+            var bookingRevenueCtx = document.getElementById('bookingRevenueChart').getContext('2d');
+            new Chart(bookingRevenueCtx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        { label: 'Bookings', data: bookings, borderColor: '#1c84c6', yAxisID: 'y', tension: 0.25 },
+                        { label: 'Revenue', data: revenue, borderColor: '#1ab394', yAxisID: 'y1', tension: 0.25 }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: { beginAtZero: true, position: 'left' },
+                        y1: { beginAtZero: true, position: 'right', grid: { drawOnChartArea: false } }
                     }
                 }
-            }
-        });
-    </script>
-    {{-- <script>
-        const xValues = [100, 200, 300, 400, 500, 600, 700, 800, 900, 1000];
-
-        new Chart("myChartone", {
-            type: "line",
-            data: {
-                labels: xValues,
-                datasets: [{
-                    data: [1600, 1700, 1700, 1900, 2000, 2700, 4000, 5000, 6000, 7000],
-                    borderColor: "green",
-                    fill: false,
-                    label: "Total Users"
-                }, {
-                    data: [300, 700, 2000, 5000, 6000, 4000, 2000, 1000, 200, 100],
-                    borderColor: "#47c1cf",
-                    fill: false,
-                    label: "Total Gym"
-                }, {
-                    data: [4000, 2000, 1000, 200, 100, 300, 700, 2000, 5000, 6000],
-                    borderColor: "#32385a",
-                    fill: false,
-                    label: "Total Bookings"
-                }]
-            },
-            options: {
-                legend: {
-                    display: false
-                }
-            }
-        });
-    </script> --}}
-    <script>
-        $(document).ready(function () {
-            $.ajax({
-                url: "{{ url('/chart-data-line') }}",
-                method: "GET",
-                success: function(response) {
-                    const ctx = document.getElementById("myChartone").getContext("2d");
-
-                    new Chart(ctx, {
-                        type: "line",
-                        data: {
-                            labels: response.xValues, // Dates from backend
-                            datasets: [{
-                                label: "Total Users",
-                                data: response.usersData, // Users per date
-                                borderColor: "green",
-                                fill: false
-                            }, {
-                                label: "Total Gyms",
-                                data: response.gymsData, // Gyms per date
-                                borderColor: "#47c1cf",
-                                fill: false
-                            }, {
-                                label: "Total Bookings",
-                                data: response.bookingsData, // Bookings per date
-                                borderColor: "#32385a",
-                                fill: false
-                            }]
-                        },
-                        options: {
-                            responsive: true,
-                            plugins: {
-                                legend: { display: true }
-                            },
-                            scales: {
-                                x: {
-                                    title: { display: true, text: "Date" }
-                                },
-                                y: {
-                                    title: { display: true, text: "Count" },
-                                    beginAtZero: true
-                                }
-                            }
-                        }
-                    });
-                }
             });
-        });
+
+            var activityCtx = document.getElementById('activityChart').getContext('2d');
+            new Chart(activityCtx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        { label: 'Posts', data: posts, backgroundColor: '#f8ac59' },
+                        { label: 'Comments', data: comments, backgroundColor: '#23c6c8' },
+                        { label: 'Workout Logs', data: workoutLogs, backgroundColor: '#ed5565' }
+                    ]
+                },
+                options: { responsive: true, scales: { y: { beginAtZero: true } } }
+            });
+        })();
     </script>
 @endsection
