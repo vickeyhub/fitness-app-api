@@ -1,273 +1,395 @@
-# Client Panel (Web) Build Plan
+# Client Panel (Web) - Full Proof Delivery Plan
 
-This document defines everything needed to build a **web-based client panel** using the existing API-first backend (currently focused on mobile app usage).
+This document is the execution blueprint to build a production-ready web client panel on top of the current API-first backend (currently mobile-first usage).
 
-Goal: deliver a browser UI where end users can do what they do in the mobile app, plus web-specific usability improvements.
-
----
-
-## 1) Objectives
-
-- Build a responsive client web app for `user`, `trainer`, and `gym` roles.
-- Reuse existing API endpoints and validation rules wherever possible.
-- Avoid business-logic duplication in Blade/JS; keep logic in controllers/services/API.
-- Launch in phases so high-impact workflows go live first.
+Primary outcome: all critical end-user journeys must be usable from web without depending on mobile app screens.
 
 ---
 
-## 2) Target roles and access
+## 1. Product scope and success criteria
 
-- **Client/User**
-  - Account/profile management
-  - Session discovery, details, booking, payment
-  - Bookmarks, active plans, workouts, nutrition, social activity
-- **Trainer**
-  - Own session list and session creation/edit
-  - Booking and schedule visibility
-  - Content posting and profile management
-- **Gym**
-  - Gym-facing session and booking operations
-  - Payment and member visibility
+### 1.1 Scope
 
-Use role-based middleware and policy checks on all web routes.
+- Build role-aware web experiences for:
+  - `user`
+  - `trainer`
+  - `gym`
+- Reuse existing API endpoints and data contracts.
+- Keep server as source of truth for validation, authorization, and business rules.
 
----
+### 1.2 Success criteria (must pass)
 
-## 3) Core web modules to build
-
-## 3.1 Authentication and account
-
-- Login, signup, OTP verify, forgot/reset password
-- Session persistence in browser (Sanctum token handling)
-- Logout and device/session invalidation UX
-- Profile edit page (name, avatar, personal metrics, trainer specialties, etc.)
-
-API base:
-- `AuthController`
-- `PasswordResetController`
-- `UserController`
-
-## 3.2 Discover sessions and trainers
-
-- Sessions listing page with filters (goal, duration, intensity, type, keyword)
-- Session detail page (media, trainer, timing, price, fitness metadata)
-- Trainers listing/profile and optional “find buddy” experience
-- Gym listing page
-
-API base:
-- `SessionsController`
-- `SessionFilterController`
-- `UserController` (trainers / users)
-- `GymsController`
-
-## 3.3 Booking and payments
-
-- Create booking flow from session detail
-- Date/time selection UX (human-friendly time picker)
-- Booking history page with status filters
-- Payment intent + confirmation flow
-- Payment history page and invoice-like receipt view
-
-API base:
-- `BookingsController`
-- `PaymentController`
-- Stripe webhook flow (backend already present)
-
-## 3.4 Bookmarks and active plans
-
-- Save/remove bookmarked sessions
-- Bookmarks listing page
-- Active plans screen for user/trainer/gym context
-
-API base:
-- `SessionsController` bookmark and active-plan endpoints
-
-## 3.5 Workouts and exercise logs
-
-- Exercise categories and exercises browse
-- Workout plans list/detail/create/edit
-- Workout logs create and history timeline
-- Exercise-level logging UI
-
-API base:
-- `ExerciseController`
-- `WorkoutPlanController`
-- `WorkoutLogController`
-
-## 3.6 Nutrition
-
-- Meals CRUD by date and meal type
-- Daily macro summary widget
-- Nutrition targets view/update
-- Adherence trends and simple charts
-
-API base:
-- `NutritionController`
-
-## 3.7 Social and engagement
-
-- Feed page: posts list/detail
-- Create/edit/delete post (role-dependent)
-- Comment and like/dislike actions
-- Tag usage in post create flow
-- Status media upload and viewer
-- Follow/unfollow and followers/following pages
-
-API base:
-- `PostController`
-- `CommentController`
-- `LikeController`
-- `TagController`
-- `StatusController`
-- `FollowController`
-
-## 3.8 Notifications and chat
-
-- Notification center page (read/list actions if supported)
-- Push/notification preference toggles (if API coverage allows)
-- Chat token/channel bootstrap for web chat integration
-
-API base:
-- `NotificationController`
-- `GetStreamController`
+- A new user can signup/login, browse sessions, book, pay, and view booking/payment history on web.
+- Trainer/gym users can manage their sessions and see related bookings on web.
+- Workouts, nutrition, and social modules are available with parity to API capabilities.
+- All sensitive actions are role-protected and auditable.
 
 ---
 
-## 4) Recommended web route structure
+## 2. Delivery principles (non-negotiable)
 
-- `/` landing page (public)
-- `/auth/*` auth routes
+- **API-first parity:** No web-only business rules unless explicitly approved.
+- **Backward compatibility:** Existing mobile payloads/flows must not break.
+- **Progressive rollout:** Ship in phases behind feature flags where needed.
+- **Resilience:** Error handling, retries, and empty-state UX are required.
+- **Observability:** Critical actions must be traceable in logs/audit entries.
+
+---
+
+## 3. Role model and permissions matrix
+
+### 3.1 User
+
+- Can view/edit own profile.
+- Can discover sessions, bookmark, book, and pay.
+- Can view own bookings, workouts, nutrition data, social interactions.
+- Cannot manage others' sessions/bookings except allowed social actions.
+
+### 3.2 Trainer
+
+- Everything user can do (except restricted by policy), plus:
+- Create/update/delete own sessions.
+- View bookings relevant to own sessions.
+- Manage own training-related content.
+
+### 3.3 Gym
+
+- Gym-facing session lifecycle.
+- Gym booking visibility and related operational workflows.
+- Limited user management only where API allows.
+
+### 3.4 Security enforcement points
+
+- Route middleware (`auth` + role middleware).
+- Policy checks at controller level for ownership and destructive actions.
+- Server-side validation for every write endpoint.
+
+---
+
+## 4. Required page inventory (complete)
+
+## 4.1 Public pages
+
+- `Home / Landing`
+- `About`
+- `Pricing / Plans`
+- `Contact`
+- `Sessions Explore` (public-safe listing)
+- `Session Detail` (public-safe)
+- `Trainers List`
+- `Trainer Public Profile`
+- `Gyms List`
+- `Gym Public Profile`
+- `404`, `403`, `500`, maintenance page
+
+## 4.2 Authentication pages
+
+- `Login`
+- `Signup`
+- `OTP Verification`
+- `Forgot Password`
+- `Reset Password`
+- `Logout` (action/redirect)
+
+## 4.3 Authenticated common pages
+
+- `Dashboard`
+- `My Profile`
+- `Settings` (security/preferences)
+- `Notifications Center`
+
+## 4.4 Sessions and booking pages
+
+- `Sessions Listing` (search/filter/sort)
+- `Session Detail` (full metadata)
+- `Book Session` (date/slot selection)
+- `My Bookings` (tabs: upcoming/past/cancelled)
+- `Booking Detail`
+
+## 4.5 Payment pages
+
+- `Checkout / Payment`
+- `Payment Status` (success/failed/pending)
+- `Payment History`
+- `Payment Detail / Receipt`
+
+## 4.6 Bookmark and plan pages
+
+- `Bookmarked Sessions`
+- `Active Plans`
+- `Plan Detail`
+
+## 4.7 Workout pages
+
+- `Workout Dashboard`
+- `Workout Plans List`
+- `Workout Plan Detail`
+- `Create/Edit Workout Plan`
+- `Workout Logs List`
+- `Workout Log Detail`
+- `Create Workout Log`
+- `Exercise Logs / Progress`
+
+## 4.8 Nutrition pages
+
+- `Nutrition Dashboard`
+- `Meals by Date`
+- `Add/Edit Meal`
+- `Nutrition Targets`
+- `Adherence / Trend View`
+
+## 4.9 Social pages
+
+- `Feed`
+- `Post Detail`
+- `Create Post`
+- `Edit Post`
+- `My Posts`
+- `Status/Story Viewer`
+- `Followers`
+- `Following`
+- `User Public/Social Profile`
+
+## 4.10 Trainer-only pages
+
+- `Trainer Dashboard`
+- `My Sessions (CRUD)`
+- `Session Create/Edit`
+- `Trainer Bookings`
+- `Trainer Earnings Overview` (if endpoint data available)
+- `Trainer Availability`
+- `My Clients`
+
+## 4.11 Gym-only pages
+
+- `Gym Dashboard`
+- `Gym Sessions (CRUD)`
+- `Gym Bookings`
+- `Gym Trainers`
+- `Gym Members`
+- `Gym Payment Summary`
+
+---
+
+## 5. Information architecture and route map
+
+### 5.1 Route groups
+
+- Public: `/`
+- Auth: `/auth/*`
+- App shell: `/app/*`
+- Role buckets:
+  - `/app/user/*`
+  - `/app/trainer/*`
+  - `/app/gym/*`
+
+### 5.2 Minimum route skeleton
+
 - `/app/dashboard`
 - `/app/profile`
 - `/app/sessions`, `/app/sessions/{id}`
-- `/app/bookings`
-- `/app/payments`
+- `/app/bookings`, `/app/bookings/{id}`
+- `/app/payments`, `/app/payments/{id}`
 - `/app/bookmarks`
 - `/app/workouts/*`
 - `/app/nutrition/*`
 - `/app/social/*`
 - `/app/settings`
 
-Use route groups by auth + role.
+---
+
+## 6. API integration matrix (web module -> backend controller)
+
+- Auth and account:
+  - `AuthController`
+  - `PasswordResetController`
+  - `UserController`
+- Session discovery and detail:
+  - `SessionsController`
+  - `SessionFilterController`
+  - `GymsController`
+- Booking and payment:
+  - `BookingsController`
+  - `PaymentController`
+  - Stripe webhook (backend processing)
+- Bookmarks and active plans:
+  - `SessionsController` bookmark/active plan endpoints
+- Workouts and exercises:
+  - `ExerciseController`
+  - `WorkoutPlanController`
+  - `WorkoutLogController`
+- Nutrition:
+  - `NutritionController`
+- Social:
+  - `PostController`
+  - `CommentController`
+  - `LikeController`
+  - `TagController`
+  - `StatusController`
+  - `FollowController`
+- Notifications and chat:
+  - `NotificationController`
+  - `GetStreamController`
 
 ---
 
-## 5) UI/UX requirements (web-specific)
+## 7. Data contracts and formatting standards
 
-- Fully responsive layout (desktop/tablet/mobile browser)
-- Persistent sidebar + top nav for logged-in users
-- Table + card hybrid views (tables on desktop, cards on mobile)
-- Global filters/search/sort with URL query-state persistence
-- Reusable modal/drawer components
-- Form validation:
-  - client-side precheck
-  - API error rendering (field-level + toast)
-- Loading skeletons and empty states for each module
-- Clear permission-denied and not-found pages
-
----
-
-## 6) Technical requirements
-
-- Keep current stack friendly:
-  - Blade + jQuery can be used first for fast delivery
-  - Optional gradual move to Livewire/Inertia later
-- Centralized API client wrapper for:
-  - auth header
-  - error normalization
-  - retry/refresh behavior
-- Shared helpers for:
-  - time/date formatting
-  - currency formatting
-  - pagination query handling
-- Standardized component partials:
-  - filter bar
-  - paginated table
-  - detail modal
-  - status badges
-
----
-
-## 7) Data and validation parity checklist
-
-- Keep API as source of truth for validation and business rules.
-- Web forms must submit payloads in exact API format.
-- For time-range fields (example session timing), format consistently:
+- Keep payload keys exactly as API expects.
+- Do not rename server fields in outbound requests.
+- Time-range format standard:
   - `07:00am - 08:30am`
-- Preserve existing DB schema behavior unless explicitly migrated.
-- Avoid writing role-specific logic in view templates.
+- Date format:
+  - Use consistent ISO transport where endpoint accepts it.
+- Numeric fields:
+  - Validate and normalize client-side before submit.
+- JSON arrays:
+  - Preserve expected array structure and order where meaningful.
 
 ---
 
-## 8) Security and access control
+## 8. Frontend architecture and reusable building blocks
 
-- Enforce role middleware on all `/app/*` routes.
-- Policy checks for update/delete operations.
-- CSRF protection for web forms and AJAX requests.
-- Rate-limit auth-sensitive and write-heavy endpoints.
-- Audit critical actions (booking/payment/content moderation).
+### 8.1 Stack strategy
+
+- Phase 1: Blade + jQuery (fastest fit with current project)
+- Optional phase 2+: progressive migration to Livewire/Inertia if needed
+
+### 8.2 Shared web components (must build once)
+
+- App shell layout (sidebar + top bar + breadcrumbs)
+- Filter bar component
+- Reusable paginated table
+- Card-list alternative for small screens
+- Status badge system
+- Toast/error renderer
+- Confirm dialog for destructive actions
+- Empty/loading/error state blocks
+
+### 8.3 Shared JS utilities
+
+- API request wrapper (headers, error normalization)
+- Query-string state helper (filters/pagination persistence)
+- Time/date formatting helper
+- Currency formatter
 
 ---
 
-## 9) Monitoring and operational readiness
+## 9. UX quality bar
 
-- Error logging with route + user context
-- API latency and failure dashboard (at least basic logs)
-- Stripe payment failure visibility in panel
-- Optional export tools (CSV for bookings/payments/workouts)
+- Responsive behavior at common breakpoints.
+- Keyboard and accessibility basics (focus state, labels, form errors).
+- Multi-step flows provide progress and validation feedback.
+- No dead ends: every page has clear next action.
+- Permission-denied screens must explain why and where to go next.
 
 ---
 
-## 10) Delivery phases (suggested)
+## 10. Security, privacy, and compliance checklist
 
-## Phase A (MVP - High priority)
+- CSRF on all form and AJAX writes.
+- Role middleware and policy checks for all protected routes.
+- Prevent IDOR (ownership checks on every resource detail/update/delete).
+- Rate-limit auth and abuse-prone endpoints.
+- Mask sensitive payment data in UI/logs.
+- Add/keep audit trail on critical write actions.
 
-- Auth + profile
+---
+
+## 11. Testing strategy (full-proof)
+
+### 11.1 Critical flow tests (must automate)
+
+- Signup -> OTP -> login -> logout
+- Session search -> detail -> booking -> payment -> booking history
+- Bookmark add/remove lifecycle
+- Workout create/edit/log flow
+- Nutrition meal/target update flow
+- Social post/comment/like lifecycle
+
+### 11.2 Manual QA checklist
+
+- Cross-role access checks (`user`, `trainer`, `gym`)
+- Form validation and API error rendering parity
+- Time format consistency in forms/lists/details
+- Responsive checks on mobile browser widths
+- Empty states and network failure behavior
+
+---
+
+## 12. Delivery phases with acceptance gates
+
+## Phase 0 - Foundation
+
+- Finalize route groups, middleware, base app shell.
+- Implement shared UI components and API helper utilities.
+- Gate: app shell + auth-protected navigation works for all roles.
+
+## Phase 1 - Revenue-critical MVP
+
+- Auth/account
 - Sessions browse/detail
-- Booking create/history
+- Booking flow
 - Payment flow
-- Basic dashboard
+- Booking/payment history
+- Gate: end-to-end booking and payment on web works.
 
-## Phase B
+## Phase 2 - Engagement and retention
 
-- Bookmarks + active plans
-- Workout plans/logs
+- Bookmarks and active plans
+- Workouts module
 - Nutrition module
+- Gate: daily active use journey possible without mobile app.
 
-## Phase C
+## Phase 3 - Community features
 
-- Social (posts/comments/likes/tags/status/follows)
-- Notifications + chat bootstrap
-- Reporting/export polish
+- Social feeds/posts/comments/likes/tags/status/follows
+- Notifications center
+- Chat bootstrap page
+- Gate: full community interactions available on web.
 
-## Phase D (Hardening)
+## Phase 4 - Hardening and scale
 
-- Role/policy audit
-- UX polish and accessibility pass
-- E2E smoke tests on critical flows
-
----
-
-## 11) Testing matrix (must-have)
-
-- Signup/login/logout and token expiry behavior
-- Session search/filter and detail load correctness
-- Booking + payment happy path and failure path
-- Time formatting consistency across forms/details/lists
-- Workout/nutrition CRUD flows
-- Social actions with role checks
-- Mobile browser responsive checks
+- Role and policy audit
+- Performance optimization
+- Accessibility pass
+- E2E smoke suite + production readiness checklist
+- Gate: no high/critical issues open for launch scope.
 
 ---
 
-## 12) Definition of done (web client panel)
+## 13. Risks and mitigation
 
-- Key user journeys are executable on browser without mobile app dependency.
-- All major API modules used by app have equivalent web workflows.
-- Role-based access is enforced and tested.
-- No critical blocker in booking/payment/session workflows.
-- Documentation and runbook for support team is available.
+- **Risk:** API/web behavior drift.
+  - **Mitigation:** central request builder + shared validation contracts.
+- **Risk:** role leaks (unauthorized actions).
+  - **Mitigation:** policy tests + route middleware audit.
+- **Risk:** payment UX confusion.
+  - **Mitigation:** explicit status pages and webhook-driven state refresh.
+- **Risk:** schedule/time format inconsistency.
+  - **Mitigation:** single formatter helper + strict input masking.
+- **Risk:** delivery sprawl.
+  - **Mitigation:** phase gates and clear out-of-scope list per release.
 
 ---
 
-*This file is a web-client implementation blueprint based on the current API-first architecture.*
+## 14. Definition of done
+
+- Web app covers core mobile user journeys for all target roles.
+- Role-based security and ownership checks are verified.
+- Booking/payment flows are reliable and supportable.
+- Key operational metrics and logs are observable.
+- Documentation exists for QA, support, and future development.
+
+---
+
+## 15. Immediate next execution tasks
+
+- Confirm final page priority for Phase 1.
+- Create route stubs and nav map for all required pages.
+- Implement shared app shell and API helper layer.
+- Start MVP sprint with sessions -> bookings -> payments.
+
+---
+
+*This is the canonical full-proof plan for web client panel delivery in this repository.*

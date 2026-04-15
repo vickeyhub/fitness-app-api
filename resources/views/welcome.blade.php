@@ -4,11 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FitX | Train Smarter</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
-<body class="bg-slate-950 text-slate-100 antialiased" id="theme">
-    <header class="sticky top-0 z-50 border-b border-slate-800/70 bg-slate-950/90 backdrop-blur">
-        <div class="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
+<body class="antialiased bg-base-200 text-base-content" data-theme="dark" id="theme">
+    <header class="navbar sticky top-0 z-50 border-b border-base-300/70 bg-base-100/90 px-6 backdrop-blur">
+        <div class="mx-auto flex w-full max-w-6xl items-center justify-between py-2">
             <a href="/" class="text-xl font-extrabold tracking-tight">
                 Fit<span class="text-amber-400">X</span>
             </a>
@@ -19,11 +19,11 @@
                 <a href="#testimonials" class="transition hover:text-amber-400">Testimonials</a>
             </nav>
             <div class="flex items-center gap-3">
-                <a href="{{ route('web-login') }}" class="rounded-lg border border-slate-700 px-4 py-2 text-sm font-semibold text-slate-200 transition hover:border-slate-500">
+                <a href="{{ route('web-login') }}" class="btn btn-outline btn-sm">
                     Log in
                 </a>
-                <button id="themeToggle" class="rounded-lg border border-slate-700 px-3 py-2 text-sm text-slate-200 transition hover:border-slate-500" type="button" aria-label="Toggle theme">
-                    Light
+                <button id="themeToggle" class="btn btn-ghost btn-sm" type="button" aria-label="Toggle theme">
+                    Light theme
                 </button>
             </div>
         </div>
@@ -44,10 +44,10 @@
                         Personalized coaching, science-backed programs, and a supportive community that keeps you consistent.
                     </p>
                     <div class="mt-8 flex flex-wrap gap-4">
-                        <a href="#pricing" class="rounded-xl bg-amber-400 px-6 py-3 text-sm font-bold text-slate-900 transition hover:bg-amber-300">
+                        <a href="#pricing" class="btn btn-warning">
                             Start Membership
                         </a>
-                        <a href="#programs" class="rounded-xl border border-slate-700 px-6 py-3 text-sm font-semibold text-slate-200 transition hover:border-slate-500">
+                        <a href="#programs" class="btn btn-outline">
                             Explore Programs
                         </a>
                     </div>
@@ -177,7 +177,7 @@
             <div class="rounded-3xl border border-slate-800 bg-gradient-to-r from-amber-500/20 to-cyan-400/10 p-10 text-center">
                 <h2 class="text-3xl font-bold text-white md:text-4xl">Ready to start your transformation?</h2>
                 <p class="mx-auto mt-4 max-w-2xl text-slate-300">Book your free first session and get a personalized roadmap from our coaching team.</p>
-                <a href="{{ route('web-login') }}" class="mt-8 inline-flex rounded-xl bg-amber-400 px-7 py-3 text-sm font-bold text-slate-900 transition hover:bg-amber-300">
+                <a href="{{ route('web-login') }}" class="btn btn-warning mt-8">
                     Book Free Session
                 </a>
             </div>
@@ -193,12 +193,9 @@
         const body = document.getElementById('theme');
 
         themeToggle.addEventListener('click', () => {
-            const isDark = body.classList.contains('bg-slate-950');
-            body.classList.toggle('bg-slate-950', !isDark);
-            body.classList.toggle('text-slate-100', !isDark);
-            body.classList.toggle('bg-slate-100', isDark);
-            body.classList.toggle('text-slate-900', isDark);
-            themeToggle.textContent = isDark ? 'Dark' : 'Light';
+            const isDark = body.getAttribute('data-theme') === 'dark';
+            body.setAttribute('data-theme', isDark ? 'light' : 'dark');
+            themeToggle.textContent = isDark ? 'Dark theme' : 'Light theme';
         });
     </script>
 </body>
