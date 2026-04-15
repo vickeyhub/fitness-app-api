@@ -167,15 +167,30 @@ This file tracks phased delivery of the **Classes (sessions)**, **Bookings**, **
 
 ---
 
+## Phase 8 — Invoices & Reports (done)
+
+**Goal:** Make payment/bookings finance operations production-ready with invoice lifecycle and export.
+
+- [x] Added invoice data model + migration (`invoices` table) and admin screens.
+- [x] Added `Admin\InvoicesController` index/show plus generation from bookings and payments.
+- [x] Added polished invoice popup layout (no raw JSON payload).
+- [x] Added invoice print view and PDF download flow (`barryvdh/laravel-dompdf`).
+- [x] Added invoice settings store (`admin_settings` table) for branding, tax, discount, and footer notes.
+- [x] Added invoice settings page and save endpoint (`admin/invoice-settings`).
+- [x] Added report dashboard page (`admin/reports`) with date-filtered booking/revenue/invoice KPIs.
+- [x] Added auto invoice generation on paid transitions via model observers for `Booking` and `Payment`.
+
+---
+
 ## Files touched (reference)
 
 | Area | Files |
 |------|--------|
 | Routes | `routes/web.php` |
-| Controllers | `app/Http/Controllers/Admin/ClassesController.php`, `BookingsController.php`, `PaymentsController.php`, `PostsController.php`, `CommentsController.php`, `StatusesController.php`, `FollowsController.php`, `TagsController.php`, `UsersController.php`, `ExerciseCategoriesController.php`, `ExercisesController.php`, `WorkoutPlansController.php`, `WorkoutLogsController.php`, `ExerciseLogsController.php`, `NutritionMealsController.php`, `NutritionTargetsController.php`, `NutritionAdherenceController.php`, `DashboardController.php` |
-| Views | `resources/views/admin/classes/*`, `admin/bookings/index.blade.php`, `admin/payments/index.blade.php`, `admin/posts/index.blade.php`, `admin/comments/index.blade.php`, `admin/statuses/index.blade.php`, `admin/follows/index.blade.php`, `admin/tags/index.blade.php`, `admin/exercise-categories/index.blade.php`, `admin/exercises/index.blade.php`, `admin/workout-plans/index.blade.php`, `admin/workout-logs/index.blade.php`, `admin/exercise-logs/index.blade.php`, `admin/nutrition/*`, `admin/dashboard.blade.php` |
+| Controllers | `app/Http/Controllers/Admin/ClassesController.php`, `BookingsController.php`, `PaymentsController.php`, `InvoicesController.php`, `ReportsController.php`, `PostsController.php`, `CommentsController.php`, `StatusesController.php`, `FollowsController.php`, `TagsController.php`, `UsersController.php`, `ExerciseCategoriesController.php`, `ExercisesController.php`, `WorkoutPlansController.php`, `WorkoutLogsController.php`, `ExerciseLogsController.php`, `NutritionMealsController.php`, `NutritionTargetsController.php`, `NutritionAdherenceController.php`, `DashboardController.php` |
+| Views | `resources/views/admin/classes/*`, `admin/bookings/index.blade.php`, `admin/payments/index.blade.php`, `admin/invoices/*`, `admin/reports/index.blade.php`, `admin/posts/index.blade.php`, `admin/comments/index.blade.php`, `admin/statuses/index.blade.php`, `admin/follows/index.blade.php`, `admin/tags/index.blade.php`, `admin/exercise-categories/index.blade.php`, `admin/exercises/index.blade.php`, `admin/workout-plans/index.blade.php`, `admin/workout-logs/index.blade.php`, `admin/exercise-logs/index.blade.php`, `admin/nutrition/*`, `admin/dashboard.blade.php` |
 | Nav | `resources/views/layouts/nav.blade.php` |
-| Models | `app/Models/Booking.php`, `app/Models/Classes.php` |
+| Models | `app/Models/Booking.php`, `app/Models/Classes.php`, `app/Models/Invoice.php`, `app/Models/AdminSetting.php` |
 | Provider | `app/Providers/AppServiceProvider.php` |
 
 ---

@@ -7,6 +7,7 @@
     "license": "MIT",
     "require": {
         "php": "^8.2",
+        "barryvdh/laravel-dompdf": "^3.1",
         "berkayk/onesignal-laravel": "^2.4",
         "get-stream/stream-chat": "^3.12",
         "laravel/framework": "^11.31",

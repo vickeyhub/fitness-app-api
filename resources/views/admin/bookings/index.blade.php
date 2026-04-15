@@ -413,6 +413,7 @@
                                         <th></th>
                                         <th></th>
                                         <th></th>
+                                        <th></th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -447,6 +448,7 @@
                                             <td><a href="#" class="btn-view-booking text-navy" data-id="{{ $b->id }}"><i class="fa fa-eye"></i></a></td>
                                             <td><a href="#" class="btn-edit-booking text-navy" data-id="{{ $b->id }}"><i class="fa fa-pencil"></i></a></td>
                                             <td><a href="#" class="btn-delete-booking text-danger" data-id="{{ $b->id }}"><i class="fa fa-trash"></i></a></td>
+                                            <td><a href="#" class="btn-generate-booking-invoice text-primary" title="Generate invoice" data-id="{{ $b->id }}"><i class="fa fa-file-text-o"></i></a></td>
                                         </tr>
                                     @endforeach
                                 </tbody>
@@ -667,6 +669,19 @@
                     success: function (res) {
                         toastr.success(res.message || 'Deleted.');
                         window.location.reload();
+                    },
+                    error: toastErrors
+                });
+            });
+
+            $(document).on('click', '.btn-generate-booking-invoice', function (e) {
+                e.preventDefault();
+                var id = $(this).data('id');
+                $.ajax({
+                    url: "{{ url('admin/bookings') }}/" + id + "/generate-invoice",
+                    method: 'POST',
+                    success: function (res) {
+                        toastr.success(res.message || 'Invoice generated.');
                     },
                     error: toastErrors
                 });

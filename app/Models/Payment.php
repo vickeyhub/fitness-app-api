@@ -31,4 +31,9 @@ class Payment extends Model
     public function booking() {
         return $this->belongsTo(Booking::class, 'payment_intent_id', 'payment_id');
     }
+
+    public function invoices()
+    {
+        return $this->hasMany(Invoice::class, 'payment_row_id');
+    }
 }

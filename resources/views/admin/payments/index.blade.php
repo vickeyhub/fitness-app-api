@@ -188,6 +188,7 @@
                                         <th>Status</th>
                                         <th>Amount</th>
                                         <th></th>
+                                        <th></th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -212,6 +213,7 @@
                                             <td><span class="label label-default">{{ $p->status }}</span></td>
                                             <td>{{ $p->amount }} {{ strtoupper($p->currency) }}</td>
                                             <td><a href="#" class="btn-view-payment text-navy" data-id="{{ $p->id }}"><i class="fa fa-eye"></i></a></td>
+                                            <td><a href="#" class="btn-generate-payment-invoice text-primary" title="Generate invoice" data-id="{{ $p->id }}"><i class="fa fa-file-text-o"></i></a></td>
                                         </tr>
                                     @endforeach
                                 </tbody>
@@ -326,6 +328,19 @@
                     $('#viewPaymentContent').empty().append($root);
                     $('#viewPaymentModal').modal('show');
                 }).fail(toastErrors);
+            });
+
+            $(document).on('click', '.btn-generate-payment-invoice', function (e) {
+                e.preventDefault();
+                var id = $(this).data('id');
+                $.ajax({
+                    url: "{{ url('admin/payments') }}/" + id + "/generate-invoice",
+                    method: 'POST',
+                    success: function (res) {
+                        toastr.success(res.message || 'Invoice generated.');
+                    },
+                    error: toastErrors
+                });
             });
         });
     </script>

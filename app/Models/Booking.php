@@ -36,4 +36,9 @@ class Booking extends Model
     {
         return $this->belongsTo(Classes::class, 'session_id');
     }
+
+    public function invoice()
+    {
+        return $this->hasOne(Invoice::class);
+    }
 }

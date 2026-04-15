@@ -82,6 +82,17 @@ Route::middleware('auth')->group(function () {
 
     Route::get('admin/payments', [Admin\PaymentsController::class, 'index'])->name('admin.payments.index');
     Route::get('admin/payments/{payment}', [Admin\PaymentsController::class, 'show'])->name('admin.payments.show');
+    Route::post('admin/payments/{payment}/generate-invoice', [Admin\InvoicesController::class, 'generateFromPayment'])->name('admin.payments.generate-invoice');
+
+    Route::get('admin/invoices', [Admin\InvoicesController::class, 'index'])->name('admin.invoices.index');
+    Route::get('admin/invoices/{invoice}', [Admin\InvoicesController::class, 'show'])->name('admin.invoices.show');
+    Route::get('admin/invoices/{invoice}/print', [Admin\InvoicesController::class, 'print'])->name('admin.invoices.print');
+    Route::get('admin/invoices/{invoice}/pdf', [Admin\InvoicesController::class, 'pdf'])->name('admin.invoices.pdf');
+    Route::get('admin/invoice-settings', [Admin\InvoicesController::class, 'settings'])->name('admin.invoices.settings');
+    Route::post('admin/invoice-settings', [Admin\InvoicesController::class, 'updateSettings'])->name('admin.invoices.settings.update');
+
+    Route::post('admin/bookings/{booking}/generate-invoice', [Admin\InvoicesController::class, 'generateFromBooking'])->name('admin.bookings.generate-invoice');
+    Route::get('admin/reports', [Admin\ReportsController::class, 'index'])->name('admin.reports.index');
 
     Route::get('admin/posts', [Admin\PostsController::class, 'index'])->name('admin.posts.index');
     Route::post('admin/posts', [Admin\PostsController::class, 'store'])->name('admin.posts.store');

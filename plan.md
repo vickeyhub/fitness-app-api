@@ -11,6 +11,7 @@ This document maps your **database schema (migrations)**, **REST API (`routes/ap
 - **Session catalog:** New `session_catalog_items` table + admin endpoints/modal for managing selectable options.
 - **Bookings:** CRUD, filters + pagination, separate `start_time`/`end_time` form inputs with controller-side normalized `time_slot`, modern detail popup.
 - **Payments:** Read-only index + detail, filters + pagination, structured modal view (no raw payload dump as primary UI).
+- **Invoices & reports:** New invoice module with booking/payment-based generation, print + PDF download, branding/tax settings, and finance report page.
 - **Social/Content:** Posts/Comments/Statuses/Tags modules implemented; posts now support admin create, edit, delete, like/unlike, and comment actions from a modern popup.
 - **Moderation hardening:** Added hide/unhide state for posts/comments/statuses and restore flow for soft-deleted posts.
 - **Workouts & Exercises (2.5):** Exercise categories CRUD, exercises CRUD, workout plans/logs CRUD, and exercise logs oversight are implemented.
@@ -29,7 +30,8 @@ This document maps your **database schema (migrations)**, **REST API (`routes/ap
 | Users | Full CRUD + profile fields + separate trainer/gym management views (`Admin\UsersController`) | Profile update, list users, trainers, buddy search (`UserController`) |
 | Sessions (classes) | CRUD + filtering + modern detail + catalog management | Sessions/search/filter endpoints |
 | Bookings | CRUD + filtering + modern detail | Booking list/create endpoints |
-| Payments | Read-only listing + filtering + structured detail view | Payment + webhook pipeline |
+| Payments | Read-only listing + filtering + structured detail view + invoice generation action | Payment + webhook pipeline |
+| Invoices | Full admin list/detail/print/pdf + settings | Derived from bookings/payments |
 | Social/content | Posts + comments + statuses + tags moderation, post create/edit, admin like/comment flows | Rich API coverage exists |
 | Workouts & exercises | Exercise categories/exercises CRUD, workout plans/logs CRUD, exercise log oversight | API coverage exists |
 | Nutrition | Meals CRUD, targets CRUD, adherence analytics | Rich API coverage exists |
@@ -148,21 +150,22 @@ Use the same stack as today: **Blade + Inspinia-style layout + jQuery + server r
 
 1. **Bookings management** — ✅ Implemented (CRUD + filtering + modern detail). Optional: audit trail, cross-links.
 2. **Sessions / classes management** — ✅ Implemented (CRUD + publish controls + filtering + catalog-driven UX + modern detail).
-3. **Payments** — ✅ Implemented read-only list/detail with filtering. Optional: Stripe dashboard deep-link.
+3. **Payments** — ✅ Implemented read-only list/detail with filtering + invoice generation action.
+4. **Invoices/finance reports** — ✅ Implemented invoice list/detail, print/PDF export, invoice settings, and report summary page.
 
 ### P1 — Content moderation
 
-4. **Posts** — ✅ Implemented list/search/view/create/edit/delete moderation screen (`admin/posts`) with popup interactions.
-5. **Comments** — ✅ Implemented global moderation list + filters + delete (`admin/comments`).
-6. **Statuses** — ✅ Implemented list/filter/delete moderation screen with media open link (`admin/statuses`).
-7. **Follows** — ✅ Implemented support moderation list/filter/remove screen (`admin/follows`).
-8. **Tags** — ✅ Implemented CRUD screen with modal create/edit + delete (`admin/tags`).
+5. **Posts** — ✅ Implemented list/search/view/create/edit/delete moderation screen (`admin/posts`) with popup interactions.
+6. **Comments** — ✅ Implemented global moderation list + filters + delete (`admin/comments`).
+7. **Statuses** — ✅ Implemented list/filter/delete moderation screen with media open link (`admin/statuses`).
+8. **Follows** — ✅ Implemented support moderation list/filter/remove screen (`admin/follows`).
+9. **Tags** — ✅ Implemented CRUD screen with modal create/edit + delete (`admin/tags`).
 
 ### P2 — Catalog & fitness data
 
-8. **Exercise categories** — ✅ Implemented CRUD `exercise_categories`.
-9. **Exercises** — ✅ Implemented CRUD `exercises` per category (aligned with `ExerciseController`).
-10. **Workout oversight** — ✅ Implemented full `workout_plans` and `workout_logs` management plus `exercise_logs` oversight with filters.
+10. **Exercise categories** — ✅ Implemented CRUD `exercise_categories`.
+11. **Exercises** — ✅ Implemented CRUD `exercises` per category (aligned with `ExerciseController`).
+12. **Workout oversight** — ✅ Implemented full `workout_plans` and `workout_logs` management plus `exercise_logs` oversight with filters.
 
 ### P3 — Users & engagement depth
 

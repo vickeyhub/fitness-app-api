@@ -47,6 +47,9 @@
             <li class="{{ Request::is('admin/payments*') ? 'active' : '' }}">
                 <a href="{{ route('admin.payments.index') }}"><i class="fa fa-credit-card"></i> <span class="nav-label">Payments</span></a>
             </li>
+            <li class="{{ Request::is('admin/invoices*') ? 'active' : '' }}">
+                <a href="{{ route('admin.invoices.index') }}"><i class="fa fa-file-text-o"></i> <span class="nav-label">Invoices</span></a>
+            </li>
             <li class="{{ Request::is('admin/posts*') ? 'active' : '' }}">
                 <a href="{{ route('admin.posts.index') }}"><i class="fa fa-comments"></i> <span class="nav-label">Social/Content (Posts)</span></a>
             </li>
@@ -62,9 +65,8 @@
             <li class="{{ Request::is('admin/users/trainers') ? 'active' : '' }}">
                 <a href="{{ route('admin.users.trainers') }}"><i class="fa fa-user-secret"></i> <span class="nav-label">Trainer Management</span></a>
             </li>
-            <li class="">
-                <a href="report.html"><i class="fa fa-file-text"></i> <span class="nav-label">Report
-                    </span></a>
+            <li class="{{ Request::is('admin/reports*') ? 'active' : '' }}">
+                <a href="{{ route('admin.reports.index') }}"><i class="fa fa-line-chart"></i> <span class="nav-label">Reports</span></a>
             </li>
             <li>
                 <a href="customer-support.html"><i class="fa fa-headphones"></i> <span class="nav-label">Customer
