@@ -4,15 +4,29 @@ This document maps your **database schema (migrations)**, **REST API (`routes/ap
 
 ---
 
+## Progress update (implemented)
+
+- **Users:** Full admin CRUD with profile fields, jQuery modal workflows.
+- **Sessions (classes):** CRUD, trainer-linked creation, catalog-backed checkboxes (muscles/goals/types/keywords), session filters + pagination, modern detail popup with inline edit action.
+- **Session catalog:** New `session_catalog_items` table + admin endpoints/modal for managing selectable options.
+- **Bookings:** CRUD, filters + pagination, separate `start_time`/`end_time` form inputs with controller-side normalized `time_slot`, modern detail popup.
+- **Payments:** Read-only index + detail, filters + pagination, structured modal view (no raw payload dump as primary UI).
+- **UI foundation:** Select2 + Flatpickr integrated globally in admin with modal stacking/z-index fixes.
+
+---
+
 ## 1. Current admin vs API
 
 | Area | Admin (web) today | API coverage |
 |------|-------------------|--------------|
 | Dashboard | User aggregates + chart endpoint (`DashboardController`) | N/A (app-facing) |
 | Users | Full CRUD + profile fields (`Admin\UsersController`) | Profile update, list users, trainers, buddy search (`UserController`) |
-| Everything else | Nav placeholders / static links only | Rich feature set (bookings, sessions, social, nutrition, workouts, payments, etc.) |
+| Sessions (classes) | CRUD + filtering + modern detail + catalog management | Sessions/search/filter endpoints |
+| Bookings | CRUD + filtering + modern detail | Booking list/create endpoints |
+| Payments | Read-only listing + filtering + structured detail view | Payment + webhook pipeline |
+| Other domains (social/workout/nutrition/etc.) | Not yet in admin | Rich API coverage exists |
 
-**Gap:** Almost all product behavior lives in the API and models, but the admin UI only operationalizes **users** (and a thin dashboard). The plan below is what to add so operations can manage the same domains the app exposes.
+**Gap:** Core operations (**users/sessions/bookings/payments**) are now operational in admin. Remaining gap is mostly social/workout/nutrition moderation/support tooling.
 
 ---
 
@@ -124,16 +138,16 @@ Use the same stack as today: **Blade + Inspinia-style layout + jQuery + server r
 
 ### P0 — Operations & revenue
 
-1. **Bookings management** — List/filter `bookings` by date, status, payment_status, user, trainer, gym, session; view detail; optional manual status correction (with audit trail later).
-2. **Sessions / classes management** — CRUD or approve/unpublish (`is_publish`) for `classes`; tie to trainer `user_id`; map to API `SessionsController` rules.
-3. **Payments** — Read-only list of `payments` + link to Stripe dashboard by `payment_intent_id`; filter by user/status/date.
+1. **Bookings management** — ✅ Implemented (CRUD + filtering + modern detail). Optional: audit trail, cross-links.
+2. **Sessions / classes management** — ✅ Implemented (CRUD + publish controls + filtering + catalog-driven UX + modern detail).
+3. **Payments** — ✅ Implemented read-only list/detail with filtering. Optional: Stripe dashboard deep-link.
 
 ### P1 — Content moderation
 
-4. **Posts** — List/search `posts`; view; soft-delete or hide (align with `PostController` / API resource).
-5. **Comments** — List by post or globally; delete abusive rows (`comments`).
-6. **Statuses** — List `statuses`; delete inappropriate media; optional disable user uploads.
-7. **Tags** — CRUD `tags` (API already has index/store).
+4. **Posts** — ✅ Implemented list/search/view/delete moderation screen (`admin/posts`).
+5. **Comments** — ✅ Implemented global moderation list + filters + delete (`admin/comments`).
+6. **Statuses** — ✅ Implemented list/filter/delete moderation screen with media open link (`admin/statuses`).
+7. **Tags** — ✅ Implemented CRUD screen with modal create/edit + delete (`admin/tags`).
 
 ### P2 — Catalog & fitness data
 
@@ -194,12 +208,10 @@ Use the same stack as today: **Blade + Inspinia-style layout + jQuery + server r
 ## 7. Suggested order of execution
 
 1. Harden **dashboard** metrics (P5) + role gates.  
-2. **Bookings** + **payments** read-only (P0).  
-3. **Sessions/classes** management (P0).  
-4. **Content moderation** posts → comments → statuses (P1).  
-5. **Exercise catalog** (P2).  
-6. **User drill-down** and support tools (P3–P4).  
-7. Integrations polish (P6).
+2. **Content moderation** posts → comments → statuses (P1).  
+3. **Exercise catalog** (P2).  
+4. **User drill-down** and support tools (P3–P4).  
+5. Integrations polish (P6).
 
 ---
 

@@ -42,4 +42,23 @@ Route::middleware('auth')->group(function () {
 
     Route::get('admin/payments', [Admin\PaymentsController::class, 'index'])->name('admin.payments.index');
     Route::get('admin/payments/{payment}', [Admin\PaymentsController::class, 'show'])->name('admin.payments.show');
+
+    Route::get('admin/posts', [Admin\PostsController::class, 'index'])->name('admin.posts.index');
+    Route::post('admin/posts', [Admin\PostsController::class, 'store'])->name('admin.posts.store');
+    Route::get('admin/posts/{post}', [Admin\PostsController::class, 'show'])->name('admin.posts.show');
+    Route::put('admin/posts/{post}', [Admin\PostsController::class, 'update'])->name('admin.posts.update');
+    Route::post('admin/posts/{post}/like', [Admin\PostsController::class, 'like'])->name('admin.posts.like');
+    Route::post('admin/posts/{post}/comments', [Admin\PostsController::class, 'comment'])->name('admin.posts.comment');
+    Route::delete('admin/posts/{post}', [Admin\PostsController::class, 'destroy'])->name('admin.posts.destroy');
+
+    Route::get('admin/comments', [Admin\CommentsController::class, 'index'])->name('admin.comments.index');
+    Route::delete('admin/comments/{comment}', [Admin\CommentsController::class, 'destroy'])->name('admin.comments.destroy');
+
+    Route::get('admin/statuses', [Admin\StatusesController::class, 'index'])->name('admin.statuses.index');
+    Route::delete('admin/statuses/{status}', [Admin\StatusesController::class, 'destroy'])->name('admin.statuses.destroy');
+
+    Route::get('admin/tags', [Admin\TagsController::class, 'index'])->name('admin.tags.index');
+    Route::post('admin/tags', [Admin\TagsController::class, 'store'])->name('admin.tags.store');
+    Route::put('admin/tags/{tag}', [Admin\TagsController::class, 'update'])->name('admin.tags.update');
+    Route::delete('admin/tags/{tag}', [Admin\TagsController::class, 'destroy'])->name('admin.tags.destroy');
 });

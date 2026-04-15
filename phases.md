@@ -1,6 +1,6 @@
-# Phases: Admin Sessions, Bookings, Payments
+# Phases: Admin Sessions, Bookings, Payments, Social/Content
 
-This file tracks phased delivery of the **Classes (sessions)**, **Bookings**, and **Payments** admin UIs. Scope matches `plan.md` P0 priorities.
+This file tracks phased delivery of the **Classes (sessions)**, **Bookings**, **Payments**, and **Social/Content** admin UIs.
 
 ---
 
@@ -10,6 +10,8 @@ This file tracks phased delivery of the **Classes (sessions)**, **Bookings**, an
 - [x] Bootstrap 3 pagination for admin tables (`Paginator::useBootstrapThree()` in `AppServiceProvider`).
 - [x] Route model binding for `{classes}` → `App\Models\Classes` (`Route::bind` in `AppServiceProvider`).
 - [x] Model fixes: `Booking` uses `SoftDeletes`; `session()` is `belongsTo(Classes)`; `Classes::bookings()` is `hasMany`.
+- [x] Global admin UI helpers restored and standardized: Select2 + Flatpickr assets + `window.initUiEnhancements()` in `layouts/admin.blade.php`.
+- [x] Select2 z-index/modal overlap fixes applied (`dropdownParent: body` + z-index tuning) so dropdowns render above modal content.
 
 ---
 
@@ -27,7 +29,9 @@ This file tracks phased delivery of the **Classes (sessions)**, **Bookings**, an
 
 - [ ] Thumbnail upload to `public` disk (API supports file; admin currently uses URL/path string).
 - [x] User-friendly session fields: `session_catalog_items` migration + checkboxes / day picker / step list; **Manage options** modal to extend catalog (`SessionCatalogController`).
-- [ ] Search/filter/pagination query params on index.
+- [x] Search/filter/pagination query params on index.
+- [x] Sessions index filter UX: right-side show/hide filters toggle with query-preserving pagination.
+- [x] Session detail modal upgraded to modern card UI and includes **Edit session** action from within the popup.
 
 ---
 
@@ -44,8 +48,10 @@ This file tracks phased delivery of the **Classes (sessions)**, **Bookings**, an
 
 **Follow-up (optional later):**
 
-- [ ] Filters (date range, status, payment_status, user id).
-- [ ] Pagination with query string retention.
+- [x] Filters (date range, status, payment_status, user id, session, search) on index.
+- [x] Pagination with query string retention.
+- [x] Booking form time UX changed to separate `start_time` + `end_time` inputs; controller composes/stores normalized `time_slot` (`10:00am - 11:00am`).
+- [x] Booking detail modal upgraded to concise modern card view (no raw JSON payload dump).
 - [ ] Inline link from booking row to related user/session/payment admin screens.
 
 ---
@@ -61,8 +67,9 @@ This file tracks phased delivery of the **Classes (sessions)**, **Bookings**, an
 
 **Follow-up (optional later):**
 
-- [ ] Filters (status, date, user).
+- [x] Filters (status, date, user, currency, amount range, search, per-page).
 - [ ] External deep link to Stripe Dashboard using `payment_intent_id`.
+- [x] Payment detail modal upgraded to structured modern UI (overview/user/gateway response) instead of raw JSON dump.
 - [ ] No create/edit here by design; refunds/disputes stay in Stripe or a future service layer.
 
 ---
@@ -72,6 +79,31 @@ This file tracks phased delivery of the **Classes (sessions)**, **Bookings**, an
 - [ ] Manual test matrix: create session → create booking referencing session → confirm payment row exists from API flow; admin CRUD on session/booking does not break FKs.
 - [ ] Role gate: restrict `admin/*` routes to `admin` / `super_admin` only (`auth` + policy or middleware).
 - [ ] Handle DB integrity errors on delete (sessions with active bookings) with friendly JSON/toastr message.
+- [ ] Add browser-level smoke checks for Select2/Flatpickr in all add/edit modals after dependency updates.
+
+---
+
+## Phase 5 — Social/Content moderation
+
+**Goal:** Admin can moderate community content from web panel.
+
+- [x] Added `Admin\PostsController` with list/filter/view/delete endpoints.
+- [x] Added `Admin\CommentsController` with global moderation list/filter/delete.
+- [x] Added `Admin\StatusesController` with list/filter/delete and storage cleanup.
+- [x] Added `Admin\TagsController` with list + create/update/delete.
+- [x] Added routes under `auth` middleware: `admin/posts`, `admin/comments`, `admin/statuses`, `admin/tags`.
+- [x] Added sidebar **Social/Content** dropdown with Posts, Comments, Statuses, Tags links.
+- [x] Added views:
+  - `resources/views/admin/posts/index.blade.php`
+  - `resources/views/admin/comments/index.blade.php`
+  - `resources/views/admin/statuses/index.blade.php`
+  - `resources/views/admin/tags/index.blade.php`
+
+**Follow-up (optional later):**
+
+- [ ] Add soft-delete restore workflow for posts if moderation policy requires undo.
+- [ ] Add "hide vs delete" moderation state for posts/comments.
+- [ ] Add direct jump links from post detail to comments and user profile drill-down.
 
 ---
 
@@ -80,12 +112,12 @@ This file tracks phased delivery of the **Classes (sessions)**, **Bookings**, an
 | Area | Files |
 |------|--------|
 | Routes | `routes/web.php` |
-| Controllers | `app/Http/Controllers/Admin/ClassesController.php`, `BookingsController.php`, `PaymentsController.php` |
-| Views | `resources/views/admin/classes/*`, `admin/bookings/index.blade.php`, `admin/payments/index.blade.php` |
+| Controllers | `app/Http/Controllers/Admin/ClassesController.php`, `BookingsController.php`, `PaymentsController.php`, `PostsController.php`, `CommentsController.php`, `StatusesController.php`, `TagsController.php` |
+| Views | `resources/views/admin/classes/*`, `admin/bookings/index.blade.php`, `admin/payments/index.blade.php`, `admin/posts/index.blade.php`, `admin/comments/index.blade.php`, `admin/statuses/index.blade.php`, `admin/tags/index.blade.php` |
 | Nav | `resources/views/layouts/nav.blade.php` |
 | Models | `app/Models/Booking.php`, `app/Models/Classes.php` |
 | Provider | `app/Providers/AppServiceProvider.php` |
 
 ---
 
-*Status: Phases 0–3 implemented in codebase; Phase 4 is checklist for you to run through when ready.*
+*Status: Phases 0–3 and Phase 5 implemented. Phase 4 remains checklist for hardening and QA.*

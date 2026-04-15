@@ -30,6 +30,9 @@
             <li class="{{ Request::is('admin/payments*') ? 'active' : '' }}">
                 <a href="{{ route('admin.payments.index') }}"><i class="fa fa-credit-card"></i> <span class="nav-label">Payments</span></a>
             </li>
+            <li class="{{ Request::is('admin/posts*') ? 'active' : '' }}">
+                <a href="{{ route('admin.posts.index') }}"><i class="fa fa-comments"></i> <span class="nav-label">Social/Content (Posts)</span></a>
+            </li>
             <li class="">
                 <a href="gym-management.html"><i class="fa fa-building"></i> <span class="nav-label">Gym
                         Management

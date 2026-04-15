@@ -14,6 +14,9 @@
 
     <!-- Toastr style -->
     <link href="{{ asset('assets/css/plugins/toastr/toastr.min.css') }}" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/select2-bootstrap-theme@0.1.0-beta.10/dist/select2-bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css" rel="stylesheet">
 
     <link href="{{ asset('assets/css/animate.css') }}" rel="stylesheet">
     <link href="{{ asset('assets/css/style.css') }}" rel="stylesheet">
@@ -22,6 +25,21 @@
     <style>
         .cimg {
             width: 140px;
+        }
+        .select2-container {
+            width: 100% !important;
+        }
+        .select2-container--open,
+        .select2-dropdown,
+        .select2-container--default.select2-container--open {
+            z-index: 999999 !important;
+        }
+        .modal-open .select2-container--open,
+        .modal-open .select2-dropdown {
+            z-index: 2065 !important;
+        }
+        .flatpickr-calendar {
+            z-index: 2066 !important;
         }
     </style>
 </head>
@@ -86,8 +104,113 @@
 
     <!-- Toastr -->
     <script src="{{ asset('assets/js/plugins/toastr/toastr.min.js') }}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+
+    <script>
+        window.initUiEnhancements = function(scope) {
+            var $scope = scope ? $(scope) : $(document);
+
+            $scope.find('select.js-select2').each(function() {
+                var $select = $(this);
+                if ($select.hasClass('select2-hidden-accessible')) return;
+                var config = {
+                    width: '100%',
+                    theme: 'bootstrap',
+                    placeholder: $select.attr('data-placeholder') || '',
+                    allowClear: !$select.prop('required'),
+                    dropdownParent: $(document.body)
+                };
+                $select.select2(config);
+            });
+
+            var formatAmPmRange = function(selectedDates, instance) {
+                if (!selectedDates || selectedDates.length === 0) {
+                    instance.input.value = '';
+                    return;
+                }
+                var parts = selectedDates.map(function(dt) {
+                    return instance.formatDate(dt, 'h:iK').toLowerCase();
+                });
+                instance.input.value = parts.join(' - ');
+            };
+
+            $scope.find('input.js-flatpickr-date').each(function() {
+                if (this._flatpickr) return;
+                flatpickr(this, {
+                    dateFormat: 'Y-m-d',
+                    allowInput: false,
+                    disableMobile: true
+                });
+            });
+
+            $scope.find('input.js-flatpickr-time').each(function() {
+                if (this._flatpickr) return;
+                flatpickr(this, {
+                    enableTime: true,
+                    noCalendar: true,
+                    dateFormat: 'h:iK',
+                    minuteIncrement: 5,
+                    time_24hr: false,
+                    allowInput: false,
+                    disableMobile: true
+                });
+            });
+
+            $scope.find('input.js-flatpickr-time-range').each(function() {
+                if (this._flatpickr) return;
+                flatpickr(this, {
+                    mode: 'range',
+                    enableTime: true,
+                    noCalendar: true,
+                    dateFormat: 'h:iK',
+                    conjunction: ' - ',
+                    minuteIncrement: 5,
+                    time_24hr: false,
+                    allowInput: false,
+                    disableMobile: true,
+                    onChange: function(selectedDates, dateStr, instance) {
+                        formatAmPmRange(selectedDates, instance);
+                    }
+                });
+            });
+
+            $scope.find('input.js-flatpickr-session-timing').each(function() {
+                if (this._flatpickr) return;
+                flatpickr(this, {
+                    mode: 'range',
+                    enableTime: true,
+                    noCalendar: true,
+                    dateFormat: 'h:iK',
+                    conjunction: ' - ',
+                    minuteIncrement: 5,
+                    time_24hr: false,
+                    allowInput: false,
+                    disableMobile: true,
+                    onChange: function(selectedDates, dateStr, instance) {
+                        formatAmPmRange(selectedDates, instance);
+                    },
+                    onClose: function(selectedDates, dateStr, instance) {
+                        if (selectedDates.length === 1) {
+                            instance.open();
+                        }
+                    }
+                });
+            });
+        };
+
+        $(function() {
+            $.ajaxSetup({
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                }
+            });
+            window.initUiEnhancements(document);
+        });
+    </script>
 
     @yield('script')
+    @yield('scripts')
 </body>
 
 </html>
