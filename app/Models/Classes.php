@@ -30,8 +30,8 @@ class Classes extends Model
         return $this->belongsTo(UserProfile::class, 'user_id', 'user_id');
     }
 
-    public function bookings(){
-        return $this->belongsTo(Booking::class, 'session_id', 'id');
+    public function bookings()
+    {
+        return $this->hasMany(Booking::class, 'session_id');
     }
-
 }

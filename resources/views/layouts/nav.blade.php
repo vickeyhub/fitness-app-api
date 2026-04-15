@@ -21,6 +21,15 @@
                 <a href="{{ route('admin.users')}}"><i class="fa fa-user-plus"></i> <span class="nav-label">Users
                     </span></a>
             </li>
+            <li class="{{ Request::is('admin/classes*') ? 'active' : '' }}">
+                <a href="{{ route('admin.classes.index') }}"><i class="fa fa-calendar"></i> <span class="nav-label">Sessions</span></a>
+            </li>
+            <li class="{{ Request::is('admin/bookings*') ? 'active' : '' }}">
+                <a href="{{ route('admin.bookings.index') }}"><i class="fa fa-ticket"></i> <span class="nav-label">Bookings</span></a>
+            </li>
+            <li class="{{ Request::is('admin/payments*') ? 'active' : '' }}">
+                <a href="{{ route('admin.payments.index') }}"><i class="fa fa-credit-card"></i> <span class="nav-label">Payments</span></a>
+            </li>
             <li class="">
                 <a href="gym-management.html"><i class="fa fa-building"></i> <span class="nav-label">Gym
                         Management
@@ -30,7 +39,7 @@
                 <a href=""><i class="fa fa-file"></i> <span class="nav-label">Booking Management
                     </span><span class="fa arrow"></span></a>
                 <ul class="nav nav-second-level collapse">
-                    <li class=""><a href="user-wise.html">User Wise</a></li>
+                    <li class=""><a href="{{ route('admin.bookings.index') }}">All bookings</a></li>
                     <li><a href="gym-wise.html">Gym Wise</a></li>
                 </ul>
             </li>

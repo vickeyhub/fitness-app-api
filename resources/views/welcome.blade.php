@@ -3,132 +3,203 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gym Membership | FitX</title>
+    <title>FitX | Train Smarter</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        .fade-in {
-            animation: fadeIn 1s ease-out;
-        }
-    </style>
 </head>
-<body class="bg-gray-900 text-white transition-all duration-500" id="theme">
-
-    <!-- Navigation -->
-    <header class="bg-gray-800 p-4">
-        <div class="container mx-auto flex justify-between items-center">
-            <h1 class="text-2xl font-bold text-yellow-400">FitX</h1>
-            <nav>
-                <ul class="flex space-x-6">
-                    <li><a href="#about" class="hover:text-yellow-400">About</a></li>
-                    <li><a href="#features" class="hover:text-yellow-400">Features</a></li>
-                    <li><a href="#gallery" class="hover:text-yellow-400">Gallery</a></li>
-                    <li><a href="#plans" class="hover:text-yellow-400">Plans</a></li>
-                    <li><a href="#contact" class="hover:text-yellow-400">Contact</a></li>
-                </ul>
+<body class="bg-slate-950 text-slate-100 antialiased" id="theme">
+    <header class="sticky top-0 z-50 border-b border-slate-800/70 bg-slate-950/90 backdrop-blur">
+        <div class="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
+            <a href="/" class="text-xl font-extrabold tracking-tight">
+                Fit<span class="text-amber-400">X</span>
+            </a>
+            <nav class="hidden items-center gap-8 text-sm font-medium text-slate-300 md:flex">
+                <a href="#programs" class="transition hover:text-amber-400">Programs</a>
+                <a href="#schedule" class="transition hover:text-amber-400">Schedule</a>
+                <a href="#pricing" class="transition hover:text-amber-400">Pricing</a>
+                <a href="#testimonials" class="transition hover:text-amber-400">Testimonials</a>
             </nav>
-            <button id="themeToggle" class="ml-4 bg-yellow-500 px-4 py-2 rounded-lg text-gray-900 font-semibold">🌙 Dark</button>
+            <div class="flex items-center gap-3">
+                <a href="{{ route('web-login') }}" class="rounded-lg border border-slate-700 px-4 py-2 text-sm font-semibold text-slate-200 transition hover:border-slate-500">
+                    Log in
+                </a>
+                <button id="themeToggle" class="rounded-lg border border-slate-700 px-3 py-2 text-sm text-slate-200 transition hover:border-slate-500" type="button" aria-label="Toggle theme">
+                    Light
+                </button>
+            </div>
         </div>
     </header>
 
-    <!-- Hero Section -->
-    <section class="relative h-screen flex items-center justify-center bg-cover bg-center fade-in" style="background-image: url('{{asset('images/hero.jpg')}}');">
-        <div class="absolute inset-0 bg-black opacity-60"></div>
-        <div class="relative text-center">
-            <h2 class="text-5xl font-extrabold">Elevate Your Fitness Journey</h2>
-            <p class="text-lg text-gray-300 mt-4">Join our community and achieve your dream body.</p>
-            <a href="#" class="mt-6 inline-block bg-yellow-500 px-6 py-3 rounded-lg text-gray-900 font-bold text-lg hover:bg-yellow-400 transition">Get Started</a>
-        </div>
-    </section>
-
-    <!-- About Us -->
-    <section id="about" class="container mx-auto py-16 px-6 text-center fade-in">
-        <h3 class="text-3xl font-bold">About <span class="text-yellow-400">FitX</span></h3>
-        <p class="mt-4 text-gray-400 max-w-2xl mx-auto">
-            FitX is a modern fitness center designed to help you reach your goals. Our expert trainers, state-of-the-art equipment, and engaging group classes make us the perfect gym for all fitness levels.
-        </p>
-    </section>
-
-    <!-- Gallery -->
-    <section id="gallery" class="container mx-auto py-16 px-6 fade-in">
-        <h3 class="text-3xl font-bold text-center">Our <span class="text-yellow-400">Gallery</span></h3>
-        <div class="grid md:grid-cols-3 gap-8 mt-10">
-            <img src="https://source.unsplash.com/500x400/?gym" class="rounded-lg shadow-lg" />
-            <img src="https://source.unsplash.com/500x400/?workout" class="rounded-lg shadow-lg" />
-            <img src="https://source.unsplash.com/500x400/?fitness" class="rounded-lg shadow-lg" />
-        </div>
-    </section>
-
-    <!-- Membership Plans -->
-    <section id="plans" class="container mx-auto py-16 px-6 fade-in">
-        <h3 class="text-3xl font-bold text-center">Choose Your Plan</h3>
-        <div class="grid md:grid-cols-3 gap-8 mt-10">
-            <div class="bg-gray-800 p-6 rounded-lg text-center">
-                <h4 class="text-xl font-semibold">Basic</h4>
-                <p class="text-gray-400">Access to gym equipment</p>
-                <p class="text-3xl font-bold mt-4">$20/mo</p>
-                <a href="#" class="mt-4 block bg-yellow-500 px-4 py-2 rounded-lg text-gray-900 font-semibold">Join Now</a>
+    <main>
+        <section class="relative overflow-hidden">
+            <div class="absolute inset-0 bg-gradient-to-br from-amber-500/25 via-transparent to-cyan-400/10"></div>
+            <div class="mx-auto grid max-w-6xl gap-10 px-6 pb-24 pt-20 md:grid-cols-2 md:items-center">
+                <div class="relative z-10">
+                    <p class="mb-4 inline-flex items-center gap-2 rounded-full border border-amber-400/40 bg-amber-400/10 px-3 py-1 text-xs font-semibold uppercase tracking-widest text-amber-300">
+                        Premium Fitness Club
+                    </p>
+                    <h1 class="text-4xl font-extrabold leading-tight text-white md:text-6xl">
+                        Build strength, energy, and confidence.
+                    </h1>
+                    <p class="mt-5 max-w-xl text-base text-slate-300 md:text-lg">
+                        Personalized coaching, science-backed programs, and a supportive community that keeps you consistent.
+                    </p>
+                    <div class="mt-8 flex flex-wrap gap-4">
+                        <a href="#pricing" class="rounded-xl bg-amber-400 px-6 py-3 text-sm font-bold text-slate-900 transition hover:bg-amber-300">
+                            Start Membership
+                        </a>
+                        <a href="#programs" class="rounded-xl border border-slate-700 px-6 py-3 text-sm font-semibold text-slate-200 transition hover:border-slate-500">
+                            Explore Programs
+                        </a>
+                    </div>
+                    <div class="mt-10 grid grid-cols-3 gap-5 text-center">
+                        <div class="rounded-xl border border-slate-800 bg-slate-900/80 p-4">
+                            <p class="text-2xl font-extrabold text-white">2K+</p>
+                            <p class="text-xs text-slate-400">Active members</p>
+                        </div>
+                        <div class="rounded-xl border border-slate-800 bg-slate-900/80 p-4">
+                            <p class="text-2xl font-extrabold text-white">40+</p>
+                            <p class="text-xs text-slate-400">Weekly classes</p>
+                        </div>
+                        <div class="rounded-xl border border-slate-800 bg-slate-900/80 p-4">
+                            <p class="text-2xl font-extrabold text-white">12</p>
+                            <p class="text-xs text-slate-400">Expert coaches</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="relative z-10">
+                    <div class="rounded-2xl border border-slate-800 bg-slate-900/80 p-5 shadow-2xl shadow-cyan-900/20">
+                        <img src="{{ asset('images/hero.jpg') }}" alt="Gym training area" class="h-[440px] w-full rounded-xl object-cover">
+                    </div>
+                </div>
             </div>
-        
-            <div class="bg-gray-800 p-6 rounded-lg text-center">
-                <h4 class="text-xl font-semibold">Medium</h4>
-                <p class="text-gray-400">Access to gym equipment</p>
-                <p class="text-3xl font-bold mt-4">$50/mo</p>
-                <a href="#" class="mt-4 block bg-yellow-500 px-4 py-2 rounded-lg text-gray-900 font-semibold">Join Now</a>
+        </section>
+
+        <section id="programs" class="mx-auto max-w-6xl px-6 py-20">
+            <div class="mb-12 text-center">
+                <h2 class="text-3xl font-bold text-white md:text-4xl">Programs for every goal</h2>
+                <p class="mt-3 text-slate-400">Choose a training style that fits your pace and objective.</p>
             </div>
-        
-            <div class="bg-gray-800 p-6 rounded-lg text-center">
-                <h4 class="text-xl font-semibold">Advanced</h4>
-                <p class="text-gray-400">Access to gym equipment</p>
-                <p class="text-3xl font-bold mt-4">$99/mo</p>
-                <a href="#" class="mt-4 block bg-yellow-500 px-4 py-2 rounded-lg text-gray-900 font-semibold">Join Now</a>
+            <div class="grid gap-6 md:grid-cols-3">
+                <article class="rounded-2xl border border-slate-800 bg-slate-900 p-6">
+                    <h3 class="text-xl font-bold text-white">Strength Lab</h3>
+                    <p class="mt-3 text-sm text-slate-400">Progressive lifting plans focused on performance and muscle growth.</p>
+                </article>
+                <article class="rounded-2xl border border-slate-800 bg-slate-900 p-6">
+                    <h3 class="text-xl font-bold text-white">HIIT Burn</h3>
+                    <p class="mt-3 text-sm text-slate-400">High-energy interval sessions designed to maximize calorie burn.</p>
+                </article>
+                <article class="rounded-2xl border border-slate-800 bg-slate-900 p-6">
+                    <h3 class="text-xl font-bold text-white">Mobility Flow</h3>
+                    <p class="mt-3 text-sm text-slate-400">Improve flexibility, recovery, and movement quality with guided flow work.</p>
+                </article>
             </div>
-        </div>
-    </section>
+        </section>
 
-    <!-- Contact Form -->
-    <section id="contact" class="container mx-auto py-16 px-6 text-center fade-in">
-        <h3 class="text-3xl font-bold">Contact Us</h3>
-        <form class="mt-6 max-w-lg mx-auto">
-            <input type="text" placeholder="Your Name" class="w-full p-3 rounded bg-gray-700 text-white border border-gray-600 mb-4">
-            <input type="email" placeholder="Your Email" class="w-full p-3 rounded bg-gray-700 text-white border border-gray-600 mb-4">
-            <textarea placeholder="Your Message" class="w-full p-3 rounded bg-gray-700 text-white border border-gray-600 mb-4"></textarea>
-            <button type="submit" class="bg-yellow-500 px-6 py-3 rounded-lg text-gray-900 font-bold">Send Message</button>
-        </form>
-    </section>
+        <section id="schedule" class="border-y border-slate-800 bg-slate-900/50">
+            <div class="mx-auto max-w-6xl px-6 py-20">
+                <div class="mb-8 text-center">
+                    <h2 class="text-3xl font-bold text-white md:text-4xl">Weekly class snapshot</h2>
+                    <p class="mt-3 text-slate-400">Plan your week in advance.</p>
+                </div>
+                <div class="overflow-hidden rounded-2xl border border-slate-800">
+                    <table class="min-w-full divide-y divide-slate-800 text-left">
+                        <thead class="bg-slate-900">
+                            <tr class="text-xs uppercase tracking-wide text-slate-400">
+                                <th class="px-6 py-4">Day</th>
+                                <th class="px-6 py-4">Morning</th>
+                                <th class="px-6 py-4">Evening</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-800 bg-slate-950/60 text-sm text-slate-200">
+                            <tr>
+                                <td class="px-6 py-4 font-semibold">Monday</td>
+                                <td class="px-6 py-4">Strength Foundations</td>
+                                <td class="px-6 py-4">HIIT Burn</td>
+                            </tr>
+                            <tr>
+                                <td class="px-6 py-4 font-semibold">Wednesday</td>
+                                <td class="px-6 py-4">Mobility Flow</td>
+                                <td class="px-6 py-4">Upper Body Power</td>
+                            </tr>
+                            <tr>
+                                <td class="px-6 py-4 font-semibold">Friday</td>
+                                <td class="px-6 py-4">Core Conditioning</td>
+                                <td class="px-6 py-4">Total Body Circuit</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
 
-    <!-- Live Chat Button -->
-    <div class="fixed bottom-6 right-6">
-        <a href="https://wa.me/1234567890" target="_blank" class="bg-green-500 text-white p-3 rounded-full shadow-lg hover:bg-green-400 transition">
-            💬 Chat with Us
-        </a>
-    </div>
+        <section id="pricing" class="mx-auto max-w-6xl px-6 py-20">
+            <div class="mb-10 text-center">
+                <h2 class="text-3xl font-bold text-white md:text-4xl">Simple, flexible pricing</h2>
+                <p class="mt-3 text-slate-400">No hidden fees. Cancel anytime.</p>
+            </div>
+            <div class="grid gap-6 md:grid-cols-3">
+                <article class="rounded-2xl border border-slate-800 bg-slate-900 p-6 text-center">
+                    <h3 class="text-lg font-semibold text-white">Starter</h3>
+                    <p class="mt-4 text-4xl font-extrabold text-white">$29<span class="text-base font-medium text-slate-400">/mo</span></p>
+                    <p class="mt-4 text-sm text-slate-400">Gym floor access and basic group classes.</p>
+                </article>
+                <article class="rounded-2xl border border-amber-400/60 bg-slate-900 p-6 text-center shadow-lg shadow-amber-700/10">
+                    <p class="text-xs font-bold uppercase tracking-wider text-amber-300">Most Popular</p>
+                    <h3 class="mt-2 text-lg font-semibold text-white">Pro</h3>
+                    <p class="mt-4 text-4xl font-extrabold text-white">$59<span class="text-base font-medium text-slate-400">/mo</span></p>
+                    <p class="mt-4 text-sm text-slate-400">Unlimited classes, one coaching session per month.</p>
+                </article>
+                <article class="rounded-2xl border border-slate-800 bg-slate-900 p-6 text-center">
+                    <h3 class="text-lg font-semibold text-white">Elite</h3>
+                    <p class="mt-4 text-4xl font-extrabold text-white">$99<span class="text-base font-medium text-slate-400">/mo</span></p>
+                    <p class="mt-4 text-sm text-slate-400">Personalized programming and weekly coach check-ins.</p>
+                </article>
+            </div>
+        </section>
 
-    <!-- Footer -->
-    <footer class="bg-gray-800 py-6 text-center">
-        <p class="text-gray-400">&copy; 2025 FitX Gym. All rights reserved.</p>
+        <section id="testimonials" class="border-t border-slate-800 bg-slate-900/50">
+            <div class="mx-auto max-w-6xl px-6 py-20">
+                <h2 class="text-center text-3xl font-bold text-white md:text-4xl">What members say</h2>
+                <div class="mt-10 grid gap-6 md:grid-cols-2">
+                    <blockquote class="rounded-2xl border border-slate-800 bg-slate-900 p-6 text-slate-300">
+                        "The structure and coaching here completely changed my routine. I finally train consistently."
+                        <footer class="mt-4 text-sm font-semibold text-white">- Priya K.</footer>
+                    </blockquote>
+                    <blockquote class="rounded-2xl border border-slate-800 bg-slate-900 p-6 text-slate-300">
+                        "Programs are clear, motivating, and practical. I feel stronger and more energized every week."
+                        <footer class="mt-4 text-sm font-semibold text-white">- Rohan M.</footer>
+                    </blockquote>
+                </div>
+            </div>
+        </section>
+
+        <section class="mx-auto max-w-6xl px-6 py-20">
+            <div class="rounded-3xl border border-slate-800 bg-gradient-to-r from-amber-500/20 to-cyan-400/10 p-10 text-center">
+                <h2 class="text-3xl font-bold text-white md:text-4xl">Ready to start your transformation?</h2>
+                <p class="mx-auto mt-4 max-w-2xl text-slate-300">Book your free first session and get a personalized roadmap from our coaching team.</p>
+                <a href="{{ route('web-login') }}" class="mt-8 inline-flex rounded-xl bg-amber-400 px-7 py-3 text-sm font-bold text-slate-900 transition hover:bg-amber-300">
+                    Book Free Session
+                </a>
+            </div>
+        </section>
+    </main>
+
+    <footer class="border-t border-slate-800 py-8 text-center text-sm text-slate-400">
+        <p>&copy; {{ date('Y') }} FitX Gym. All rights reserved.</p>
     </footer>
 
-    <!-- Dark Mode Script -->
     <script>
         const themeToggle = document.getElementById('themeToggle');
         const body = document.getElementById('theme');
 
         themeToggle.addEventListener('click', () => {
-            if (body.classList.contains('bg-gray-900')) {
-                body.classList.replace('bg-gray-900', 'bg-gray-100');
-                body.classList.replace('text-white', 'text-gray-900');
-                themeToggle.innerHTML = '☀️ Light';
-            } else {
-                body.classList.replace('bg-gray-100', 'bg-gray-900');
-                body.classList.replace('text-gray-900', 'text-white');
-                themeToggle.innerHTML = '🌙 Dark';
-            }
+            const isDark = body.classList.contains('bg-slate-950');
+            body.classList.toggle('bg-slate-950', !isDark);
+            body.classList.toggle('text-slate-100', !isDark);
+            body.classList.toggle('bg-slate-100', isDark);
+            body.classList.toggle('text-slate-900', isDark);
+            themeToggle.textContent = isDark ? 'Dark' : 'Light';
         });
     </script>
-
 </body>
 </html>

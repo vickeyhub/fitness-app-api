@@ -4,10 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Booking extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes;
     protected $fillable = [
         'user_id', 'trainer_id', 'gym_id', 'session_id', 'payment_id', 'booking_date', 'time_slot', 'status','payment_status'
     ];
@@ -31,7 +32,8 @@ class Booking extends Model
         return $this->hasOne(Payment::class, 'payment_intent_id', 'payment_id');
     }
 
-    public function session(){
-        return $this->hasOne(Classes::class,'id','session_id');
+    public function session()
+    {
+        return $this->belongsTo(Classes::class, 'session_id');
     }
 }
