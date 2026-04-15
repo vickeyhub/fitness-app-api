@@ -277,13 +277,17 @@
             $('#' + prefix + 'keyword_custom').val(customParts.join(', '));
         }
 
-        $(document).on('click', '.btn-edit-class', function (e) {
-            e.preventDefault();
-            var id = $(this).data('id');
+        function openEditClassModal(id) {
             $.get("{{ url('admin/classes') }}/" + id, function (res) {
                 fillClassForm('edit_class_', res.class);
                 $('#editClassModal').modal('show');
             }).fail(toastErrors);
+        }
+
+        $(document).on('click', '.btn-edit-class', function (e) {
+            e.preventDefault();
+            var id = $(this).data('id');
+            openEditClassModal(id);
         });
 
         $('#editClassForm').on('submit', function (e) {
@@ -518,9 +522,17 @@
             $.get("{{ url('admin/classes') }}/" + id, function (res) {
                 var c = res.class;
                 $('#viewClassModalTitle').text(c.session_title ? detailTxt(c.session_title) : 'Session details');
+                $('#viewClassEditBtn').attr('data-id', c.id);
                 $('#viewClassContent').empty().append(renderSessionDetailView(c));
                 $('#viewClassModal').modal('show');
             }).fail(toastErrors);
+        });
+
+        $('#viewClassEditBtn').on('click', function () {
+            var id = $(this).attr('data-id');
+            if (!id) return;
+            $('#viewClassModal').modal('hide');
+            openEditClassModal(id);
         });
 
         $(document).on('click', '.btn-delete-class', function (e) {

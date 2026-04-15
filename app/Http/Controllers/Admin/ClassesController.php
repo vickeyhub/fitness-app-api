@@ -17,9 +17,40 @@ class ClassesController extends Controller
     /** @var list<string> */
     private const SCHEDULE_DAY_ORDER = ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN'];
 
-    public function index()
+    public function index(Request $request)
     {
-        $classes = Classes::with('user')->orderByDesc('id')->paginate(20);
+        $perPage = (int) $request->integer('per_page', 20);
+        if (! in_array($perPage, [10, 20, 50, 100], true)) {
+            $perPage = 20;
+        }
+
+        $classes = Classes::with('user')
+            ->when($request->filled('q'), function ($query) use ($request) {
+                $term = trim((string) $request->string('q'));
+                $query->where(function ($inner) use ($term) {
+                    $inner->where('session_title', 'like', "%{$term}%")
+                        ->orWhere('description', 'like', "%{$term}%");
+                });
+            })
+            ->when($request->filled('trainer_id'), function ($query) use ($request) {
+                $query->where('user_id', (string) $request->string('trainer_id'));
+            })
+            ->when($request->filled('is_publish'), function ($query) use ($request) {
+                $query->where('is_publish', (string) $request->string('is_publish'));
+            })
+            ->when($request->filled('intensity'), function ($query) use ($request) {
+                $query->where('intensity', 'like', '%' . trim((string) $request->string('intensity')) . '%');
+            })
+            ->when($request->filled('created_from'), function ($query) use ($request) {
+                $query->whereDate('created_at', '>=', (string) $request->string('created_from'));
+            })
+            ->when($request->filled('created_to'), function ($query) use ($request) {
+                $query->whereDate('created_at', '<=', (string) $request->string('created_to'));
+            })
+            ->orderByDesc('id')
+            ->paginate($perPage)
+            ->appends($request->query());
+
         $trainers = User::query()
             ->where('user_type', 'trainer')
             ->orderBy('first_name')
@@ -32,7 +63,7 @@ class ClassesController extends Controller
             ->get()
             ->groupBy('type');
 
-        return view('admin.classes.index', compact('classes', 'trainers', 'catalogByType'));
+        return view('admin.classes.index', compact('classes', 'trainers', 'catalogByType', 'perPage'));
     }
 
     public function show(Classes $classes)
