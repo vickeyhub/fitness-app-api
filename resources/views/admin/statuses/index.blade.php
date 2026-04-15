@@ -65,7 +65,10 @@ $(function () {
         if (!confirm('Delete this status?')) return;
         $.ajax({ url: "{{ url('admin/statuses') }}/" + id, method: 'DELETE' })
             .done(function (res) { toastr.success(res.message || 'Deleted'); location.reload(); })
-            .fail(function (xhr) { toastr.error(xhr.responseJSON?.message || 'Delete failed'); });
+            .fail(function (xhr) {
+                var msg = (xhr.responseJSON && xhr.responseJSON.message) ? xhr.responseJSON.message : 'Delete failed';
+                toastr.error(msg);
+            });
     });
 });
 </script>

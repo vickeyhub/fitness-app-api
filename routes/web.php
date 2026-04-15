@@ -96,6 +96,8 @@ Route::middleware('auth')->group(function () {
 
     Route::get('admin/statuses', [Admin\StatusesController::class, 'index'])->name('admin.statuses.index');
     Route::delete('admin/statuses/{status}', [Admin\StatusesController::class, 'destroy'])->name('admin.statuses.destroy');
+    Route::get('admin/follows', [Admin\FollowsController::class, 'index'])->name('admin.follows.index');
+    Route::delete('admin/follows/{follow}', [Admin\FollowsController::class, 'destroy'])->name('admin.follows.destroy');
 
     Route::get('admin/tags', [Admin\TagsController::class, 'index'])->name('admin.tags.index');
     Route::post('admin/tags', [Admin\TagsController::class, 'store'])->name('admin.tags.store');

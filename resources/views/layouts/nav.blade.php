@@ -50,6 +50,12 @@
             <li class="{{ Request::is('admin/posts*') ? 'active' : '' }}">
                 <a href="{{ route('admin.posts.index') }}"><i class="fa fa-comments"></i> <span class="nav-label">Social/Content (Posts)</span></a>
             </li>
+            <li class="{{ Request::is('admin/statuses*') ? 'active' : '' }}">
+                <a href="{{ route('admin.statuses.index') }}"><i class="fa fa-circle-o-notch"></i> <span class="nav-label">Status Management</span></a>
+            </li>
+            <li class="{{ Request::is('admin/follows*') ? 'active' : '' }}">
+                <a href="{{ route('admin.follows.index') }}"><i class="fa fa-link"></i> <span class="nav-label">Follows Management</span></a>
+            </li>
             <li class="{{ Request::is('admin/users/gyms') ? 'active' : '' }}">
                 <a href="{{ route('admin.users.gyms') }}"><i class="fa fa-building"></i> <span class="nav-label">Gym Management</span></a>
             </li>
