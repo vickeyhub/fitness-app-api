@@ -19,7 +19,7 @@
                 <a href="#testimonials" class="transition hover:text-amber-400">Testimonials</a>
             </nav>
             <div class="flex items-center gap-3">
-                <a href="{{ route('web-login') }}" class="btn btn-outline btn-sm">
+                <a href="{{ route('auth.login') }}" class="btn btn-outline btn-sm">
                     Log in
                 </a>
                 <button id="themeToggle" class="btn btn-ghost btn-sm" type="button" aria-label="Toggle theme">
@@ -177,7 +177,7 @@
             <div class="rounded-3xl border border-slate-800 bg-gradient-to-r from-amber-500/20 to-cyan-400/10 p-10 text-center">
                 <h2 class="text-3xl font-bold text-white md:text-4xl">Ready to start your transformation?</h2>
                 <p class="mx-auto mt-4 max-w-2xl text-slate-300">Book your free first session and get a personalized roadmap from our coaching team.</p>
-                <a href="{{ route('web-login') }}" class="btn btn-warning mt-8">
+                <a href="{{ route('auth.login') }}" class="btn btn-warning mt-8">
                     Book Free Session
                 </a>
             </div>

@@ -68,7 +68,29 @@ Primary outcome: all critical end-user journeys must be usable from web without 
 
 ## 4. Required page inventory (complete)
 
+### 4.0 Implementation status (April 2026, this repository)
+
+Use this snapshot to track **member-facing web** (`Blade` + **Tailwind/Vite**, session auth). Staff operations remain under **`/admin/*`** (separate from this inventory’s “client panel” scope unless noted).
+
+| Area | Status | Notes |
+|------|--------|--------|
+| §4.1 Public | **Done** | Marketing UI, public-safe session/trainer/gym discovery; error pages `403`, `404`, `500`, `503`. |
+| §4.2 Auth (members) | **Done** | Routes under `/auth/*` (login, register, OTP, forgot/reset); `POST /logout`; staff login remains `/login`. |
+| §4.3 App (common) | **Mostly done** | App shell with sidebar: `/app/dashboard`, `/app/profile` (API-aligned update), `/app/settings` (password). **Notifications:** UI placeholder only — no persisted inbox/API yet (push/OneSignal remains mobile-oriented). |
+| §4.4 Sessions & booking | **Done** (web MVP) | `/app/sessions` (search/sort/paginate), detail, **Book** (date + slot) via `BookingsController::createBookings`, bookmark toggle; `/app/bookings` (tabs) + detail. Paid sessions → pending until Stripe web checkout exists. |
+| §4.5–4.11 | **Partial / not started** | §4.5 payments; §4.6 bookmarks list page (toggle on session only); workouts, nutrition, social, trainer/gym `/app/*` areas — **next priorities** after payments. |
+
+**Implemented web routes (member app, `auth` + `customer` middleware):**  
+`/app/dashboard`, `/app/profile` (POST update), `/app/settings`, `POST /app/settings/password`, `/app/notifications`,  
+`/app/sessions`, `/app/sessions/{id}`, `/app/sessions/{id}/book`, `POST /app/sessions/{id}/bookings`, `POST /app/sessions/{id}/bookmark`,  
+`/app/bookings`, `/app/bookings/{booking}`.  
+**Middleware:** `customer` (`EnsureCustomerPortal`) blocks `admin` from member app (redirect to `admin.dashboard`).
+
+---
+
 ## 4.1 Public pages
+
+**Status: implemented**
 
 - `Home / Landing`
 - `About`
@@ -84,6 +106,8 @@ Primary outcome: all critical end-user journeys must be usable from web without 
 
 ## 4.2 Authentication pages
 
+**Status: implemented (members)**
+
 - `Login`
 - `Signup`
 - `OTP Verification`
@@ -93,20 +117,28 @@ Primary outcome: all critical end-user journeys must be usable from web without 
 
 ## 4.3 Authenticated common pages
 
+**Status: implemented (except notifications data)**
+
 - `Dashboard`
 - `My Profile`
 - `Settings` (security/preferences)
-- `Notifications Center`
+- `Notifications Center` (placeholder UI; full inbox pending API/storage)
 
 ## 4.4 Sessions and booking pages
 
-- `Sessions Listing` (search/filter/sort)
-- `Session Detail` (full metadata)
-- `Book Session` (date/slot selection)
-- `My Bookings` (tabs: upcoming/past/cancelled)
-- `Booking Detail`
+**Status: implemented (authenticated `/app`; public marketing browse remains on `/sessions`, `/sessions/{id}`)**
+
+- `Sessions Listing` — search `q`, sort (newest / price / title), paginated; published sessions only (`is_publish = 1`).
+- `Session Detail` — host, price, duration, rating, timing, description; bookmark + link to book.
+- `Book Session` — date + time slot (suggestions from `session_timing` / `schedule` when present); creates booking via same rules as API (`BookingsController::createBookings`); free sessions confirm immediately, paid stay **pending** until payment.
+- `My Bookings` — tabs: upcoming / past / cancelled; role-aware (`user` → own bookings; `trainer` / `gym` → bookings where they are assigned).
+- `Booking Detail` — session link, payment record when `payment_id` is set.
+
+**Not in this slice:** dedicated bookmarked-sessions list (§4.6), Stripe checkout on web (§4.5).
 
 ## 4.5 Payment pages
+
+**Status: not implemented (web)**
 
 - `Checkout / Payment`
 - `Payment Status` (success/failed/pending)
@@ -115,11 +147,15 @@ Primary outcome: all critical end-user journeys must be usable from web without 
 
 ## 4.6 Bookmark and plan pages
 
+**Status: not implemented (web)**
+
 - `Bookmarked Sessions`
 - `Active Plans`
 - `Plan Detail`
 
 ## 4.7 Workout pages
+
+**Status: not implemented (web)**
 
 - `Workout Dashboard`
 - `Workout Plans List`
@@ -132,6 +168,8 @@ Primary outcome: all critical end-user journeys must be usable from web without 
 
 ## 4.8 Nutrition pages
 
+**Status: not implemented (web)**
+
 - `Nutrition Dashboard`
 - `Meals by Date`
 - `Add/Edit Meal`
@@ -139,6 +177,8 @@ Primary outcome: all critical end-user journeys must be usable from web without 
 - `Adherence / Trend View`
 
 ## 4.9 Social pages
+
+**Status: not implemented (web)**
 
 - `Feed`
 - `Post Detail`
@@ -152,6 +192,8 @@ Primary outcome: all critical end-user journeys must be usable from web without 
 
 ## 4.10 Trainer-only pages
 
+**Status: not implemented (web)** — admin has overlapping data tools under `/admin/*`; member trainer UX not built.
+
 - `Trainer Dashboard`
 - `My Sessions (CRUD)`
 - `Session Create/Edit`
@@ -161,6 +203,8 @@ Primary outcome: all critical end-user journeys must be usable from web without 
 - `My Clients`
 
 ## 4.11 Gym-only pages
+
+**Status: not implemented (web)** — same note as §4.10 for `/admin` vs `/app/gym/*`.
 
 - `Gym Dashboard`
 - `Gym Sessions (CRUD)`
@@ -185,16 +229,26 @@ Primary outcome: all critical end-user journeys must be usable from web without 
 
 ### 5.2 Minimum route skeleton
 
+**Implemented (member app shell):**
+
 - `/app/dashboard`
-- `/app/profile`
-- `/app/sessions`, `/app/sessions/{id}`
-- `/app/bookings`, `/app/bookings/{id}`
+- `/app/profile` (+ `POST` profile update)
+- `/app/settings` (+ `POST` `/app/settings/password`)
+- `/app/notifications`
+- `/app/sessions`, `/app/sessions/{id}`, `/app/sessions/{id}/book`, `POST …/bookings`, `POST …/bookmark`
+- `/app/bookings`, `/app/bookings/{booking}`
+
+**Planned (not wired yet):**
+
 - `/app/payments`, `/app/payments/{id}`
 - `/app/bookmarks`
 - `/app/workouts/*`
 - `/app/nutrition/*`
 - `/app/social/*`
-- `/app/settings`
+
+**Auth (members):** `/auth/login`, `/auth/register`, `/auth/verify-otp`, `/auth/forgot-password`, `/auth/reset-password`.  
+**Staff:** `/login` (admin session).  
+**Public marketing:** `/`, `/about`, `/pricing`, `/contact`, `/sessions`, `/sessions/{id}`, `/trainers`, `/trainers/{id}`, `/gyms`, `/gyms/{id}`.
 
 ---
 
@@ -252,12 +306,13 @@ Primary outcome: all critical end-user journeys must be usable from web without 
 
 ### 8.1 Stack strategy
 
-- Phase 1: Blade + jQuery (fastest fit with current project)
-- Optional phase 2+: progressive migration to Livewire/Inertia if needed
+- **Current:** Blade + **Tailwind CSS** (Vite) + minimal vanilla JS for toggles; member forms use server-side validation and CSRF; profile updates delegate to existing **API controllers** where noted for parity.
+- **Original note:** jQuery was considered for Phase 1; the codebase uses Tailwind/DaisyUI-style patterns on public/auth/app instead.
+- Optional phase 2+: Livewire/Inertia if server-driven UI needs to scale.
 
 ### 8.2 Shared web components (must build once)
 
-- App shell layout (sidebar + top bar + breadcrumbs)
+- App shell layout (sidebar + top bar + breadcrumbs) — **partial:** `layouts/app.blade.php` (sidebar + top bar; breadcrumbs optional later)
 - Filter bar component
 - Reusable paginated table
 - Card-list alternative for small screens
@@ -321,18 +376,18 @@ Primary outcome: all critical end-user journeys must be usable from web without 
 
 ## Phase 0 - Foundation
 
-- Finalize route groups, middleware, base app shell.
-- Implement shared UI components and API helper utilities.
-- Gate: app shell + auth-protected navigation works for all roles.
+- Finalize route groups, middleware, base app shell. — **Largely done:** `/auth/*`, `/app/*` with `auth` + `customer`, public routes, marketing + auth layouts.
+- Implement shared UI components and API helper utilities. — **Partial:** app shell + public/auth styling; reusable filter/table/toast utilities still open.
+- Gate: app shell + auth-protected navigation works for all roles. — **Partial:** member + staff paths work; **role buckets** `/app/user/*`, `/app/trainer/*`, `/app/gym/*` **not created yet**.
 
 ## Phase 1 - Revenue-critical MVP
 
-- Auth/account
-- Sessions browse/detail
-- Booking flow
-- Payment flow
-- Booking/payment history
-- Gate: end-to-end booking and payment on web works.
+- Auth/account — **Done (web members)**; aligns with API signup/OTP/login/password reset.
+- Sessions browse/detail — **Done:** public marketing + **authenticated** `/app/sessions` (search/sort) and detail.
+- Booking flow — **Done (web MVP):** book form calls API booking create; paid sessions pending until checkout.
+- Payment flow — **Not done (web)** — Stripe checkout UI + webhook-driven status still required for paid sessions.
+- Booking history — **Done (web):** `/app/bookings` + detail; full payment history pages still §4.5.
+- Gate: end-to-end booking and payment on web works (payment piece outstanding).
 
 ## Phase 2 - Engagement and retention
 
@@ -344,7 +399,7 @@ Primary outcome: all critical end-user journeys must be usable from web without 
 ## Phase 3 - Community features
 
 - Social feeds/posts/comments/likes/tags/status/follows
-- Notifications center
+- Notifications center — **Web placeholder page only**; real inbox needs product/API support.
 - Chat bootstrap page
 - Gate: full community interactions available on web.
 
@@ -385,11 +440,12 @@ Primary outcome: all critical end-user journeys must be usable from web without 
 
 ## 15. Immediate next execution tasks
 
-- Confirm final page priority for Phase 1.
-- Create route stubs and nav map for all required pages.
-- Implement shared app shell and API helper layer.
-- Start MVP sprint with sessions -> bookings -> payments.
+1. **Phase 1 — payments:** checkout UI, Stripe payment intent/confirm flow, **payment status** + **history/detail** pages; link pending web bookings to completed payments.
+2. **Phase 1 — bookmarks list:** optional `/app/bookmarks` if product wants parity with mobile saved sessions (bookmark toggle already on session detail).
+3. **API helper layer (optional but recommended):** thin wrapper for Sanctum-from-web or consistent server-side calls to booking/payment endpoints; keep payload keys identical to API.
+4. **Role buckets:** introduce `/app/trainer/*` and `/app/gym/*` (or middleware variants) when building trainer/gym dashboards; keep `customer` vs admin separation.
+5. **Notifications:** define storage/API for in-app notification list if product requires parity with mobile; until then keep placeholder or hide nav item.
 
 ---
 
-*This is the canonical full-proof plan for web client panel delivery in this repository.*
+*This is the canonical full-proof plan for web client panel delivery in this repository. Last updated: April 2026 — `/app/sessions` + `/app/bookings` shipped.*

@@ -1,22 +1,64 @@
 <?php
 
-use App\Http\Controllers\AuthController;
 use App\Http\Controllers\Admin;
+use App\Http\Controllers\AuthController;
+use App\Http\Controllers\Web\AppBookingsController;
+use App\Http\Controllers\Web\AppPortalController;
+use App\Http\Controllers\Web\AppSessionsController;
+use App\Http\Controllers\Web\CustomerAuthController;
+use App\Http\Controllers\Web\PublicSiteController;
 use Illuminate\Support\Facades\Route;
-use App\Http\Middleware\RedirectIfAuthenticated;
 
-Route::get('/', function () {
-    return view('welcome');
+Route::get('/', [PublicSiteController::class, 'home'])->name('public.home');
+Route::get('/about', [PublicSiteController::class, 'about'])->name('public.about');
+Route::get('/pricing', [PublicSiteController::class, 'pricing'])->name('public.pricing');
+Route::get('/contact', [PublicSiteController::class, 'contact'])->name('public.contact');
+Route::post('/contact', [PublicSiteController::class, 'contactSubmit'])->name('public.contact.submit');
+Route::get('/sessions', [PublicSiteController::class, 'sessions'])->name('public.sessions');
+Route::get('/sessions/{id}', [PublicSiteController::class, 'sessionShow'])->name('public.sessions.show')->whereNumber('id');
+Route::get('/trainers', [PublicSiteController::class, 'trainers'])->name('public.trainers');
+Route::get('/trainers/{id}', [PublicSiteController::class, 'trainerShow'])->name('public.trainers.show')->whereNumber('id');
+Route::get('/gyms', [PublicSiteController::class, 'gyms'])->name('public.gyms');
+Route::get('/gyms/{id}', [PublicSiteController::class, 'gymShow'])->name('public.gyms.show')->whereNumber('id');
+
+Route::prefix('auth')->name('auth.')->group(function () {
+    Route::get('login', [CustomerAuthController::class, 'showLogin'])->name('login');
+    Route::post('login', [CustomerAuthController::class, 'login'])->name('login.store');
+    Route::get('register', [CustomerAuthController::class, 'showRegister'])->name('register');
+    Route::post('register', [CustomerAuthController::class, 'register'])->name('register.store');
+    Route::get('verify-otp', [CustomerAuthController::class, 'showVerifyOtp'])->name('verify-otp');
+    Route::post('verify-otp', [CustomerAuthController::class, 'verifyOtp'])->name('verify-otp.store');
+    Route::get('forgot-password', [CustomerAuthController::class, 'showForgotPassword'])->name('forgot-password');
+    Route::post('forgot-password', [CustomerAuthController::class, 'forgotPassword'])->name('forgot-password.store');
+    Route::get('reset-password', [CustomerAuthController::class, 'showResetPassword'])->name('reset-password');
+    Route::post('reset-password', [CustomerAuthController::class, 'resetPassword'])->name('reset-password.store');
 });
+
 Route::get('login', [AuthController::class, 'index'])->name('web-login');
 Route::post('login', [AuthController::class, 'login'])->name('post-login');
 
-
-
 Route::middleware('auth')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+
+    Route::middleware('customer')->prefix('app')->name('app.')->group(function () {
+        Route::get('dashboard', [AppPortalController::class, 'dashboard'])->name('dashboard');
+        Route::get('profile', [AppPortalController::class, 'profile'])->name('profile');
+        Route::post('profile', [AppPortalController::class, 'updateProfile'])->name('profile.update');
+        Route::get('settings', [AppPortalController::class, 'settings'])->name('settings');
+        Route::post('settings/password', [AppPortalController::class, 'updatePassword'])->name('settings.password');
+        Route::get('notifications', [AppPortalController::class, 'notifications'])->name('notifications');
+
+        Route::get('sessions', [AppSessionsController::class, 'index'])->name('sessions.index');
+        Route::get('sessions/{session}/book', [AppSessionsController::class, 'book'])->name('sessions.book')->whereNumber('session');
+        Route::post('sessions/{session}/bookings', [AppSessionsController::class, 'storeBooking'])->name('sessions.bookings.store')->whereNumber('session');
+        Route::post('sessions/{session}/bookmark', [AppSessionsController::class, 'toggleBookmark'])->name('sessions.bookmark')->whereNumber('session');
+        Route::get('sessions/{session}', [AppSessionsController::class, 'show'])->name('sessions.show')->whereNumber('session');
+
+        Route::get('bookings', [AppBookingsController::class, 'index'])->name('bookings.index');
+        Route::get('bookings/{booking}', [AppBookingsController::class, 'show'])->name('bookings.show');
+    });
     Route::get('admin/dashboard', [Admin\DashboardController::class, 'dashboard'])->name('admin.dashboard');
-    Route::get('chart-data-line',[Admin\DashboardController::class, 'newChartDataLine']);
+    Route::get('chart-data-line', [Admin\DashboardController::class, 'newChartDataLine']);
     Route::get('admin/users', [Admin\UsersController::class, 'index'])->name('admin.users');
     Route::get('admin/users/trainers', [Admin\UsersController::class, 'trainers'])->name('admin.users.trainers');
     Route::get('admin/users/gyms', [Admin\UsersController::class, 'gyms'])->name('admin.users.gyms');
