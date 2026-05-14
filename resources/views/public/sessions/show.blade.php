@@ -72,7 +72,17 @@
         @if ($session->schedule && (is_array($session->schedule) ? count($session->schedule) : filled($session->schedule)))
             <div class="fx-glass mt-6 rounded-2xl p-6">
                 <h2 class="text-xs font-semibold uppercase tracking-wider text-zinc-500">Weekly schedule</h2>
-                <pre class="mt-3 overflow-x-auto whitespace-pre-wrap font-sans text-sm text-zinc-400">{{ is_array($session->schedule) ? json_encode($session->schedule, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) : $session->schedule }}</pre>
+                <div class="mt-3 flex flex-wrap gap-2">
+                    @foreach (['MON','TUE','WED','THU','FRI','SAT','SUN'] as $day)
+                        @php $active = is_array($session->schedule) && in_array($day, $session->schedule); @endphp
+                        <span class="inline-flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs font-semibold uppercase tracking-wider transition {{ $active ? 'bg-teal-500/20 text-teal-300 ring-1 ring-teal-500/40' : 'bg-white/5 text-zinc-600 ring-1 ring-white/10' }}">
+                            @if ($active)
+                                <svg class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/></svg>
+                            @endif
+                            {{ $day }}
+                        </span>
+                    @endforeach
+                </div>
             </div>
         @endif
 
